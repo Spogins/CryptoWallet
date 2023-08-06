@@ -3,6 +3,13 @@ from pydantic import BaseModel, FieldValidationInfo, ValidationError, field_vali
 from email_validator import validate_email, EmailNotValidError
 
 
+class UserForm(BaseModel):
+    id: int
+    email: str
+    username: str
+    avatar: str
+
+
 class AuthUsers(BaseModel):
     email: str
     password: str

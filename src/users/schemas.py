@@ -1,4 +1,5 @@
 import re
+from typing import Optional
 
 from pydantic import (
     BaseModel,
@@ -38,7 +39,7 @@ class RegisterUserModel(BaseModel):
     def email_validator(cls, password: str) -> str:
         pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$'
         if re.match(pattern, password) is None:
-            raise ValueError('password has incorrect format.')
+            raise ValueError('Your password must be at least 8 characters long, be of mixed case and also contain a digit.')
         else:
             return password
 
@@ -56,9 +57,27 @@ class RegisterUserModel(BaseModel):
 
 class UserProfile(BaseModel):
     username: str
-    # new_password: str
-    # repeat_password: str
+    new_password: Optional[str] = ''
+    repeat_password: Optional[str] = ''
     # avatar: str
+
+    @field_validator('repeat_password')
+    @classmethod
+    def psw_validator(cls, repeat_password: str, values: FieldValidationInfo) -> str:
+        data = values.data
+        new_password = data.get('new_password')
+        if new_password == '' and repeat_password == '':
+            return ''
+
+        if not new_password == repeat_password:
+            raise ValueError('password mismatch.')
+
+        pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$'
+        if re.match(pattern, new_password) is None:
+            raise ValueError('Your password must be at least 8 characters long, be of mixed case and also contain a digit.')
+        else:
+            return new_password
+
 
 
 class UserForm(BaseModel):

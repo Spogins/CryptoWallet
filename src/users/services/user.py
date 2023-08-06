@@ -1,9 +1,6 @@
-from uuid import uuid4
 from typing import Iterator, Callable
-
 from src.users.models import User
 from src.users.repository import UserRepository
-from src.users.schemas import UserModel, RegisterUserModel
 
 
 class UserService:
@@ -27,5 +24,8 @@ class UserService:
     async def delete_user_by_id(self, user_id: int) -> None:
         return await self._repository.delete_by_id(user_id)
 
-    async def edit_profile(self, profile, email: str):
-        return await self._repository.edit_profile(profile, email)
+    async def edit_profile(self, profile, user):
+        psw = profile.new_password
+        if not profile.new_password == '':
+            psw = self.hashed_psw(psw)
+        return await self._repository.edit_profile(profile, user, psw)

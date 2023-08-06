@@ -1,18 +1,23 @@
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status, Request
 import jwt
+from fastapi.security import HTTPAuthorizationCredentials
 from config.settings import JWT_SECRET, ALGORITHM
+from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.users.containers import Container
 from src.users.repository import NotFoundError
-from src.users.schemas import UserModel,UserProfile
+from src.users.schemas import UserModel, UserProfile
 from src.users.services.user import UserService
 
 app = APIRouter()
 
+user_auth = AutoModernJWTAuth()
+
 
 @app.get("/users")
 @inject
-async def get_all(user_service: UserService = Depends(Provide[Container.user_service])):
+async def get_all(user_service: UserService = Depends(Provide[Container.user_service]),
+                  bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
     return await user_service.get_users()
 
 
@@ -53,14 +58,13 @@ async def delete_by_id(
 @app.put("/edit_profile", status_code=status.HTTP_200_OK)
 @inject
 async def edit_profile(profile: UserProfile,
-                       request: Request,
                        user_service: UserService = Depends(Provide[Container.user_service]),
+                       bearer: HTTPAuthorizationCredentials = Depends(user_auth)
                        ):
     try:
-        token = request.cookies.get('access_token')
+        token = bearer.credentials
         verify = jwt.decode(token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
-        email = verify.get('user_email')
-        return await user_service.edit_profile(profile, email)
+        user = verify.get('id')
+        return await user_service.edit_profile(profile, user)
     except:
         return {'access_token': 'expire token'}
-

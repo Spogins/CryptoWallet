@@ -37,10 +37,12 @@ class UserRepository:
             session.delete(entity)
             session.commit()
 
-    async def edit_profile(self, profile: UserProfile, email):
+    async def edit_profile(self, profile: UserProfile, user, psw):
         with self.session_factory() as session:
-            user = session.query(User).filter(User.email == email).first()
+            user = session.query(User).filter(User.id == user).first()
             if user:
+                if not psw == '':
+                    user.password = psw
                 user.username = profile.username
                 session.commit()
                 session.refresh(user)

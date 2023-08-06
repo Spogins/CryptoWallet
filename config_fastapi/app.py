@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-
 from src.core.register import RegisterContainer
 from src.users.endpoints import app as user_app
 from src.auth.endpoints import app as auth_app
@@ -17,3 +16,5 @@ def create_app() -> FastAPI:
 
 
 app = create_app()
+
+
