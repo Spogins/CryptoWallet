@@ -9,7 +9,7 @@ from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.auth.schemas import AuthUsers, RegisterUserModel
 from src.auth.services.auth import AuthService
-from src.auth.t_task import test_task
+from config_celery.celery import test_task
 
 app = APIRouter()
 
