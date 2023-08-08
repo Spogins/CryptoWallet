@@ -12,4 +12,5 @@ class User(Base):
     created_on = Column(DateTime, default=datetime.datetime.utcnow)
     avatar = Column(String, default='str')
     is_superuser = Column(Boolean, default=False)
-    # is_active = Column(Boolean, default=True)
+    is_active = Column(Boolean, default=True)
+    chat_access = Column(Boolean, default=False)

@@ -1,4 +1,6 @@
 import datetime
+import json
+import time
 from typing import Callable
 
 from fastapi import HTTPException
@@ -7,7 +9,7 @@ from sqlalchemy.orm import Session
 from config.settings import JWT_SECRET, ALGORITHM
 from src.auth.schemas import RegisterUserModel, UserForm
 import jwt
-from src.auth.services.send_mail import send_mail
+
 from src.users.models import User
 
 
@@ -41,5 +43,19 @@ class AuthRepository:
             session.add(user)
             session.commit()
             session.refresh(user)
-            await send_mail([user.email])
+
+            from src.celery.auth_tasks import send_mail, chat_access_task
+            send_mail.apply_async(args=(user.email,))
+            chat_access_task(user.id)
             return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
+
+    def chat_access(self, user):
+        with self.session_factory() as session:
+            _user = session.query(User).filter(User.id == user).first()
+            _user.chat_access = True
+            session.commit()
+            session.refresh(_user)
+
+
+
+

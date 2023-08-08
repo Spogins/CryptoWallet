@@ -19,5 +19,5 @@ MAIL_PORT = 587
 MAIL_SERVER = 'smtp.gmail.com'
 MAIL_FROM_NAME = 'CryptoWallet'
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'

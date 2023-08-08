@@ -1,6 +1,9 @@
+# import time
+# from asgiref.sync import async_to_sync, sync_to_async
 # from starlette.responses import JSONResponse
 # from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 # from config.settings import MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM, MAIL_SERVER, MAIL_FROM_NAME
+# from config_celery.celery import celery
 #
 # conf = ConnectionConfig(
 #     MAIL_USERNAME=MAIL_USERNAME,
@@ -16,7 +19,17 @@
 # )
 #
 #
-# async def send_mail(email):
+# celery.conf.beat_schedule = {
+#     "send-mail": {
+#         "task": ["src.tasks.send_mail"],
+#         "schedule": 30.0  # Every 30 seconds, adjust as needed
+#     }
+# }
+
+#
+# @celery.task
+# def send_mail(email):
+#     print('send_mail')
 #     html = """<p>Hi you have successfully registered on Crypto Wallet!</p> """
 #
 #     message = MessageSchema(
@@ -26,5 +39,6 @@
 #         subtype=MessageType.html)
 #
 #     fm = FastMail(conf)
-#     await fm.send_message(message)
-#     return JSONResponse(status_code=200, content={"message": "email has been sent"})
+#     async_to_sync(fm.send_message)(message, template_name=html)
+#     # fm.send_message(message)
+#     # return JSONResponse(status_code=200, content={"message": "email has been sent"})

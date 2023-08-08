@@ -11,15 +11,19 @@ from src.auth.schemas import AuthUsers, RegisterUserModel
 from src.auth.services.auth import AuthService
 from config_celery.celery import test_task
 
+
 app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
 
 @app.get("/test")
 @inject
-async def test():
-    res = test_task.apply_async()
-    return {"message": "Push notification task sent", "task_id": res.id}
+async def test(auth_service: AuthService = Depends(Provide[Container.auth_service])):
+    # res = test_task.apply_async()
+    from src.celery.auth_tasks import chat_access_task
+    res = chat_access_task(5)
+    print(res)
+    return {"message": "Push notification task sent"}
 
 
 @app.post("/log_in")
