@@ -21,3 +21,5 @@ MAIL_FROM_NAME = 'CryptoWallet'
 
 CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+
+QUICKNODE_URL = 'https://damp-cosmopolitan-sea.ethereum-sepolia.discover.quiknode.pro/f9b662c08002faf65b111387307c448466c1ecc0/'

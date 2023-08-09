@@ -1,13 +1,10 @@
 import time
-
 from asgiref.sync import async_to_sync, sync_to_async
-from dependency_injector.wiring import Provide, inject
-from fastapi import Depends
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from config.settings import MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM, MAIL_SERVER, MAIL_FROM_NAME
 from config_celery.celery import celery
 from src.auth.containers import Container
-from src.auth.services.auth import AuthService
+
 
 conf = ConnectionConfig(
     MAIL_USERNAME=MAIL_USERNAME,

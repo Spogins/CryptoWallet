@@ -20,10 +20,9 @@ user_auth = AutoModernJWTAuth()
 @inject
 async def test(auth_service: AuthService = Depends(Provide[Container.auth_service])):
     # res = test_task.apply_async()
-    from src.celery.auth_tasks import chat_access_task
-    res = chat_access_task(5)
-    print(res)
-    return {"message": "Push notification task sent"}
+    # print(res)
+    # return {"message": "Push notification task sent"}
+    pass
 
 
 @app.post("/log_in")

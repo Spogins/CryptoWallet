@@ -3,6 +3,7 @@ from propan import RabbitBroker
 from src.core.register import RegisterContainer
 from src.users.endpoints import app as user_app
 from src.auth.endpoints import app as auth_app
+from src.wallet.endpoints import app as wallet_app
 from fastapi import Depends, FastAPI
 from propan.fastapi import RabbitRouter
 
@@ -25,6 +26,7 @@ def create_app() -> FastAPI:
     db.create_database()
     app = FastAPI(lifespan=router.lifespan_context)
     app.container = container
+    app.include_router(wallet_app, tags=["Wallets"])
     app.include_router(auth_app, tags=["Auth"])
     app.include_router(user_app, tags=["User"])
     app.include_router(router, tags=['Propan'])

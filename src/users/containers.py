@@ -7,7 +7,8 @@ from src.users.services.user import UserService
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=[
-        'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth'
+        'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
+        'src.wallet'
         ]
     )
     user_repository = providers.Factory(UserRepository, session_factory=db_container.session)
