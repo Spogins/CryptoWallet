@@ -1,3 +1,4 @@
+import httpx as httpx
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status, Request
 import jwt
@@ -17,7 +18,8 @@ user_auth = AutoModernJWTAuth()
 @app.get("/users")
 @inject
 async def get_all(user_service: UserService = Depends(Provide[Container.user_service]),
-                  bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+                  # bearer: HTTPAuthorizationCredentials = Depends(user_auth)
+                  ):
     return await user_service.get_users()
 
 
@@ -61,6 +63,7 @@ async def edit_profile(profile: UserProfile,
                        user_service: UserService = Depends(Provide[Container.user_service]),
                        bearer: HTTPAuthorizationCredentials = Depends(user_auth)
                        ):
+    print(bearer.credentials)
     try:
         token = bearer.credentials
         verify = jwt.decode(token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
@@ -68,3 +71,8 @@ async def edit_profile(profile: UserProfile,
         return await user_service.edit_profile(profile, user)
     except:
         return {'access_token': 'expire token'}
+
+
+
+
+

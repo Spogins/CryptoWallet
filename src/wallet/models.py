@@ -9,14 +9,12 @@ from src.core.db import Base
 class Wallet(Base):
     __tablename__ = 'wallet'
     id = Column(Integer, primary_key=True, index=True)
+    private_key = Column(String, unique=True)
     address = Column(String, unique=True)
-    balance = Column(DECIMAL(precision=10, scale=2))
+    balance = Column(Float, default=0)
+    user_id = Column(Integer, ForeignKey('user.id'))
 
     asset_id = Column(Integer, ForeignKey('asset.id'))
-    asset = relationship("Asset", back_populates="wallets")
-
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship("User", back_populates="wallets")
 
 
 class Asset(Base):
@@ -25,10 +23,9 @@ class Asset(Base):
     abbreviation = Column(String)
     image = Column(String, default='str')
     symbol = Column(String)
-    decimal_places = Column(DECIMAL())
-
+    decimal_places = Column(Float, default=0)
     blockchain_id = Column(Integer, ForeignKey('blockchain.id'))
-    blockchain = relationship("Blockchain", back_populates="wallets")
+    wallet = relationship('Wallet', backref='asset')
 
 
 class Blockchain(Base):
@@ -37,6 +34,8 @@ class Blockchain(Base):
     name = Column(String)
     code = Column(String)
     image = Column(String, default='str')
+    asset = relationship('Asset', backref='blockchain')
+
 
 
 

@@ -1,5 +1,8 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 import datetime
+
+from sqlalchemy.orm import relationship
+
 from src.core.db import Base
 
 
@@ -14,3 +17,4 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     chat_access = Column(Boolean, default=False)
+    wallets = relationship('Wallet', backref='user')

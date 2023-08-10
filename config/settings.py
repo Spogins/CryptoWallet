@@ -7,7 +7,7 @@ DB_PASSWORD = 'root'
 DB_HOST = 'localhost'
 DB_PORT = 5432
 
-URL = f'postgresql://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
+URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 JWT_SECRET = 'crypto_wallet'
 ALGORITHM = 'HS256'
@@ -23,3 +23,5 @@ CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
 
 QUICKNODE_URL = 'https://damp-cosmopolitan-sea.ethereum-sepolia.discover.quiknode.pro/f9b662c08002faf65b111387307c448466c1ecc0/'
+
+MORALIS_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjkxOGEwY2JmLTkxNjctNDgxZS1iYTRkLWFkNjRjNWVkZTg2MyIsIm9yZ0lkIjoiMzUyMzI0IiwidXNlcklkIjoiMzYyMTI4IiwidHlwZSI6IlBST0pFQ1QiLCJ0eXBlSWQiOiJlNjJkOWI2Yy01MTRjLTQ2MDMtOGJlYi1kZDk3MGM0NzU5NzAiLCJpYXQiOjE2OTE2MDE1OTAsImV4cCI6NDg0NzM2MTU5MH0.Ww5foE2uKxgr8FCLGIgRQQ8wvazz-5UJ3Yag3m0QxHM'

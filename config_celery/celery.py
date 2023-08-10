@@ -9,6 +9,7 @@ celery = Celery(
     include=["src.celery.auth_tasks", "src.celery.user_tasks", "config_celery.celery"]
 )
 
+
 celery.conf.beat_schedule = {
     "test-task": {
         "task": ["config_celery.celery.test_task"],

@@ -3,7 +3,6 @@ from asgiref.sync import async_to_sync, sync_to_async
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from config.settings import MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM, MAIL_SERVER, MAIL_FROM_NAME
 from config_celery.celery import celery
-from src.auth.containers import Container
 
 
 conf = ConnectionConfig(
@@ -45,17 +44,14 @@ def send_mail(email):
 
     fm = FastMail(conf)
     async_to_sync(fm.send_message)(message, template_name=html)
-    # fm.send_message(message)
-    # return JSONResponse(status_code=200, content={"message": "email has been sent"})
 
 
 
-@celery.task
-def chat_access_task(user):
-    time.sleep(60)
-    container = Container()
-    auth_service_factory = container.auth_service
-    auth_service = auth_service_factory()
-    auth_service.chat_access(user)
+
+# @celery.task
+# def chat_access_task(user):
+#     print('chat_access_task')
+#     time.sleep(20)
+
 
 

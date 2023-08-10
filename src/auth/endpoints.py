@@ -9,21 +9,11 @@ from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.auth.schemas import AuthUsers, RegisterUserModel
 from src.auth.services.auth import AuthService
-from config_celery.celery import test_task
 
 
 app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
-
-@app.get("/test")
-@inject
-async def test(auth_service: AuthService = Depends(Provide[Container.auth_service])):
-    # res = test_task.apply_async()
-    # print(res)
-    # return {"message": "Push notification task sent"}
-    pass
-
 
 @app.post("/log_in")
 @inject
@@ -67,7 +57,5 @@ async def verify_token(access_token: str = Cookie(None)):
 
 @app.post("/registration", status_code=status.HTTP_201_CREATED)
 @inject
-async def registration(user: RegisterUserModel,
-              auth_service: AuthService = Depends(Provide[Container.auth_service]),
-              ):
+async def registration(user: RegisterUserModel, auth_service: AuthService = Depends(Provide[Container.auth_service])):
     return await auth_service.register_user(user)

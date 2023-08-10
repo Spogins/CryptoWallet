@@ -11,6 +11,36 @@ class WalletService:
     def __init__(self, wallet_repository: WalletRepository) -> None:
         self._repository: WalletRepository = wallet_repository
 
+    async def create_user_wallet(self, user_id):
+        priv = secrets.token_hex(32)
+        private_key = "0x" + priv
+        acct = Account.from_key(private_key)
+        wallet = {
+            "private_key": private_key,
+            "address": acct.address
+        }
+        return await self._repository.user_add_wallet(user_id, wallet)
+
+    async def import_user_wallet(self, user_id, private_key):
+        account = Account.from_key(private_key)
+        address = account.address
+        wallet = {
+            "private_key": private_key,
+            "address": address
+        }
+        balance_wei = w3.eth.get_balance(address)
+        balance = w3.from_wei(balance_wei, 'ether')
+        return await self._repository.user_add_wallet(user_id, wallet, balance)
+
+    async def create_eth(self):
+        return await self._repository.create_eth()
+
+    async def create_blockchain(self):
+        pass
+
+    async def create_asset(self):
+        pass
+
     @staticmethod
     async def generate_wallet():
         priv = secrets.token_hex(32)
@@ -56,4 +86,3 @@ class WalletService:
         tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
 
         return {'tx_hash': tx_hash.hex()}
-

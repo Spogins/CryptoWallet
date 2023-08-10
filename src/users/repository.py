@@ -1,51 +1,53 @@
 from typing import Callable, Iterator
-from sqlalchemy.orm import Session
+from sqlalchemy import select
+from sqlalchemy.ext.asyncio import AsyncSession
 from src.users.models import User
 from src.users.schemas import UserModel, UserForm, UserProfile
 
 
 class UserRepository:
 
-    def __init__(self, session_factory: Callable[..., Session]) -> None:
+    def __init__(self, session_factory: AsyncSession) -> None:
         self.session_factory = session_factory
 
     async def get_all(self) -> Iterator[User]:
-        with self.session_factory() as session:
-            users = session.query(User).all()
+        async with self.session_factory() as session:
+            result = await session.execute(select(User))
+            users = result.scalars().all()
             return [UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar) for user in users]
 
     async def get_by_id(self, user_id: int) -> User:
-        with self.session_factory() as session:
-            user = session.query(User).filter(User.id == user_id).first()
+        async with self.session_factory() as session:
+            user = await session.get(User, user_id)
             if not user:
                 raise UserNotFoundError(user_id)
             return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
 
     async def add(self, user_model: UserModel) -> User:
-        with self.session_factory() as session:
+        async with self.session_factory() as session:
             user = User(email=user_model.email, password=user_model.password, username=user_model.username)
             session.add(user)
-            session.commit()
-            session.refresh(user)
+            await session.commit()
+            await session.refresh(user)
             return user
 
     async def delete_by_id(self, user_id: int) -> None:
-        with self.session_factory() as session:
-            entity: User = session.query(User).filter(User.id == user_id).first()
-            if not entity:
+        async with self.session_factory() as session:
+            user = await session.get(User, user_id)
+            if not user:
                 raise UserNotFoundError(user_id)
-            session.delete(entity)
-            session.commit()
+            await session.delete(user)
+            await session.commit()
 
     async def edit_profile(self, profile: UserProfile, user, psw):
-        with self.session_factory() as session:
-            user = session.query(User).filter(User.id == user).first()
+        async with self.session_factory() as session:
+            user = await session.get(User, user)
             if user:
                 if not psw == '':
                     user.password = psw
                 user.username = profile.username
-                session.commit()
-                session.refresh(user)
+                await session.commit()
+                await session.refresh(user)
                 return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
             else:
                 return {'error': 'something goes wrong'}
