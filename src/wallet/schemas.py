@@ -7,7 +7,11 @@ class Transaction(BaseModel):
     value: float
 
 
-class Wallet(BaseModel):
+class WalletBalance(BaseModel):
     wallet_address: str
 
 
+class UserWallet(BaseModel):
+    id: int
+    address: str
+    balance: float

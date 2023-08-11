@@ -1,4 +1,6 @@
 import datetime
+from typing import Callable
+
 from fastapi import HTTPException
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import select
@@ -12,13 +14,14 @@ from src.users.models import User
 
 class AuthRepository:
 
-    def __init__(self, session_factory: AsyncSession) -> None:
+    def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
     async def token(self, user):
         async with self.session_factory() as session:
-            result = await session.execute(select(User).filter_by(email=user.email))
-            _user = result.scalars().first()
+            # result = await session.execute(select(User).filter_by(email=user.email))
+            result = await session.execute(select(User).where(User.email == user.email))
+            _user = result.scalar_one()
 
             if pbkdf2_sha256.verify(user.password, _user.password):
                 payload = {"id": _user.id,

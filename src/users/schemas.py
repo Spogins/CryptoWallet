@@ -56,7 +56,7 @@ class RegisterUserModel(BaseModel):
 
 
 class UserProfile(BaseModel):
-    username: str
+    username: Optional[str] = ''
     new_password: Optional[str] = ''
     repeat_password: Optional[str] = ''
     # avatar: str

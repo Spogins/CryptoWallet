@@ -37,5 +37,18 @@ class Blockchain(Base):
     asset = relationship('Asset', backref='blockchain')
 
 
+class Transaction(Base):
+    __tablename__ = 'transaction'
+    id = Column(Integer, primary_key=True, index=True)
+    hash = Column(String)
+    from_address = Column(String)
+    to_address = Column(String)
+    value = Column(Float)
+    date = Column(String, default='PENDING')
+    txn_fee = Column(Float, default=0)
+    status = Column(String, default='PENDING')
+
+
+
 
 

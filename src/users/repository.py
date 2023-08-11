@@ -7,13 +7,13 @@ from src.users.schemas import UserModel, UserForm, UserProfile
 
 class UserRepository:
 
-    def __init__(self, session_factory: AsyncSession) -> None:
+    def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
     async def get_all(self) -> Iterator[User]:
         async with self.session_factory() as session:
             result = await session.execute(select(User))
-            users = result.scalars().all()
+            users = result.scalar().all()
             return [UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar) for user in users]
 
     async def get_by_id(self, user_id: int) -> User:
@@ -43,9 +43,15 @@ class UserRepository:
         async with self.session_factory() as session:
             user = await session.get(User, user)
             if user:
+                if psw == '' and profile.username == '':
+                    return {'message': 'No changes.'}
+
                 if not psw == '':
                     user.password = psw
-                user.username = profile.username
+
+                if not profile.username == '':
+                    user.username = profile.username
+
                 await session.commit()
                 await session.refresh(user)
                 return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)

@@ -6,7 +6,7 @@ from datetime import datetime
 from config.settings import MORALIS_API_KEY
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.wallet.containers import Container
-from src.wallet.schemas import Wallet, Transaction
+from src.wallet.schemas import Transaction, WalletBalance
 from src.wallet.services.wallet import WalletService
 import requests
 
@@ -34,18 +34,12 @@ async def tests_wallets():
     return {'a_wallet': a_wallet, 'b_wallet': b_wallet}
 
 
-@app.post("/wallet_balance")
+@app.get('/user_wallets')
 @inject
-async def wallet_balance(wallet: Wallet, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.get_balance(wallet.wallet_address)
-
-
-@app.post("/send_eth")
-@inject
-async def send_eth(trans: Transaction,
-                   wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.transaction(private_key_sender=trans.private_key_sender,
-                                            receiver_address=trans.receiver_address, value=trans.value)
+async def user_wallets(user: int, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
+                            bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    # user_id = await get_user_from_bearer(bearer)
+    return await wallet_service.user_wallets(user)
 
 
 @app.get("/generate_wallet")
@@ -71,68 +65,81 @@ async def import_eth_wallet(private_key: str,
     return await wallet_service.import_user_wallet(user_id, private_key)
 
 
+@app.get("/wallet_balance")
+@inject
+async def wallet_balance(wallet_address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
+                         bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    user_id = await get_user_from_bearer(bearer)
+    return await wallet_service.get_balance(wallet_address)
+
+
+@app.put("/update_wallet_balance")
+@inject
+async def update_wallet_balance(wallet_address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
+                         bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    user_id = await get_user_from_bearer(bearer)
+    return await wallet_service.update_balance(wallet_address, user_id)
+
+
+@app.put("/update_all_wallets_balance")
+@inject
+async def update_all_wallets_balance(user: int, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
+                         bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    # user_id = await get_user_from_bearer(bearer)
+    return await wallet_service.update_all(user)
+
+
+@app.post("/send_eth")
+@inject
+async def send_eth(trans: Transaction,
+                   wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.transaction(private_key_sender=trans.private_key_sender,
+                                            receiver_address=trans.receiver_address, value=trans.value)
+
+
+
 @app.get('/get_transactions')
-async def get_transactions(address: str, limit: int = 10):
-    moralis_api_key = MORALIS_API_KEY
-
-    url = f'https://deep-index.moralis.io/api/v2/{address}/?chain=sepolia'
-    headers = {
-        "X-API-Key": moralis_api_key
-    }
-
-    async with httpx.AsyncClient() as client:
-        response = await client.get(url, headers=headers)
-        if response.status_code == 200:
-            current_time = datetime.utcnow()
-            transactions_data = response.json()
-            result = transactions_data.get('result')
-            transactions_list = []
-            for trans in result:
-                past_time = datetime.strptime(trans.get('block_timestamp'), "%Y-%m-%dT%H:%M:%S.%fZ")
-                time_difference = current_time - past_time
-                # Получение количества дней, часов, минут и секунд
-                days = time_difference.days
-                hours, remainder = divmod(time_difference.seconds, 3600)
-                minutes, seconds = divmod(remainder, 60)
+@inject
+async def get_transactions(address: str, limit: int = 10, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_transactions(address, limit)
 
 
-                gas_price_gwei = int(trans.get('gas_price'))  # Пример: 100 Gwei
-                gas_limit = int(trans.get('gas'))  # Пример: стандартный лимит для отправки эфира
-                txn_fee_wei = gas_price_gwei * gas_limit * 10 ** 9  # 1 Gwei = 10^9 Wei
-                txn_fee_eth = txn_fee_wei / 10 ** 18
+@app.get('/transaction_by_hash')
+@inject
+async def get_by_hash(trans_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_transaction(trans_hash)
 
-                transaction = {
-                    "hash": trans.get('hash'),
-                    "from_address": trans.get('from_address'),
-                    "to_address": trans.get('to_address'),
-                    "value": int(trans.get('value')) / 10**18,
-                    "age": f"Прошло {days} дней, {hours} часов, {minutes} минут, {seconds} секунд.",
-                    "txn_fee": txn_fee_eth / 10**9
-                }
-                transactions_list.append(transaction)
-            return transactions_list[:limit]
-        else:
-            print("Ошибка при запросе к Moralis API:", response.status_code)
-            return None
+@app.get('/db_transactionns')
+@inject
+async def db_transactionns(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_db_transaction(address)
 
 
+@app.get('/transaction_info')
+@inject
+async def transaction_info(_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.transaction_info(_hash)
+
+
+@app.put('/transaction_update')
+@inject
+async def transaction_update(_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.transaction_update(_hash)
+
+
+
+
+
+
+
+
+
+#CREATE ASSEY/BLOCKCHAIN MODEL
 @app.post('/create_eth_asset')
 @inject
 async def create_eth_asset(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.create_eth()
 
-
-
-@app.post('/add_blockchain')
-@inject
-async def add_blockchain(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.create_blockchain()
-
-
-@app.post('/add_asset')
-@inject
-async def add_blockchain(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.create_asset()
 
 
 

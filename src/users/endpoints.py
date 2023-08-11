@@ -9,6 +9,7 @@ from src.users.containers import Container
 from src.users.repository import NotFoundError
 from src.users.schemas import UserModel, UserProfile
 from src.users.services.user import UserService
+from utils.base.get_user_bearer import get_user_from_bearer
 
 app = APIRouter()
 
@@ -18,7 +19,7 @@ user_auth = AutoModernJWTAuth()
 @app.get("/users")
 @inject
 async def get_all(user_service: UserService = Depends(Provide[Container.user_service]),
-                  # bearer: HTTPAuthorizationCredentials = Depends(user_auth)
+                  bearer: HTTPAuthorizationCredentials = Depends(user_auth)
                   ):
     return await user_service.get_users()
 
@@ -28,6 +29,7 @@ async def get_all(user_service: UserService = Depends(Provide[Container.user_ser
 async def get_by_id(
         user_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
+        bearer: HTTPAuthorizationCredentials = Depends(user_auth)
 ):
     try:
         return await user_service.get_user_by_id(user_id)
@@ -39,6 +41,7 @@ async def get_by_id(
 @inject
 async def add(user: UserModel,
               user_service: UserService = Depends(Provide[Container.user_service]),
+              bearer: HTTPAuthorizationCredentials = Depends(user_auth)
               ):
     return await user_service.create_user(user)
 
@@ -48,6 +51,7 @@ async def add(user: UserModel,
 async def delete_by_id(
         user_id: int,
         user_service: UserService = Depends(Provide[Container.user_service]),
+        bearer: HTTPAuthorizationCredentials = Depends(user_auth)
 ):
     try:
         await user_service.delete_user_by_id(user_id)
@@ -63,16 +67,8 @@ async def edit_profile(profile: UserProfile,
                        user_service: UserService = Depends(Provide[Container.user_service]),
                        bearer: HTTPAuthorizationCredentials = Depends(user_auth)
                        ):
-    print(bearer.credentials)
     try:
-        token = bearer.credentials
-        verify = jwt.decode(token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
-        user = verify.get('id')
+        user = await get_user_from_bearer(bearer)
         return await user_service.edit_profile(profile, user)
     except:
         return {'access_token': 'expire token'}
-
-
-
-
-
