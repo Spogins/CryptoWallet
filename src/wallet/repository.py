@@ -1,9 +1,7 @@
 from typing import Callable
-
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from config.settings import w3
 from src.users.models import User
 from src.wallet.models import Wallet, Blockchain, Asset, Transaction
@@ -27,6 +25,18 @@ class WalletRepository:
                 return _wallet
         except:
             raise HTTPException(status_code=401, detail='the wallet was registered on the account earlier make sure you are using a new or empty wallet')
+
+    async def get_trans_by_status(self, status):
+        async with self.session_factory() as session:
+            result = await session.execute(select(Transaction).filter(Transaction.status == status))
+            transactions = result.scalars().all()
+            return transactions
+
+    async def get_all_trans(self):
+        async with self.session_factory() as session:
+            result = await session.execute(select(Transaction))
+            transactions = result.scalars().all()
+            return transactions
 
     async def user_wallets(self, user_id):
         async with self.session_factory() as session:

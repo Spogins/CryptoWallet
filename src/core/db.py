@@ -3,8 +3,6 @@ from contextlib import asynccontextmanager
 import logging
 from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine, AsyncSession
 from sqlalchemy.ext.declarative import declarative_base
-
-
 from config.settings import URL
 
 logger = logging.getLogger(__name__)
@@ -19,7 +17,6 @@ class Database(Singleton):
         self._session_factory = async_sessionmaker(self.engine, autoflush=False, expire_on_commit=False)
 
     async def create_database(self) -> None:
-        # Base.metadata.create_all(self.engine)
         async with self.engine.begin() as connect:
             await connect.run_sync(Base.metadata.create_all)
 

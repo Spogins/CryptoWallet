@@ -1,5 +1,5 @@
 import time
-from celery import shared_task, Celery
+from celery import Celery
 from config.settings import CELERY_BROKER_URL, CELERY_RESULT_BACKEND
 
 celery = Celery(
@@ -12,7 +12,7 @@ celery = Celery(
 
 celery.conf.beat_schedule = {
     "test-task": {
-        "task": ["config_celery.celery.test_task"],
+        "task": "config_celery.celery.test_task",  # Используйте строку, не список
         "schedule": 30.0  # Every 30 seconds, adjust as needed
     }
 }

@@ -1,5 +1,4 @@
 import jwt
-
 from config.settings import JWT_SECRET, ALGORITHM
 
 

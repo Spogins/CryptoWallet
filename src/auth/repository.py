@@ -1,6 +1,5 @@
 import datetime
 from typing import Callable
-
 from fastapi import HTTPException
 from passlib.hash import pbkdf2_sha256
 from sqlalchemy import select
@@ -47,14 +46,6 @@ class AuthRepository:
             await session.refresh(user)
             send_mail.apply_async(args=(user.email,))
             return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
-
-    # async def chat_access(self, user):
-    #     async with self.session_factory() as session:
-    #         # _user = session.query(User).filter(User.id == user).first()
-    #         _user = await session.get(User, user)
-    #         _user.chat_access = True
-    #         await session.commit()
-    #         await session.refresh(_user)
 
 
 

@@ -1,4 +1,3 @@
-import time
 from asgiref.sync import async_to_sync, sync_to_async
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from config.settings import MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM, MAIL_SERVER, MAIL_FROM_NAME
@@ -21,18 +20,14 @@ conf = ConnectionConfig(
 
 celery.conf.beat_schedule = {
     "send-mail": {
-        "task": ["src.celery.auth_tasks.send_mail"],
+        "task": "src.celery.auth_tasks.send_mail",
         "schedule": 30.0  # Every 30 seconds, adjust as needed
     },
-    "chat-access": {
-        "task": ["src.celery.auth_tasks.chat_access"],
-        "schedule": 30.0  # Every 30 seconds, adjust as needed
-    }
 }
 
 
 @celery.task
-def send_mail(email):
+def send_mail(email: str = 'user@user.com'):
     print('send_mail')
     html = """<p>Hi you have successfully registered on Crypto Wallet!</p> """
 
@@ -44,14 +39,6 @@ def send_mail(email):
 
     fm = FastMail(conf)
     async_to_sync(fm.send_message)(message, template_name=html)
-
-
-
-
-# @celery.task
-# def chat_access_task(user):
-#     print('chat_access_task')
-#     time.sleep(20)
 
 
 

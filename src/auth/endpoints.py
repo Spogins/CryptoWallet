@@ -3,7 +3,7 @@ import json
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status, Cookie
 import jwt
-from fastapi.security import HTTPAuthorizationCredentials, OAuth2PasswordBearer
+from fastapi.security import HTTPAuthorizationCredentials
 from config.settings import JWT_SECRET, ALGORITHM
 from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth

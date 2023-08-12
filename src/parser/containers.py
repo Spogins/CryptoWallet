@@ -1,7 +1,8 @@
+
 from dependency_injector import containers, providers
 from src.core.containers import Container as db_container
+from src.parser.services.block_parser import ParserService
 from src.wallet.repository import WalletRepository
-from src.wallet.services.wallet import WalletService
 
 
 class Container(containers.DeclarativeContainer):
@@ -11,4 +12,4 @@ class Container(containers.DeclarativeContainer):
     ]
     )
     wallet_repository = providers.Factory(WalletRepository, session_factory=db_container.session)
-    wallet_service = providers.Factory(WalletService, wallet_repository=wallet_repository)
+    parser_service = providers.Factory(ParserService, wallet_repository=wallet_repository)

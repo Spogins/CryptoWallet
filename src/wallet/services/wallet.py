@@ -1,13 +1,9 @@
 from datetime import datetime
-
 import httpx
-from fastapi import HTTPException
 from eth_account import Account
 import secrets
 from config.settings import MORALIS_API_KEY, w3
 from src.wallet.repository import WalletRepository
-
-# w3 = Web3(HTTPProvider(QUICKNODE_URL))
 
 
 class WalletService:
@@ -18,6 +14,9 @@ class WalletService:
 
     def __init__(self, wallet_repository: WalletRepository) -> None:
         self._repository: WalletRepository = wallet_repository
+
+    async def test(self):
+        return await self._repository.get_transactions()
 
     async def create_user_wallet(self, user_id):
         wallet = await self.generate_wallet()
@@ -59,7 +58,8 @@ class WalletService:
             "to_address": trans.get('to_address'),
             "value": int(trans.get('value')) / 10 ** 18,
             "age": f"Прошло {days} дней, {hours} часов, {minutes} минут, {seconds} секунд.",
-            "txn_fee": txn_fee_eth / 10 ** 9
+            "txn_fee": txn_fee_eth / 10 ** 9,
+            'block_number': trans.get('block_number')
         }
         return transaction
 
@@ -115,40 +115,40 @@ class WalletService:
         return await self._repository.update_wallet_balance(address, balance_eth, user_id)
 
     async def transaction(self, private_key_sender, receiver_address, value):
-        try:
-            # Приватный ключ отправителя
-            private_key_sender = private_key_sender
-            # Адрес отправителя (получается из приватного ключа)
-            sender_account = Account.from_key(private_key_sender)
-            sender_address = sender_account.address
-            # Адрес получателя
-            receiver_address = receiver_address
-            # Получение nonce для подписи транзакции
-            nonce = w3.eth.get_transaction_count(sender_address)
-            # Создание транзакции
-            transaction = {
-                'to': receiver_address,
-                'value': w3.to_wei(value, 'ether'),  # Сумма для перевода в Wei (0.1 ETH)
-                'gas': 21000,  # Лимит газа для базовой транзакции
-                'gasPrice': w3.to_wei('50', 'gwei'),  # Цена газа в Wei
-                'nonce': nonce,
-                'chainId': w3.eth.chain_id,  # ID сети (Ropsten)
-            }
-            # Подпись транзакции с использованием приватного ключа
-            signed_txn = w3.eth.account.sign_transaction(transaction, private_key_sender)
-            # Отправка транзакции на блокчейн
-            tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
-            # return {'tx_hash': tx_hash.hex()}
-            trans_data = {
-                "hash": tx_hash.hex(),
-                "from_address": sender_address,
-                "to_address": receiver_address,
-                "value": value,
-            }
-            return await self._repository.add_transaction(trans_data)
-        except:
-            raise HTTPException(status_code=401,
-                                detail='Something went wrong, please make sure you entered the correct details and/or you have enough funds to complete the transaction.')
+        # try:
+        # Приватный ключ отправителя
+        private_key_sender = private_key_sender
+        # Адрес отправителя (получается из приватного ключа)
+        sender_account = Account.from_key(private_key_sender)
+        sender_address = sender_account.address
+        # Адрес получателя
+        receiver_address = receiver_address
+        # Получение nonce для подписи транзакции
+        nonce = w3.eth.get_transaction_count(sender_address)
+        # Создание транзакции
+        transaction = {
+            'to': receiver_address,
+            'value': w3.to_wei(value, 'ether'),  # Сумма для перевода в Wei (0.1 ETH)
+            'gas': 21000,  # Лимит газа для базовой транзакции
+            'gasPrice': w3.to_wei('5', 'gwei'),  # Цена газа в Wei
+            'nonce': nonce,
+            'chainId': w3.eth.chain_id,  # ID сети (Ropsten)
+        }
+        # Подпись транзакции с использованием приватного ключа
+        signed_txn = w3.eth.account.sign_transaction(transaction, private_key_sender)
+        # Отправка транзакции на блокчейн
+        tx_hash = w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+        # return {'tx_hash': tx_hash.hex()}
+        trans_data = {
+            "hash": tx_hash.hex(),
+            "from_address": sender_address,
+            "to_address": receiver_address,
+            "value": value,
+        }
+        return await self._repository.add_transaction(trans_data)
+        # except:
+        #     raise HTTPException(status_code=401,
+        #                         detail='Something went wrong, please make sure you entered the correct details and/or you have enough funds to complete the transaction.')
 
     async def create_eth(self):
         return await self._repository.create_eth()
@@ -173,6 +173,14 @@ class WalletService:
             'Статус': status
         }
         return tx_info
+
+    async def update_all_transaction(self):
+        all_trans = await self._repository.get_all_trans()
+        updated = []
+        for trans in all_trans:
+            updated_trans = await self.transaction_update(trans.hash)
+            updated.append(updated_trans)
+        return updated
 
     async def transaction_update(self, _hash):
         url = f'https://deep-index.moralis.io/api/v2/transaction/{_hash}?chain=sepolia'

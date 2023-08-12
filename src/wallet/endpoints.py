@@ -1,15 +1,10 @@
-import httpx
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Depends, Response, status, Cookie
+from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
-from datetime import datetime
-from config.settings import MORALIS_API_KEY
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.wallet.containers import Container
-from src.wallet.schemas import Transaction, WalletBalance
+from src.wallet.schemas import Transaction
 from src.wallet.services.wallet import WalletService
-import requests
-
 from utils.base.get_user_bearer import get_user_from_bearer
 
 app = APIRouter()
@@ -31,7 +26,12 @@ async def tests_wallets():
         "private_key": "0xd150efcd2ac62da276c1ff5ad1449bedd336209b1d7861b0672cea57ab473568",
         "address": "0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
     }
-    return {'a_wallet': a_wallet, 'b_wallet': b_wallet}
+
+    c_wallet = {
+        "private_key": "0xe0282cec5644e6981cfe402f8b9a1d58bd535c69aef14d3444e6244d09534af5",
+        "address": "0x669130e74FB677D6616315D1CaE8c88BA4A883Df"
+    }
+    return {'a_wallet': a_wallet, 'b_wallet': b_wallet, 'c_wallet': c_wallet}
 
 
 @app.get('/user_wallets')
@@ -93,9 +93,9 @@ async def update_all_wallets_balance(user: int, wallet_service: WalletService = 
 @inject
 async def send_eth(trans: Transaction,
                    wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+
     return await wallet_service.transaction(private_key_sender=trans.private_key_sender,
                                             receiver_address=trans.receiver_address, value=trans.value)
-
 
 
 @app.get('/get_transactions')
@@ -127,10 +127,10 @@ async def transaction_update(_hash: str, wallet_service: WalletService = Depends
     return await wallet_service.transaction_update(_hash)
 
 
-
-
-
-
+@app.put('/update_all_transaction')
+@inject
+async def update_all_transaction(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.update_all_transaction()
 
 
 
