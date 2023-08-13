@@ -1,8 +1,7 @@
-import passlib.hash
 from dependency_injector import containers, providers
-from src.auth.repository import AuthRepository
-from src.auth.services.auth import AuthService
 from src.core.containers import Container as db_container
+from src.chat.repository import ChatRepository
+from src.chat.services.chat import ChatService
 
 
 class Container(containers.DeclarativeContainer):
@@ -10,8 +9,7 @@ class Container(containers.DeclarativeContainer):
         'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
         'src.wallet', 'src.parser.services', 'src.parser', 'config_socketio', 'src.chat.services',
         'src.chat'
-        ]
+    ]
     )
-    auth_repository = providers.Factory(AuthRepository, session_factory=db_container.session)
-    password_hasher = providers.Callable(passlib.hash.pbkdf2_sha256.hash)
-    auth_service = providers.Factory(AuthService, auth_repository=auth_repository, hashed_psw=password_hasher.provider)
+    chat_repository = providers.Factory(ChatRepository, session_factory=db_container.session)
+    chat_service = providers.Factory(ChatService, chat_repository=chat_repository)

@@ -8,7 +8,8 @@ from src.users.services.user import UserService
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=[
         'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
-        'src.wallet'
+        'src.wallet', 'src.parser.services', 'src.parser', 'config_socketio', 'src.chat.services',
+        'src.chat'
         ]
     )
     user_repository = providers.Factory(UserRepository, session_factory=db_container.session)

@@ -4,13 +4,15 @@ from src.core.containers import Container as DatabaseContainer
 from src.users.containers import Container as UserContainer
 from src.wallet.containers import Container as WalletContainer
 from src.parser.containers import Container as ParserContainer
+from src.chat.containers import Container as ChatContainer
 
 
 
 class RegisterContainer(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=[
         'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
-        'src.wallet', 'src.parser.services', 'src.parser', 'config_socketio'
+        'src.wallet', 'src.parser.services', 'src.parser', 'config_socketio', 'src.chat.services',
+        'src.chat'
     ]
     )
     users_container = providers.Container(UserContainer)
@@ -18,3 +20,4 @@ class RegisterContainer(containers.DeclarativeContainer):
     db_container = providers.Container(DatabaseContainer)
     wallet_container = providers.Container(WalletContainer)
     parser_container = providers.Container(ParserContainer)
+    chat_container = providers.Container(ChatContainer)

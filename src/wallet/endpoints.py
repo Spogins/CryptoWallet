@@ -1,3 +1,5 @@
+from time import sleep
+
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
@@ -94,8 +96,17 @@ async def update_all_wallets_balance(user: int, wallet_service: WalletService = 
 async def send_eth(trans: Transaction,
                    wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
 
-    return await wallet_service.transaction(private_key_sender=trans.private_key_sender,
-                                            receiver_address=trans.receiver_address, value=trans.value)
+    # return await wallet_service.transaction(private_key_sender=trans.private_key_sender,
+    #                                         receiver_address=trans.receiver_address, value=trans.value)
+
+    a_wallet = await wallet_service.transaction(private_key_sender='0x17f270e0a153579b024b38a35ed11397e4b1a56c36f55b144d477ca1869f432e',
+                                              receiver_address="0x5A79fe36275B1A8d557A8e1b3D36261515d12542", value=0.01)
+
+
+    c_wallet = await wallet_service.transaction(private_key_sender="0xd150efcd2ac62da276c1ff5ad1449bedd336209b1d7861b0672cea57ab473568",
+                                              receiver_address='0x669130e74FB677D6616315D1CaE8c88BA4A883Df', value=0.001)
+
+    return {'a_wallet': a_wallet, 'c_wallet': c_wallet}
 
 
 @app.get('/get_transactions')
