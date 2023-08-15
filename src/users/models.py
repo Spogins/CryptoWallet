@@ -17,7 +17,7 @@ class User(Base):
     is_superuser = Column(Boolean, default=False)
     is_active = Column(Boolean, default=True)
     chat_access = Column(Boolean, default=False)
-    chat_messages = relationship('ChatMessage', backref='user')
     wallets = relationship('Wallet', backref='user')
+    chat_messages = relationship('ChatMessage', backref='user')
 
 

@@ -24,7 +24,6 @@ aioredis = "2.0.0"
 propan = {extras = ["async-rabbit"], version = "^0.1.5.17"}
 broker = "^0.3.3"
 rabbitmq = "^0.2.0"
-alembic = "^1.11.2"
 asgiref = "^3.7.2"
 utils = "^1.0.1"
 w3 = "^0.0.0"
@@ -34,6 +33,7 @@ requests = "^2.31.0"
 asyncpg = "^0.28.0"
 httpx = "^0.24.1"
 python-socketio = "^5.8.0"
+alembic = "^1.11.2"
 
 
 [tool.poetry.group.dev.dependencies]

@@ -18,12 +18,12 @@ conf = ConnectionConfig(
 )
 
 
-celery.conf.beat_schedule = {
-    "send-mail": {
-        "task": "src.celery.auth_tasks.send_mail",
-        "schedule": 30.0  # Every 30 seconds, adjust as needed
-    },
-}
+# celery.conf.beat_schedule = {
+#     "send-mail": {
+#         "task": "src.celery.auth_tasks.send_mail",
+#         "schedule": 30.0  # Every 30 seconds, adjust as needed
+#     },
+# }
 
 
 @celery.task

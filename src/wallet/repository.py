@@ -26,11 +26,11 @@ class WalletRepository:
         except:
             raise HTTPException(status_code=401, detail='the wallet was registered on the account earlier make sure you are using a new or empty wallet')
 
-    async def get_trans_by_status(self, status):
-        async with self.session_factory() as session:
-            result = await session.execute(select(Transaction).filter(Transaction.status == status))
-            transactions = result.scalars().all()
-            return transactions
+    # async def get_trans_by_status(self, status):
+    #     async with self.session_factory() as session:
+    #         result = await session.execute(select(Transaction).filter(Transaction.status == status))
+    #         transactions = result.scalars().all()
+    #         return transactions
 
     async def get_all_trans(self):
         async with self.session_factory() as session:

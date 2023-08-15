@@ -10,7 +10,7 @@ app = APIRouter()
 @app.put('/parse_block')
 @inject
 async def parse_block(parser_service: ParserService = Depends(Provide[Container.parser_service])):
-    return await parser_service.get_pending_hash()
+    return await parser_service.get_block()
 
 
 

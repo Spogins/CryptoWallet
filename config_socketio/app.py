@@ -2,10 +2,9 @@ import asyncio
 import socketio
 from config.settings import ALLOWED_HOSTS
 from config_celery.celery import celery
+from src.celery.parse_tasks import parsing
 from src.parser.containers import Container
-from src.parser.services.block_parser import ParserService
-from sqlalchemy.orm import clear_mappers
-
+# from src.parser.services.block_parser import ParserService
 
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=ALLOWED_HOSTS)
@@ -13,18 +12,18 @@ sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=ALLOWED_HOSTS
 socket_app = socketio.ASGIApp(sio)
 
 celery_app = celery
-parse_service = Container.parser_service()
+# parse_service = Container.parser_service()
 
-async def my_interval_task(sid):
-    while True:
-        await parsing(parse_service)
-        await asyncio.sleep(5)  # Интервал в секундах
-        await sio.emit('hello', {'test': 'Hello'}, room=sid)
-
-
-async def parsing(parse_service: ParserService):
-    result = await parse_service.get_pending_hash()
-    print(result)
+# async def my_interval_task(sid):
+#     while True:
+#         asyncio.create_task(parsing(parse_service))
+#         await asyncio.sleep(2)  # Интервал в секундах
+#         await sio.emit('hello', {'test': 'Hello'}, room=sid)
+#
+#
+# async def parsing(parse_service):
+#     asyncio.create_task(parse_service.get_block())
+#     # print(result)
 
 #
 #
@@ -52,7 +51,8 @@ async def join_room(sid, data):
     sio.enter_room(sid, room_name)
     if room_name == 'parse_block':
         print(f'Start parsing.')
-        asyncio.create_task(my_interval_task(sid))
+        res = parsing.apply_async()
+        # asyncio.create_task(my_interval_task(sid))
     chat_room_clients.add(sid)  # Добавляем клиента в комнату
     print(f"Client {sid} joined room {room_name}")
 

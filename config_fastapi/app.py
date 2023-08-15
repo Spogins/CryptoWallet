@@ -1,6 +1,6 @@
-from typing import Annotated
-from propan import RabbitBroker
 from fastapi.middleware.cors import CORSMiddleware
+
+from config_fastapi.test import router
 from config_socketio.app import socket_app
 from src.core.register import RegisterContainer
 from src.users.endpoints import app as user_app
@@ -9,19 +9,17 @@ from src.wallet.endpoints import app as wallet_app
 from src.chat.endpoints import app as chat_app
 from src.parser.endpoints import app as parser
 from fastapi import Depends, FastAPI
-from propan.fastapi import RabbitRouter
-
-router = RabbitRouter(schema_url="/asyncapi",
-                      include_in_schema=True, )
 
 
-def broker():
-    return router.broker
 
-@router.get("/")
-async def hello_http(broker: Annotated[RabbitBroker, Depends(broker)]):
-    await broker.publish("Hello, Rabbit!", "test")
-    return "Hello, HTTP!"
+
+# def broker():
+#     return router.broker
+
+# @router.get("/")
+# async def hello_http(broker: Annotated[RabbitBroker, Depends(broker)]):
+#     await broker.publish("Hello, Rabbit!", "test")
+#     return "Hello, HTTP!"
 
 
 origins = [
@@ -56,12 +54,25 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-@app.get('/startup')
-async def startup():
-    print('Create DB')
-    container = RegisterContainer()
-    db = container.db_container.db()
-    await db.create_database()
+# @router.after_startup
+# def do_smth(app: FastAPI):
+#     print('do_smth')
+#     return {'do_smth': 'do_smth'}
+#
+#
+# @router.after_startup
+# async def publish_smth(app: FastAPI):
+#     await router.broker.publish(("Hello, Rabbit!", "publish_smth"))
+#     print('publish_smth')
+#     return {'publish_smth': 'publish_smth'}
+
+
+# @app.get('/startup')
+# async def startup():
+#     print('Create DB')
+#     container = RegisterContainer()
+#     db = container.db_container.db()
+#     await db.create_database()
 
 
 

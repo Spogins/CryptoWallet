@@ -1,5 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 import datetime
+
+
 from src.core.db import Base
 
 
@@ -10,4 +12,5 @@ class ChatMessage(Base):
     image = Column(String, default='.img')
     date = Column(DateTime, default=datetime.datetime.utcnow)
     user_id = Column(Integer, ForeignKey('user.id'))
+
 
