@@ -23,23 +23,25 @@ class ParserService:
         for item in lst:
             yield item
 
-    async def get_block(self):
-        self.block = await self._repository.get_block()
-        block_latest = w3.eth.get_block('latest')
-        block = w3.eth.get_block(self.block)
-        if not block_latest == block:
-            await self._repository.update_block(block_latest.number)
-            print('---FIND_BLOCK---')
-            print(f"---{block.number}---")
-            return await self.parse_block(block)
-        else:
-            print('---SKIP_BLOCK---')
+    # async def get_block(self):
+    #     self.block = await self._repository.get_block()
+    #     block_latest = w3.eth.get_block('latest')
+    #     block = w3.eth.get_block(self.block)
+    #     if not block_latest == block:
+    #         await self._repository.update_block(block_latest.number)
+    #         print('---FIND_BLOCK---')
+    #         print(f"---{block.number}---")
+    #         return await self.parse_block(block)
+    #     else:
+    #         print('---SKIP_BLOCK---')
 
     async def parse_block(self, block):
+        block = w3.eth.get_block(block)
         wallets = await self._repository.get_wallets()
         self.hash_trans = await self._repository.get_trans_by_status("PENDING")
         parse_data = []
         iterator = self.forward_iterator(block.transactions)
+        await broker.publish(message={'m': f'hi {block.number}'}, queue='parser/hash')
         async for transaction_block in iterator:
             _hash = hexbytes.HexBytes(transaction_block).hex()
             if _hash in self.hash_trans:

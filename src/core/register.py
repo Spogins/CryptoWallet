@@ -1,4 +1,6 @@
 from dependency_injector import containers, providers
+
+from config.settings import WIRING_CONFIG
 from src.auth.containers import Container as AuthContainer
 from src.core.containers import Container as DatabaseContainer
 from src.users.containers import Container as UserContainer
@@ -10,12 +12,7 @@ from src.ibay.containers import Container as IBayContainer
 
 
 class RegisterContainer(containers.DeclarativeContainer):
-    wiring_config = containers.WiringConfiguration(packages=[
-        'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
-        'src.wallet', 'src.parser.services', 'src.parser', 'config_socketio', 'src.chat.services',
-        'src.chat', 'src',
-    ]
-    )
+    wiring_config = containers.WiringConfiguration(packages=WIRING_CONFIG)
     users_container = providers.Container(UserContainer)
     auth_container = providers.Container(AuthContainer)
     db_container = providers.Container(DatabaseContainer)

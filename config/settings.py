@@ -31,3 +31,10 @@ MORALIS_API_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJub25jZSI6IjkxOGEwY2Jm
 w3 = Web3(HTTPProvider(QUICKNODE_URL))
 
 ALLOWED_HOSTS = ['http://127.0.0.1:8000']
+
+
+WIRING_CONFIG = [
+        'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
+        'src.wallet', 'src.parser.services', 'src.parser', 'config_socketio', 'src.chat.services',
+        'src.chat', 'src.ibay', 'src.ibay.services',
+    ]

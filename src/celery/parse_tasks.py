@@ -14,9 +14,10 @@ parse_service = Container.parser_service()
 
 
 @celery.task
-def parsing():
+def parsing(block):
+    print(block)
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(parse_service.get_block())
+    loop.run_until_complete(parse_service.parse_block(block))
     return "Async task completed"
 
 

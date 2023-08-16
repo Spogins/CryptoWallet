@@ -94,6 +94,7 @@ class WalletRepository:
 
     async def add_transaction(self, trans_data):
         async with self.session_factory() as session:
+            print(trans_data)
             transaction = Transaction(
                 hash=trans_data.get('hash'),
                 from_address=trans_data.get('from_address'),

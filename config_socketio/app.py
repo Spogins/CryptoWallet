@@ -1,7 +1,8 @@
 import asyncio
 import socketio
-from config.settings import ALLOWED_HOSTS
+from config.settings import ALLOWED_HOSTS, w3
 from config_celery.celery import celery
+from config_propan.app import broker
 from src.celery.parse_tasks import parsing
 from src.parser.containers import Container
 # from src.parser.services.block_parser import ParserService
@@ -37,6 +38,8 @@ celery_app = celery
 chat_room_clients = set()
 #
 # Обработчик события подключения
+
+
 @sio.on("connect")
 async def connect(sid, environ):
     await sio.emit('hello', {'test': 'Hello'})
@@ -44,26 +47,42 @@ async def connect(sid, environ):
     chat_room_clients.add(sid)  # Добавляем клиента в комнату
     print(f"Client {sid} connected")
 
+
+@sio.on('parse_block')
+async def test_handler(sid):
+    last_transaction_block = None
+    if not broker.started:
+        await broker.start()
+    while True:
+        latest_block = w3.eth.get_block('latest')
+        if last_transaction_block is None or latest_block['number'] > last_transaction_block:
+            print('---FIND_BLOCK---')
+            await broker.publish(message=latest_block['number'], queue='parser/parser_queue')
+            last_transaction_block = latest_block['number']
+        else:
+            print('---SKIP_BLOCK---')
+        await asyncio.sleep(2)
+
 # Обработчик события присоединения к комнате
-@sio.on("join_room")
-async def join_room(sid, data):
-    room_name = data.get('room')
-    sio.enter_room(sid, room_name)
-    if room_name == 'parse_block':
-        print(f'Start parsing.')
-        res = parsing.apply_async()
-        # asyncio.create_task(my_interval_task(sid))
-    chat_room_clients.add(sid)  # Добавляем клиента в комнату
-    print(f"Client {sid} joined room {room_name}")
+# @sio.on("join_room")
+# async def join_room(sid, data):
+#     room_name = data.get('room')
+#     sio.enter_room(sid, room_name)
+#     if room_name == 'parse_block':
+#         print(f'Start parsing.')
+#         res = parsing.apply_async()
+#         # asyncio.create_task(my_interval_task(sid))
+#     chat_room_clients.add(sid)  # Добавляем клиента в комнату
+#     print(f"Client {sid} joined room {room_name}")
 
 
-# Обработчик события отправки сообщения
-@sio.on("send_message")
-async def send_message(sid, data):
-    room_name = data.get('room')
-    message = data.get('message')
-    await sio.emit('new_message', {'message': message}, room=room_name)
-    print(f"Client {sid} sent a message to room {room_name}")
+# # Обработчик события отправки сообщения
+# @sio.on("send_message")
+# async def send_message(sid, data):
+#     room_name = data.get('room')
+#     message = data.get('message')
+#     await sio.emit('new_message', {'message': message}, room=room_name)
+#     print(f"Client {sid} sent a message to room {room_name}")
 
 # Обработчик события отключения
 @sio.on("disconnect")
