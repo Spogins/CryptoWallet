@@ -15,7 +15,7 @@ app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
 
-@app.post("/log_in")
+@app.post("/log_in", status_code=status.HTTP_200_OK)
 @inject
 async def get_token(user: AuthUsers, auth_service: AuthService = Depends(Provide[Container.auth_service])):
     token = await auth_service.token(user)
@@ -31,7 +31,7 @@ async def get_token(user: AuthUsers, auth_service: AuthService = Depends(Provide
     return response
 
 
-@app.post("/log_out")
+@app.post("/log_out", status_code=status.HTTP_200_OK)
 @inject
 async def log_out(bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
     response = Response(content='{"message": "Logged out successfully"}')
@@ -39,13 +39,13 @@ async def log_out(bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
     return response
 
 
-@app.get("/token_user")
+@app.get("/token_user", status_code=status.HTTP_200_OK)
 @inject
 async def token_user(access_token: str = Cookie(None)):
     return access_token
 
 
-@app.get("/verify_token")
+@app.get("/verify_token", status_code=status.HTTP_200_OK)
 @inject
 async def verify_token(access_token: str = Cookie(None)):
     try:

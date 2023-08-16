@@ -26,17 +26,16 @@ class WalletRepository:
         except:
             raise HTTPException(status_code=401, detail='the wallet was registered on the account earlier make sure you are using a new or empty wallet')
 
-    # async def get_trans_by_status(self, status):
-    #     async with self.session_factory() as session:
-    #         result = await session.execute(select(Transaction).filter(Transaction.status == status))
-    #         transactions = result.scalars().all()
-    #         return transactions
-
     async def get_all_trans(self):
         async with self.session_factory() as session:
             result = await session.execute(select(Transaction))
             transactions = result.scalars().all()
             return transactions
+
+    async def get_wallet(self, wallet_id):
+        async with self.session_factory() as session:
+            wallet = await session.get(Wallet, wallet_id)
+            return wallet
 
     async def user_wallets(self, user_id):
         async with self.session_factory() as session:
@@ -57,9 +56,9 @@ class WalletRepository:
                 raise HTTPException(status_code=401,
                                     detail='not a valid wallet make sure you check your wallet.')
 
-    async def update_all_wallets(self, user_id):
+    async def update_all_wallets(self):
         async with self.session_factory() as session:
-            result = await session.execute(select(Wallet).where(Wallet.user_id == user_id))
+            result = await session.execute(select(Wallet))
             wallets = result.scalars().all()
             for wallet in wallets:
                 balance_wei = w3.eth.get_balance(wallet.address)

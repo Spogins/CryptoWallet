@@ -1,16 +1,14 @@
 from typing import Callable
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.parser.models import Block
 from src.wallet.models import Transaction, Wallet
-from utils.base.parse_data_transaction import parse_trans_data
 
 
 class ParserRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
+
 
     async def update_balance(self, address, balance_eth):
         async with self.session_factory() as session:

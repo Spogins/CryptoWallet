@@ -1,8 +1,8 @@
-from time import sleep
-
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
+from starlette import status
+
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.wallet.containers import Container
 from src.wallet.schemas import Transaction
@@ -17,7 +17,7 @@ user_auth = AutoModernJWTAuth()
 # bearer: HTTPAuthorizationCredentials = Depends(user_auth)
 
 
-@app.get("/tests_wallets")
+@app.get("/tests_wallets", status_code=status.HTTP_200_OK)
 async def tests_wallets():
     a_wallet = {
         "private_key": "0x17f270e0a153579b024b38a35ed11397e4b1a56c36f55b144d477ca1869f432e",
@@ -36,7 +36,13 @@ async def tests_wallets():
     return {'a_wallet': a_wallet, 'b_wallet': b_wallet, 'c_wallet': c_wallet}
 
 
-@app.get('/user_wallets')
+@app.get("/generate_wallet", status_code=status.HTTP_200_OK)
+@inject
+async def generate_wallet(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.generate_wallet()
+
+
+@app.get('/user_wallets', status_code=status.HTTP_200_OK)
 @inject
 async def user_wallets(user: int, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
                             bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
@@ -44,13 +50,14 @@ async def user_wallets(user: int, wallet_service: WalletService = Depends(Provid
     return await wallet_service.user_wallets(user)
 
 
-@app.get("/generate_wallet")
+
+@app.get('/get_wallet/{wallet_id}', status_code=status.HTTP_200_OK)
 @inject
-async def generate_wallet(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.generate_wallet()
+async def get_wallet(wallet_id: int, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_wallet(wallet_id)
 
 
-@app.post("/create_eth_wallet")
+@app.post("/create_eth_wallet", status_code=status.HTTP_201_CREATED)
 @inject
 async def create_eth_wallet(wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
                             bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
@@ -58,7 +65,7 @@ async def create_eth_wallet(wallet_service: WalletService = Depends(Provide[Cont
     return await wallet_service.create_user_wallet(user_id)
 
 
-@app.post("/import_eth_wallet")
+@app.post("/import_eth_wallet", status_code=status.HTTP_201_CREATED)
 @inject
 async def import_eth_wallet(private_key: str,
                             wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
@@ -67,7 +74,7 @@ async def import_eth_wallet(private_key: str,
     return await wallet_service.import_user_wallet(user_id, private_key)
 
 
-@app.get("/wallet_balance")
+@app.get("/wallet_balance", status_code=status.HTTP_200_OK)
 @inject
 async def wallet_balance(wallet_address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
                          bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
@@ -75,7 +82,7 @@ async def wallet_balance(wallet_address: str, wallet_service: WalletService = De
     return await wallet_service.get_balance(wallet_address)
 
 
-@app.put("/update_wallet_balance")
+@app.put("/update_wallet_balance", status_code=status.HTTP_200_OK)
 @inject
 async def update_wallet_balance(wallet_address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
                          bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
@@ -83,15 +90,13 @@ async def update_wallet_balance(wallet_address: str, wallet_service: WalletServi
     return await wallet_service.update_balance(wallet_address, user_id)
 
 
-@app.put("/update_all_wallets_balance")
+@app.put("/update_all_wallets_balance", status_code=status.HTTP_200_OK)
 @inject
-async def update_all_wallets_balance(user: int, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
-                         bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
-    # user_id = await get_user_from_bearer(bearer)
-    return await wallet_service.update_all(user)
+async def update_all_wallets_balance(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.update_all()
 
 
-@app.post("/send_eth")
+@app.post("/send_eth", status_code=status.HTTP_201_CREATED)
 @inject
 async def send_eth(trans: Transaction,
                    wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
@@ -99,57 +104,55 @@ async def send_eth(trans: Transaction,
     return await wallet_service.transaction(private_key_sender=trans.private_key_sender,
                                             receiver_address=trans.receiver_address, value=trans.value)
 
-    # a_wallet = await wallet_service.transaction(private_key_sender='0x17f270e0a153579b024b38a35ed11397e4b1a56c36f55b144d477ca1869f432e',
-    #                                           receiver_address="0x5A79fe36275B1A8d557A8e1b3D36261515d12542", value=0.01)
-    #
-    #
-    # c_wallet = await wallet_service.transaction(private_key_sender="0xd150efcd2ac62da276c1ff5ad1449bedd336209b1d7861b0672cea57ab473568",
-    #                                           receiver_address='0x669130e74FB677D6616315D1CaE8c88BA4A883Df', value=0.001)
-    #
-    # return {'a_wallet': a_wallet, 'c_wallet': c_wallet}
 
-
-@app.get('/get_transactions')
+@app.get('/wallet_db_transactions', status_code=status.HTTP_200_OK)
 @inject
-async def get_transactions(address: str, limit: int = 10, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.get_transactions(address, limit)
-
-
-@app.get('/transaction_by_hash')
-@inject
-async def get_by_hash(trans_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.get_transaction(trans_hash)
-
-@app.get('/db_transactionns')
-@inject
-async def db_transactionns(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+async def db_transactions(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.get_db_transaction(address)
 
 
-@app.get('/transaction_info')
+@app.get('/db_transactions', status_code=status.HTTP_200_OK)
 @inject
-async def transaction_info(_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.transaction_info(_hash)
+async def get_all_transaction(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_all_transaction()
 
 
-@app.put('/transaction_update')
+@app.put('/update_db_transaction_moralis', status_code=status.HTTP_200_OK)
 @inject
 async def transaction_update(_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.transaction_update(_hash)
 
 
-@app.put('/update_all_transaction')
+@app.put('/update_db_transactions_moralis', status_code=status.HTTP_200_OK)
 @inject
 async def update_all_transaction(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.update_all_transaction()
 
 
-
-#CREATE ASSEY/BLOCKCHAIN MODEL
-@app.post('/create_eth_asset')
+@app.get('/transaction_info_web3', status_code=status.HTTP_200_OK)
 @inject
-async def create_eth_asset(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.create_eth()
+async def transaction_info(_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.transaction_info(_hash)
+
+
+@app.get('/transactions_moralis', status_code=status.HTTP_200_OK)
+@inject
+async def get_transactions(address: str, limit: int = 10, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_transactions(address, limit)
+
+
+@app.get('/transaction_moralis', status_code=status.HTTP_200_OK)
+@inject
+async def get_by_hash(trans_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_transaction(trans_hash)
+
+
+
+# #CREATE ASSEY/BLOCKCHAIN MODEL
+# @app.post('/create_eth_asset', status_code=status.HTTP_201_CREATED)
+# @inject
+# async def create_eth_asset(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+#     return await wallet_service.create_eth()
 
 
 

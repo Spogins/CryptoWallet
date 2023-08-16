@@ -13,7 +13,7 @@ class UserRepository:
     async def get_all(self) -> Iterator[User]:
         async with self.session_factory() as session:
             result = await session.execute(select(User))
-            users = result.scalar().all()
+            users = result.scalars().all()
             return [UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar) for user in users]
 
     async def get_by_id(self, user_id: int) -> User:

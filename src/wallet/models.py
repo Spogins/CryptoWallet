@@ -13,7 +13,6 @@ class Wallet(Base):
     address = Column(String, unique=True)
     balance = Column(Float, default=0)
     user_id = Column(Integer, ForeignKey('user.id'))
-
     asset_id = Column(Integer, ForeignKey('asset.id'))
 
 

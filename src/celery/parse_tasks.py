@@ -1,9 +1,4 @@
 import asyncio
-from asyncio import sleep
-
-from asgiref.sync import async_to_sync
-from celery.utils.log import get_task_logger
-
 from config_celery.celery import celery
 from src.parser.containers import Container
 

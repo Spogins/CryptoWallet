@@ -1,12 +1,7 @@
-import asyncio
-import json
-import time
-from datetime import datetime
 import hexbytes
 import httpx
 from config.settings import MORALIS_API_KEY
 from src.parser.repository import ParserRepository
-# from src.wallet.repository import WalletRepository
 from src.wallet.services.test import w3
 from utils.base.parse_data_transaction import parse_trans_data
 
@@ -54,7 +49,7 @@ class ParserService:
                 hash_data = await parse_trans_data(transaction, block.timestamp, transaction_receipt.get('status'), _hash)
                 update_trans = await self._repository.update_trans(hash_data)
                 self.hash_trans.append(_hash)
-                await self.update_wallet_balance(transaction.get('from'), transaction.get('to'), wallets)
+                # await self.update_wallet_balance(transaction.get('from'), transaction.get('to'), wallets)
                 parse_data.append(update_trans)
             else:
                 transaction = w3.eth.get_transaction(_hash)
@@ -65,7 +60,7 @@ class ParserService:
                         hash_data = await parse_trans_data(transaction, block.timestamp, transaction_receipt.get('status'), _hash)
                         new_trans = await self._repository.add_trans(hash_data)
                         self.hash_trans.append(_hash)
-                        await self.update_wallet_balance(transaction.get('from'), transaction.get('to'), wallets)
+                        # await self.update_wallet_balance(transaction.get('from'), transaction.get('to'), wallets)
                         parse_data.append(new_trans)
         print('---DONE---')
         return parse_data

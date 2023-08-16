@@ -9,7 +9,7 @@ class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=[
         'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
         'src.wallet', 'src.parser.services', 'src.parser', 'config_socketio', 'src.chat.services',
-        'src.chat'
+        'src.chat', 'src',
         ]
     )
     user_repository = providers.Factory(UserRepository, session_factory=db_container.session)

@@ -1,6 +1,7 @@
 from collections.abc import Iterator
 from typing import Callable
 
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.chat.models import ChatMessage
@@ -16,14 +17,18 @@ class ChatRepository:
     async def add(self, message: MessageForm, user_id: int):
         async with self.session_factory() as session:
             user = await session.get(User, user_id)
-            if message.text == '':
-                chat_message = ChatMessage(text='', image=message.image, user=user)
+            if user.chat_access:
+                if message.text == '':
+                    chat_message = ChatMessage(text='', image=message.image, user=user)
+                else:
+                    chat_message = ChatMessage(text=message.text, user=user)
+                session.add(chat_message)
+                await session.commit()
+                await session.refresh(chat_message)
+                return chat_message
             else:
-                chat_message = ChatMessage(text=message.text, user=user)
-            session.add(chat_message)
-            await session.commit()
-            await session.refresh(chat_message)
-            return chat_message
+                raise HTTPException(status_code=401,
+                                    detail='User does not have access to the chat')
 
     async def get_chat_messages(self, _limit) -> Iterator[ChatMessage]:
         async with self.session_factory() as session:

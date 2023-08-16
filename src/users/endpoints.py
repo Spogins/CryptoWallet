@@ -16,7 +16,7 @@ app = APIRouter()
 user_auth = AutoModernJWTAuth()
 
 
-@app.get("/users")
+@app.get("/users", status_code=status.HTTP_200_OK)
 @inject
 async def get_all(user_service: UserService = Depends(Provide[Container.user_service]),
                   bearer: HTTPAuthorizationCredentials = Depends(user_auth)
@@ -24,7 +24,7 @@ async def get_all(user_service: UserService = Depends(Provide[Container.user_ser
     return await user_service.get_users()
 
 
-@app.get("/user/{user_id}")
+@app.get("/user/{user_id}", status_code=status.HTTP_200_OK)
 @inject
 async def get_by_id(
         user_id: int,

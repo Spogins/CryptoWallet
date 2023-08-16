@@ -7,6 +7,7 @@ from src.users.endpoints import app as user_app
 from src.auth.endpoints import app as auth_app
 from src.wallet.endpoints import app as wallet_app
 from src.chat.endpoints import app as chat_app
+from src.ibay.endpoints import app as ibay_app
 from src.parser.endpoints import app as parser
 from fastapi import Depends, FastAPI
 
@@ -34,6 +35,7 @@ def create_app() -> FastAPI:
     container = RegisterContainer()
     app = FastAPI(lifespan=router.lifespan_context)
     app.container = container
+    app.include_router(ibay_app, tags=["iBay"])
     app.include_router(wallet_app, tags=["Wallets"])
     app.include_router(auth_app, tags=["Auth"])
     app.include_router(user_app, tags=["User"])

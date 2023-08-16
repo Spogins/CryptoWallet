@@ -1,7 +1,7 @@
 from dependency_injector import containers, providers
 from src.core.containers import Container as db_container
-from src.parser.repository import ParserRepository
-from src.parser.services.block_parser import ParserService
+from src.ibay.repository import IBayRepository
+from src.ibay.services.ibay import IBayService
 
 
 class Container(containers.DeclarativeContainer):
@@ -11,5 +11,5 @@ class Container(containers.DeclarativeContainer):
         'src.chat', 'src',
     ]
     )
-    parser_repository = providers.Factory(ParserRepository, session_factory=db_container.session)
-    parser_service = providers.Factory(ParserService, parser_repository=parser_repository)
+    ibay_repository = providers.Factory(IBayRepository, session_factory=db_container.session)
+    ibay_service = providers.Factory(IBayService, ibay_repository=ibay_repository)

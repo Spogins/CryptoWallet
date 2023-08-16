@@ -2,9 +2,7 @@ from datetime import datetime
 import httpx
 from eth_account import Account
 import secrets
-
 from fastapi import HTTPException
-
 from config.settings import MORALIS_API_KEY, w3
 from src.wallet.repository import WalletRepository
 
@@ -18,8 +16,8 @@ class WalletService:
     def __init__(self, wallet_repository: WalletRepository) -> None:
         self._repository: WalletRepository = wallet_repository
 
-    async def test(self):
-        return await self._repository.get_transactions()
+    async def get_wallet(self, wallet_id):
+        return await self._repository.get_wallet(wallet_id)
 
     async def create_user_wallet(self, user_id):
         wallet = await self.generate_wallet()
@@ -30,6 +28,9 @@ class WalletService:
 
     async def user_wallets(self, user_id):
         return await self._repository.user_wallets(user_id)
+
+    async def get_all_transaction(self):
+        return await self._repository.get_all_trans()
 
     async def import_user_wallet(self, user_id, private_key):
         account = Account.from_key(private_key)
@@ -109,8 +110,8 @@ class WalletService:
         balance_eth = w3.from_wei(balance_wei, 'ether')
         return {"address": address, "balance_eth": balance_eth}
 
-    async def update_all(self, user):
-        return await self._repository.update_all_wallets(user)
+    async def update_all(self):
+        return await self._repository.update_all_wallets()
 
     async def update_balance(self, address, user_id):
         balance_wei = w3.eth.get_balance(address)
