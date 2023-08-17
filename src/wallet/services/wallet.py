@@ -7,7 +7,7 @@ from src.web3.w3_service import WebService
 
 class WalletService:
 
-    def __init__(self, wallet_repository: WalletRepository, w3_service) -> None:
+    def __init__(self, wallet_repository: WalletRepository, w3_service: WebService) -> None:
         self._repository: WalletRepository = wallet_repository
         self.w3_service: WebService = w3_service
 

@@ -31,8 +31,11 @@ async def main():
     await sio.wait()
 
 
-# Запуск асинхронной функции
-if __name__ == "__main__":
-    loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
+# # Запуск асинхронной функции
+# if __name__ == "__main__":
+#     loop = asyncio.get_event_loop()
+#     loop.run_until_complete(main())
+
+if __name__ == '__main__':
+    asyncio.run(main())
 

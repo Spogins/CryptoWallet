@@ -1,4 +1,6 @@
 from typing import Callable, Iterator
+
+from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.users.models import User
@@ -20,7 +22,7 @@ class UserRepository:
         async with self.session_factory() as session:
             user = await session.get(User, user_id)
             if not user:
-                raise UserNotFoundError(user_id)
+                raise HTTPException(status_code=401, detail=f"User not found, id: {user_id}")
             return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
 
     async def add(self, user_model: UserModel) -> User:
@@ -35,7 +37,7 @@ class UserRepository:
         async with self.session_factory() as session:
             user = await session.get(User, user_id)
             if not user:
-                raise UserNotFoundError(user_id)
+                raise HTTPException(status_code=401, detail=f"User not found, id: {user_id}")
             await session.delete(user)
             await session.commit()
 
@@ -43,7 +45,7 @@ class UserRepository:
         async with self.session_factory() as session:
             user = await session.get(User, user)
             if user:
-                if psw == '' and profile.username == '':
+                if psw == '' and profile.username == '' and profile.avatar == '':
                     return {'message': 'No changes.'}
 
                 if not psw == '':
@@ -51,6 +53,9 @@ class UserRepository:
 
                 if not profile.username == '':
                     user.username = profile.username
+
+                if not profile.avatar == '':
+                    user.avatar = profile.avatar
 
                 await session.commit()
                 await session.refresh(user)

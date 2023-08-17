@@ -9,11 +9,17 @@ from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.auth.schemas import AuthUsers, RegisterUserModel
 from src.auth.services.auth import AuthService
+from src.celery.chat_access_tasks import chat_access
 
 
 app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
+
+# @app.get('/test')
+# async def test(ui: int, auth_service: AuthService = Depends(Provide[Container.auth_service])):
+#     chat_access.apply_async(args=[ui], countdown=3)
+
 
 @app.post("/log_in", status_code=status.HTTP_200_OK)
 @inject
@@ -58,4 +64,7 @@ async def verify_token(access_token: str = Cookie(None)):
 @app.post("/registration", status_code=status.HTTP_201_CREATED)
 @inject
 async def registration(user: RegisterUserModel, auth_service: AuthService = Depends(Provide[Container.auth_service])):
-    return await auth_service.register_user(user)
+    user = await auth_service.register_user(user)
+    if user.id:
+        chat_access.apply_async(args=[user.id], countdown=60)
+    return user

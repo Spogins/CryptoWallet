@@ -17,6 +17,10 @@ class AuthService:
         user_model.password = hashed_psw
         return await self._repository.add(user_model)
 
+    async def chat_access(self, user_id):
+        return await self._repository.get_access(user_id)
+
+
 
 
 

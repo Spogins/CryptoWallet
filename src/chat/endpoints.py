@@ -25,3 +25,15 @@ async def send_message(message: MessageForm, chat_service: ChatService = Depends
 @inject
 async def get_chat(limit: int = 10, chat_service: ChatService = Depends(Provide[Container.chat_service])):
     return await chat_service.get_chat(limit)
+
+
+# @app.put("/block_unblock", status_code=status.HTTP_200_OK)
+# @inject
+# async def block_unblock(user: int, chat_service: ChatService = Depends(Provide[Container.chat_service])):
+#     return await chat_service.get_chat(limit)
+#
+#
+# @app.delete("/delete_message", status_code=status.HTTP_200_OK)
+# @inject
+# async def delete_message(message: int, chat_service: ChatService = Depends(Provide[Container.chat_service])):
+#     return await chat_service.get_chat(limit)

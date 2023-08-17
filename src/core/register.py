@@ -1,6 +1,6 @@
 from dependency_injector import containers, providers
-
 from config.settings import WIRING_CONFIG
+from src.web3.containers import Container as WebContainer
 from src.auth.containers import Container as AuthContainer
 from src.core.containers import Container as DatabaseContainer
 from src.users.containers import Container as UserContainer
@@ -8,7 +8,6 @@ from src.wallet.containers import Container as WalletContainer
 from src.parser.containers import Container as ParserContainer
 from src.chat.containers import Container as ChatContainer
 from src.ibay.containers import Container as IBayContainer
-
 
 
 class RegisterContainer(containers.DeclarativeContainer):
@@ -20,3 +19,4 @@ class RegisterContainer(containers.DeclarativeContainer):
     parser_container = providers.Container(ParserContainer)
     chat_container = providers.Container(ChatContainer)
     ibay_container = providers.Container(IBayContainer)
+    web3_container = providers.Container(WebContainer)

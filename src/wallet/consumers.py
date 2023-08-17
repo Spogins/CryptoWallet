@@ -2,17 +2,21 @@ from celery.result import AsyncResult
 from propan.brokers.rabbit import RabbitExchange, RabbitQueue, ExchangeType
 from propan import RabbitRouter
 
-
-
-parser_router = RabbitRouter(prefix='parser/')
+wallet_router = RabbitRouter('wallet/')
 
 queue_parser = RabbitQueue(name='hash')
 
 
+@wallet_router.handle(queue_parser)
+async def wallet_handle(data):
+    if data.get('create'):
+        print('create ', data.get('create'))
 
-@parser_router.handle(queue_parser)
-async def send_hash(_hash):
-    print(f'---*---{_hash}---*---')
+    if data.get('update'):
+        print('update ', data.get('update'))
+
+    # print(f"---{data}---")
+    # print(f'---*---{data}---*---')
     # result: AsyncResult = parsing.apply_async(args=[_hash])
     # # print(result)
     # # print(f"---{block}---")

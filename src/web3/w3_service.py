@@ -13,6 +13,10 @@ class WebService:
         "X-API-Key": moralis_api_key
     }
 
+    async def get_block(self, number: str = 'latest'):
+        block = self.w3.eth.get_block(number)
+        return block['number']
+
     async def get_transactions(self, address):
         url = f'https://deep-index.moralis.io/api/v2/{address}/?chain=sepolia'
         async with httpx.AsyncClient() as client:

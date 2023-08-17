@@ -1,3 +1,5 @@
+from typing import Optional
+
 from pydantic import BaseModel
 
 
@@ -5,7 +7,7 @@ class ProductForm(BaseModel):
     title: str
     wallet: str
     price: float
-    image: str
+    image: Optional[str] = ''
 
 
 class ProductEdit(BaseModel):
@@ -13,4 +15,4 @@ class ProductEdit(BaseModel):
     title: str
     wallet: str
     price: float
-    image: str
+    image: Optional[str] = ''

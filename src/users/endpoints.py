@@ -5,6 +5,7 @@ import jwt
 from fastapi.security import HTTPAuthorizationCredentials
 from config.settings import JWT_SECRET, ALGORITHM
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
+from src.boto3.schemas import Base64
 from src.users.containers import Container
 from src.users.repository import NotFoundError
 from src.users.schemas import UserModel, UserProfile
@@ -14,6 +15,12 @@ from utils.base.get_user_bearer import get_user_from_bearer
 app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
+
+
+# @app.post('/test')
+# @inject
+# async def test(base64_image: Base64, user_service: UserService = Depends(Provide[Container.user_service])):
+#     return await user_service.test(base64_image)
 
 
 @app.get("/users", status_code=status.HTTP_200_OK)
@@ -67,8 +74,7 @@ async def edit_profile(profile: UserProfile,
                        user_service: UserService = Depends(Provide[Container.user_service]),
                        bearer: HTTPAuthorizationCredentials = Depends(user_auth)
                        ):
-    try:
-        user = await get_user_from_bearer(bearer)
-        return await user_service.edit_profile(profile, user)
-    except:
-        return {'access_token': 'expire token'}
+
+    user = await get_user_from_bearer(bearer)
+    return await user_service.edit_profile(profile, user)
+

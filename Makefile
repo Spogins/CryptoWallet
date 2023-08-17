@@ -5,7 +5,7 @@ fast_api:
 
 socketio:
 
-	uvicorn config_socketio.app:socket_app --reload --port 8001
+	uvicorn config_socketio.socket_app:socket_app --reload --port 8001
 
 
 socket_connect:
@@ -15,7 +15,19 @@ socket_connect:
 
 worker:
 
-	celery -A config_celery.celery worker --loglevel=info
+	celery -A config_celery.celery_app worker --loglevel=info
+
+
+migration:
+
+	alembic revision --autogenerate -m "migration"
+
+
+migrate:
+
+	alembic upgrade head
+
+
 
 
 

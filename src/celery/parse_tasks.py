@@ -1,24 +1,18 @@
 import asyncio
+from dependency_injector.wiring import Provide, inject
 from config_celery.celery import celery
 from src.parser.containers import Container
-
-parse_service = Container.parser_service()
-
-
-# celery.conf.beat_schedule = {
-#     "parsing": {
-#         "task": "src.celery.parse_tasks.parsing",
-#         "schedule": 30.0  # Every 30 seconds, adjust as needed
-#     },
-# }
+from src.parser.services.block_parser import ParserService
 
 
 @celery.task
-def parsing(block):
-    print(block)
+@inject
+def parsing(block, parser_service: ParserService = Provide[Container.parser_service]):
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(parse_service.parse_block(block))
+    loop.run_until_complete(parser_service.parse_block(block))
     return "Async task completed"
+
+
 
 
 

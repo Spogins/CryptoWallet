@@ -2,6 +2,7 @@ from sqlalchemy import *
 import datetime
 
 from sqlalchemy.orm import relationship
+from sqlalchemy_utils import URLType
 
 from src.core.db import Base
 
@@ -20,7 +21,7 @@ class Asset(Base):
     __tablename__ = 'asset'
     id = Column(Integer, primary_key=True, index=True)
     abbreviation = Column(String)
-    image = Column(String, default='str')
+    image = Column(URLType, nullable=True)
     symbol = Column(String)
     decimal_places = Column(Float, default=0)
     blockchain_id = Column(Integer, ForeignKey('blockchain.id'))
@@ -32,7 +33,7 @@ class Blockchain(Base):
     id = Column(Integer, primary_key=True, index=True)
     name = Column(String)
     code = Column(String)
-    image = Column(String, default='str')
+    image = Column(URLType, nullable=True)
     asset = relationship('Asset', backref='blockchain')
 
 

@@ -7,6 +7,6 @@ class Product(Base):
     __tablename__ = 'product'
     id = Column(Integer, primary_key=True, index=True)
     title = Column(String, default='Product')
-    image = Column(String, default='.img')
+    image = Column(URLType, nullable=True)
     price = Column(DECIMAL, default=0)
     wallet = Column(String)

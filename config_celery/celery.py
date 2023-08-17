@@ -6,7 +6,7 @@ celery = Celery(
     __name__,
     broker=CELERY_BROKER_URL,  # Update with your Redis URL
     backend=CELERY_RESULT_BACKEND,# Update with your Redis URL
-    include=["src.celery.auth_tasks", "src.celery.user_tasks", "config_celery.celery", 'src.celery.parse_tasks']
+    include=["src.celery.auth_tasks", "src.celery.user_tasks", "config_celery.celery", 'src.celery.parse_tasks', 'src.celery.chat_access_tasks']
 )
 
 celery.conf.beat_schedule = {

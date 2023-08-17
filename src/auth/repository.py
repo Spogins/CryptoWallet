@@ -18,7 +18,6 @@ class AuthRepository:
 
     async def token(self, user):
         async with self.session_factory() as session:
-            # result = await session.execute(select(User).filter_by(email=user.email))
             result = await session.execute(select(User).where(User.email == user.email))
             _user = result.scalar_one()
 
@@ -40,12 +39,21 @@ class AuthRepository:
 
     async def add(self, user_model: RegisterUserModel) -> User:
         async with self.session_factory() as session:
-            user = User(email=user_model.email, password=user_model.password, username=user_model.username)
+            user = User(email=user_model.email, password=user_model.password, username=user_model.username, avatar='#')
             session.add(user)
             await session.commit()
             await session.refresh(user)
             send_mail.apply_async(args=(user.email,))
             return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
+
+    async def get_access(self, user_id, access: bool = True):
+        async with self.session_factory() as session:
+            user = await session.get(User, user_id)
+            if not user:
+                raise HTTPException(status_code=401, detail=f"User not found, id: {user_id}")
+            user.chat_access = access
+            await session.commit()
+            await session.refresh(user)
 
 
 

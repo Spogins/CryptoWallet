@@ -59,7 +59,7 @@ class UserProfile(BaseModel):
     username: Optional[str] = ''
     new_password: Optional[str] = ''
     repeat_password: Optional[str] = ''
-    # avatar: str
+    avatar: Optional[str] = ''
 
     @field_validator('repeat_password')
     @classmethod
