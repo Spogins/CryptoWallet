@@ -1,12 +1,8 @@
 import asyncio
-from time import sleep
-
-from asgiref.sync import async_to_sync
 from dependency_injector.wiring import Provide, inject
 from config_celery.celery import celery
 from src.auth.services.auth import AuthService
 from src.auth.containers import Container
-
 
 
 @celery.task

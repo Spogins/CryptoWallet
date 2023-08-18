@@ -1,9 +1,7 @@
 from sqlalchemy import Column, Integer, String, DateTime, Boolean
 import datetime
-
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import URLType
-
 from src.core.db import Base
 
 

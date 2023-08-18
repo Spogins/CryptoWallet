@@ -1,6 +1,5 @@
 import passlib.hash
 from dependency_injector import containers, providers
-
 from config.settings import WIRING_CONFIG
 from src.boto3.boto3_service import BotoService
 from src.core.containers import Container as db_container

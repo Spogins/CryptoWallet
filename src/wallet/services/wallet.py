@@ -74,7 +74,7 @@ class WalletService:
 
     async def get_transaction(self, trans_hash):
         transaction = await self.w3_service.get_transaction(trans_hash)
-        return await self.parse_trans_data(transaction)
+        return transaction
 
 
     @staticmethod
@@ -84,12 +84,18 @@ class WalletService:
         acct = Account.from_key(private_key)
         return {"private_key": private_key, "address": acct.address}
 
-
     async def get_balance(self, address):
         return await self.w3_service.get_balance(address)
 
     async def update_all(self):
-        return await self._repository.update_all_wallets()
+        wallets = await self._repository.get_wallets()
+        u_balance = []
+        for wallet in wallets:
+            address = wallet.address
+            balance = await self.get_balance(address)
+            updated = await self._repository.update_wallet_balance(address, balance.get('balance_eth'), wallet.user_id)
+            u_balance.append(updated)
+        return u_balance
 
     async def update_balance(self, address, user_id):
         balance = await self.w3_service.get_balance(address)
@@ -115,8 +121,11 @@ class WalletService:
 
     async def transaction_update(self, _hash):
         trans_hash = await self.w3_service.get_transaction(_hash)
-        transaction = await self.parse_trans_data(trans_hash)
-        return await self._repository.transaction_update(transaction)
+        return await self._repository.transaction_update(trans_hash)
+
+    async def add_transaction(self, _hash):
+        trans_data = await self.w3_service.get_transaction(_hash)
+        return await self._repository.add_transaction(trans_data)
 
 
 

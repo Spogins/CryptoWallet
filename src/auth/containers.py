@@ -1,6 +1,5 @@
 import passlib.hash
 from dependency_injector import containers, providers
-
 from config.settings import WIRING_CONFIG
 from src.auth.repository import AuthRepository
 from src.auth.services.auth import AuthService

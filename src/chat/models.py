@@ -1,8 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 import datetime
-
 from sqlalchemy_utils import URLType
-
 from src.core.db import Base
 
 

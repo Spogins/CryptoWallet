@@ -1,5 +1,4 @@
-from typing import Callable, Iterator
-
+from typing import Callable, Iterator, List
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -12,13 +11,13 @@ class UserRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
-    async def get_all(self) -> Iterator[User]:
+    async def get_all(self) -> list[UserForm]:
         async with self.session_factory() as session:
             result = await session.execute(select(User))
             users = result.scalars().all()
             return [UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar) for user in users]
 
-    async def get_by_id(self, user_id: int) -> User:
+    async def get_by_id(self, user_id: int) -> UserForm:
         async with self.session_factory() as session:
             user = await session.get(User, user_id)
             if not user:

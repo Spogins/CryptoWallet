@@ -1,4 +1,4 @@
-from asgiref.sync import async_to_sync, sync_to_async
+from asgiref.sync import async_to_sync
 from fastapi_mail import FastMail, MessageSchema, ConnectionConfig, MessageType
 from config.settings import MAIL_USERNAME, MAIL_PASSWORD, MAIL_FROM, MAIL_SERVER, MAIL_FROM_NAME
 from config_celery.celery import celery
@@ -16,14 +16,6 @@ conf = ConnectionConfig(
     USE_CREDENTIALS=True,
     VALIDATE_CERTS=True
 )
-
-
-# celery.conf.beat_schedule = {
-#     "send-mail": {
-#         "task": "src.celery.auth_tasks.send_mail",
-#         "schedule": 30.0  # Every 30 seconds, adjust as needed
-#     },
-# }
 
 
 @celery.task

@@ -1,13 +1,12 @@
 from collections.abc import Iterator
-from typing import Callable
-
+from typing import Callable, List
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.chat.models import ChatMessage
 from src.chat.schemas import MessageForm, ChatForm
 from src.users.models import User
-from utils.base.format_date import convert_date
+
 
 
 class ChatRepository:
@@ -30,7 +29,7 @@ class ChatRepository:
                 raise HTTPException(status_code=401,
                                     detail='User does not have access to the chat')
 
-    async def get_chat_messages(self, _limit) -> Iterator[ChatMessage]:
+    async def get_chat_messages(self, _limit) -> list[ChatForm]:
         async with self.session_factory() as session:
             stmt = select(ChatMessage).order_by(ChatMessage.id.desc()).limit(_limit)
             result = await session.execute(stmt)

@@ -1,9 +1,10 @@
 import httpx
 from eth_account import Account
 from fastapi import HTTPException
+from propan import RabbitBroker
 from web3 import Web3, HTTPProvider
+from config.settings import QUICKNODE_URL, MORALIS_API_KEY, RABBITMQ_URL
 
-from config.settings import QUICKNODE_URL, MORALIS_API_KEY
 
 
 class WebService:
@@ -12,10 +13,35 @@ class WebService:
     headers = {
         "X-API-Key": moralis_api_key
     }
+    block = None
+    old_block = None
+    new_block = None
+
+    async def get_trans(self, _hash):
+        return self.w3.eth.get_transaction(_hash)
+
+    @staticmethod
+    async def send_block_to_parsing(block: int):
+        print('---FIND_BLOCK---')
+        print(f'---{block}---')
+        async with RabbitBroker(RABBITMQ_URL) as broker:
+            await broker.publish(message=block, queue='parser/parse_block')
+
+    async def find_block(self):
+        if self.old_block is None:
+            self.old_block = await self.get_block()
+            await self.send_block_to_parsing(self.old_block)
+
+        self.new_block = await self.get_block()
+
+        if self.old_block < self.new_block:
+            for value in range(self.old_block + 1, self.new_block + 1):
+                await self.send_block_to_parsing(value)
+            self.old_block = self.new_block
 
     async def get_block(self, number: str = 'latest'):
         block = self.w3.eth.get_block(number)
-        return block['number']
+        return block['number'] if number == 'latest' else block
 
     async def get_transactions(self, address):
         url = f'https://deep-index.moralis.io/api/v2/{address}/?chain=sepolia'
@@ -32,35 +58,31 @@ class WebService:
                 # print("Ошибка при запросе к Moralis API:", response.status_code)
                 raise HTTPException(status_code=401, detail=f"Ошибка при запросе к Moralis API:, {response.status_code}")
 
-    async def get_transaction(self, trans_hash):
-        url = f'https://deep-index.moralis.io/api/v2/transaction/{trans_hash}?chain=sepolia'
-        async with httpx.AsyncClient() as client:
-            response = await client.get(url, headers=self.headers)
-            if response.status_code == 200:
-                trans = response.json()
-                return trans
-            else:
-                # print("Ошибка при запросе к Moralis API:", response.status_code)
-                raise HTTPException(status_code=401,
-                                    detail=f"Ошибка при запросе к Moralis API:, {response.status_code}")
+    async def get_transaction(self, _hash):
+        transaction = self.w3.eth.get_transaction(_hash)
+        block = await self.get_block(transaction.get('blockNumber'))
+        transaction_receipt = self.w3.eth.get_transaction_receipt(_hash)
+        hash_data = await self.parse_trans_data(transaction, block.timestamp, transaction_receipt.get('status'), _hash)
+        return hash_data
+
 
     async def transaction_info(self, tx_hash):
         tx = self.w3.eth.get_transaction(tx_hash)
         tx_receipt = self.w3.eth.get_transaction_receipt(tx_hash)
 
         if tx_receipt is None:
-            status = "Pending"
+            status = "PENDING"
         elif tx_receipt['status'] == 1:
-            status = "Success"
+            status = "SUCCESS"
         else:
-            status = "Failure"
+            status = "FAILURE"
 
         tx_info = {
-            'Хэш транзакции': tx.hash.hex(),
-            'Отправитель': tx['from'],
-            'Получатель': tx['to'],
-            'Сумма': self.w3.from_wei(tx.value, 'ether'),
-            'Статус': status
+            'hash': tx.hash.hex(),
+            'from_address': tx['from'],
+            'to_address': tx['to'],
+            'value': self.w3.from_wei(tx.value, 'ether'),
+            'status': status
         }
         return tx_info
 
@@ -105,3 +127,33 @@ class WebService:
         except:
             raise HTTPException(status_code=401,
                                 detail='Something went wrong, please make sure you entered the correct details and/or you have enough funds to complete the transaction.')
+
+    async def parse_trans_data(self, trans, block_time, status, _hash):
+        # current_time = datetime.utcnow()
+        # past_time = datetime.strptime(block_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+        # time_difference = current_time - past_time
+        # # Получение количества дней, часов, минут и секунд
+        # days = time_difference.days
+        # hours, remainder = divmod(time_difference.seconds, 3600)
+        # minutes, seconds = divmod(remainder, 60)
+        gas_price_gwei = int(trans.get('gasPrice'))  # Пример: 100 Gwei
+        gas_limit = int(trans.get('gas'))  # Пример: стандартный лимит для отправки эфира
+        txn_fee_wei = gas_price_gwei * gas_limit * 10 ** 9  # 1 Gwei = 10^9 Wei
+        txn_fee_eth = txn_fee_wei / 10 ** 18
+
+        if status == 1:
+            status = "SUCCESS"
+        elif status == 0:
+            status = "FAILURE"
+        else:
+            status = "PENDING"
+        transaction = {
+            "hash": _hash,
+            "from_address": trans.get('from'),
+            "to_address": trans.get('to'),
+            "value": int(trans.get('value')) / 10 ** 18,
+            "age": str(block_time),
+            "txn_fee": txn_fee_eth / 10 ** 9,
+            'status': status
+        }
+        return transaction

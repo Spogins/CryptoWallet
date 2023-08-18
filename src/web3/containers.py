@@ -5,4 +5,4 @@ from src.web3.w3_service import WebService
 
 class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=WIRING_CONFIG)
-    web3_service = providers.Factory(WebService)
+    web3_service = providers.Singleton(WebService)

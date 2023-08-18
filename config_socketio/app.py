@@ -2,9 +2,8 @@ import asyncio
 import socketio
 from dependency_injector.wiring import inject, Provide
 from config.settings import ALLOWED_HOSTS
-from src.parser.containers import Container
-
-from src.parser.services.block_parser import ParserService
+from src.web3.containers import Container
+from src.web3.w3_service import WebService
 
 sio = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=ALLOWED_HOSTS)
 
@@ -29,10 +28,9 @@ async def disconnect(sid):
 
 @sio.on('parse_block')
 @inject
-async def check_block(sid, parser_service: ParserService = Provide[Container.parser_service]):
+async def check_block(sid, web3_service: WebService = Provide[Container.web3_service]):
     while True:
-        # print('---*---')
-        block = await parser_service.get_block()
+        block = await web3_service.find_block()
         await asyncio.sleep(1)
 
 

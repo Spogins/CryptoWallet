@@ -2,6 +2,7 @@ import socketio
 from config_socketio.app import sio
 from src.core.register import RegisterContainer
 
+
 def create_socket_app() -> socketio.ASGIApp:
     container = RegisterContainer()
     socketio_app = socketio.ASGIApp(sio)

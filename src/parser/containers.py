@@ -10,4 +10,4 @@ class Container(containers.DeclarativeContainer):
     wiring_config = containers.WiringConfiguration(packages=WIRING_CONFIG)
     parser_repository = providers.Factory(ParserRepository, session_factory=db_container.session)
     w3_service = providers.Factory(WebService)
-    parser_service = providers.Singleton(ParserService, parser_repository=parser_repository, w3_service=w3_service)
+    parser_service = providers.Factory(ParserService, parser_repository=parser_repository, w3_service=w3_service)

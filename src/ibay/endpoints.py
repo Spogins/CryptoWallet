@@ -1,19 +1,11 @@
 from dependency_injector.wiring import Provide, inject
 from fastapi import Depends, APIRouter
-from propan import RabbitBroker
 from starlette import status
-
-from config.settings import RABBITMQ_URL
 from src.ibay.containers import Container
 from src.ibay.schemas import ProductForm, ProductEdit
 from src.ibay.services.ibay import IBayService
 
 app = APIRouter()
-
-# @app.get('/test')
-# async def test():
-#     async with RabbitBroker(RABBITMQ_URL) as broker:
-#         await broker.publish(message=f'HASH', queue='wallet/hash')
 
 
 @app.post('/add_product', status_code=status.HTTP_201_CREATED)

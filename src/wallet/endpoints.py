@@ -2,7 +2,6 @@ from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
-
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.wallet.containers import Container
 from src.wallet.schemas import Transaction
@@ -117,7 +116,7 @@ async def get_all_transaction(wallet_service: WalletService = Depends(Provide[Co
     return await wallet_service.get_all_transaction()
 
 
-@app.put('/update_db_transaction_moralis', status_code=status.HTTP_200_OK)
+@app.put('/update_db_transaction_w3', status_code=status.HTTP_200_OK)
 @inject
 async def transaction_update(_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.transaction_update(_hash)
@@ -141,7 +140,7 @@ async def get_transactions(address: str, limit: int = 10, wallet_service: Wallet
     return await wallet_service.get_transactions(address, limit)
 
 
-@app.get('/transaction_moralis', status_code=status.HTTP_200_OK)
+@app.get('/transaction_w3', status_code=status.HTTP_200_OK)
 @inject
 async def get_by_hash(trans_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.get_transaction(trans_hash)

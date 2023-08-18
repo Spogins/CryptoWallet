@@ -16,10 +16,6 @@ app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
 
-# @app.get('/test')
-# async def test(ui: int, auth_service: AuthService = Depends(Provide[Container.auth_service])):
-#     chat_access.apply_async(args=[ui], countdown=3)
-
 
 @app.post("/log_in", status_code=status.HTTP_200_OK)
 @inject

@@ -12,5 +12,5 @@ queue_parser = RabbitQueue(name='parse_block')
 @parser_router.handle(queue_parser)
 async def parser_handle(block):
     result: AsyncResult = parsing.apply_async(args=[block])
-    # print(f"---{block}---")
+
 

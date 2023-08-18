@@ -1,4 +1,4 @@
-fast_api:
+fastapi:
 
 	uvicorn config_fastapi.app:app --reload --port 8000
 

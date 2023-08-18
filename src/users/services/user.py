@@ -1,5 +1,4 @@
 from typing import Iterator, Callable
-
 from src.boto3.boto3_service import BotoService
 from src.users.models import User
 from src.users.repository import UserRepository

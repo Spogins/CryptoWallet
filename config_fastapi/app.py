@@ -51,6 +51,11 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
+# @app.get('/test')
+# async def test():
+#     return {'message': 'text'}
+
+
 @app.on_event('startup')
 async def publish_smth():
     app.broker = broker

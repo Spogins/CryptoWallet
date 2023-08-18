@@ -14,6 +14,12 @@ async def parse_trans_data(trans, block_time, status, _hash):
     txn_fee_wei = gas_price_gwei * gas_limit * 10 ** 9  # 1 Gwei = 10^9 Wei
     txn_fee_eth = txn_fee_wei / 10 ** 18
 
+    if status == 1:
+        status = "SUCCESS"
+    elif status == 0:
+        status = "FAILURE"
+    else:
+        status = "PENDING"
     transaction = {
         "hash": _hash,
         "from_address": trans.get('from'),

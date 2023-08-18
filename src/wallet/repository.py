@@ -2,7 +2,6 @@ from typing import Callable
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-from config.settings import w3
 from src.users.models import User
 from src.wallet.models import Wallet, Blockchain, Asset, Transaction
 from src.wallet.schemas import UserWallet
@@ -37,6 +36,12 @@ class WalletRepository:
             wallet = await session.get(Wallet, wallet_id)
             return wallet
 
+    async def get_wallets(self):
+        async with self.session_factory() as session:
+            wallet = await session.execute(select(Wallet))
+            wallets = wallet.scalars().all()
+            return wallets
+
     async def user_wallets(self, user_id):
         async with self.session_factory() as session:
             result = await session.execute(select(Wallet).where(Wallet.user_id == user_id))
@@ -51,22 +56,10 @@ class WalletRepository:
                 wallet.balance = balance_eth
                 await session.commit()
                 await session.refresh(wallet)
-                return {'wallet': address, 'balance_eth': balance_eth}
+                return {'id': int(wallet.id), 'wallet': wallet.address, 'balance': float(wallet.balance)}
             else:
                 raise HTTPException(status_code=401,
                                     detail='not a valid wallet make sure you check your wallet.')
-
-    async def update_all_wallets(self):
-        async with self.session_factory() as session:
-            result = await session.execute(select(Wallet))
-            wallets = result.scalars().all()
-            for wallet in wallets:
-                balance_wei = w3.eth.get_balance(wallet.address)
-                balance_eth = w3.from_wei(balance_wei, 'ether')
-                wallet.balance = balance_eth
-                await session.commit()
-                await session.refresh(wallet)
-            return [UserWallet(id=wallet.id, address=wallet.address, balance=wallet.balance) for wallet in wallets]
 
     async def get_db_transaction(self, address):
         async with self.session_factory() as session:
@@ -94,12 +87,14 @@ class WalletRepository:
 
     async def add_transaction(self, trans_data):
         async with self.session_factory() as session:
-            print(trans_data)
             transaction = Transaction(
                 hash=trans_data.get('hash'),
                 from_address=trans_data.get('from_address'),
                 to_address=trans_data.get('to_address'),
                 value=trans_data.get('value'),
+                status=trans_data.get('status') if trans_data.get('status') else "PENDING",
+                date=trans_data.get('age') if trans_data.get('age') else "PENDING",
+                txn_fee=trans_data.get('txn_fee') if trans_data.get('txn_fee') else 0
             )
             session.add(transaction)
             await session.commit()
@@ -110,10 +105,8 @@ class WalletRepository:
         async with self.session_factory() as session:
             result = await session.execute(select(Transaction).where(Transaction.hash == trans_data.get('hash')))
             transaction = result.scalar_one()
-            if trans_data.get('status') == '1':
-                transaction.status = "SUCCESS"
-            else:
-                transaction.status = "FAILURE"
+
+            transaction.status = trans_data.get('status')
             transaction.date = trans_data.get('age')
             transaction.txn_fee = trans_data.get('txn_fee')
 

@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-
 from src.boto3.boto3_service import BotoService
 from src.chat.repository import ChatRepository
 from src.chat.schemas import MessageForm

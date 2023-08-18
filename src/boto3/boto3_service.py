@@ -16,7 +16,8 @@ class BotoService:
         aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
     )
 
-    async def upload_image(self, base64_image):
+    @staticmethod
+    async def upload_image(base64_image):
         try:
             base64_image = base64_image.split(',')[1]
             image_data = base64.b64decode(base64_image)
