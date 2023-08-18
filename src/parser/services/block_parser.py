@@ -19,21 +19,26 @@ class ParserService:
     async def parse_block(self, block):
         block = await self.w3_service.get_block(block)
         wallets = await self._repository.get_wallets()
-        self.hash_trans = await self._repository.get_trans_by_status("PENDING")
+        hash_trans = await self._repository.get_trans_by_status("PENDING")
+        parsed_hash = []
         iterator = self.forward_iterator(block.transactions)
         async for transaction_block in iterator:
             _hash = hexbytes.HexBytes(transaction_block).hex()
-            if _hash in self.hash_trans:
-                print(f"hash - {_hash}")
-                async with RabbitBroker(RABBITMQ_URL) as broker:
-                    await broker.publish(message={'update': _hash}, queue='wallet/hash')
-                self.hash_trans.append(_hash)
+            if _hash in parsed_hash:
+                continue
+
+            if _hash in hash_trans:
+                await self.send_hash({'update': _hash})
+                parsed_hash.append(_hash)
             else:
                 transaction = await self.w3_service.get_trans(_hash)
                 if transaction.get('from') in wallets or transaction.get('to') in wallets:
-                    print(f"from - {transaction.get('from')}")
-                    print(f"to - {transaction.get('to')}")
-                    async with RabbitBroker(RABBITMQ_URL) as broker:
-                        await broker.publish(message={'create': _hash}, queue='wallet/hash')
-                    self.hash_trans.append(_hash)
+                    await self.send_hash({'create': _hash})
+                    parsed_hash.append(_hash)
+
         print('---DONE---')
+
+    @staticmethod
+    async def send_hash(data):
+        async with RabbitBroker(RABBITMQ_URL) as broker:
+            await broker.publish(message=data, queue='wallet/hash')

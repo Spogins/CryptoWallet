@@ -38,28 +38,34 @@ class WalletService:
         balance = balance.get('balance_eth')
         return await self._repository.user_add_wallet(user_id, wallet, balance)
 
-    async def parse_trans_data(self, trans):
-        current_time = datetime.utcnow()
-        past_time = datetime.strptime(trans.get('block_timestamp'), "%Y-%m-%dT%H:%M:%S.%fZ")
-        time_difference = current_time - past_time
-        # Получение количества дней, часов, минут и секунд
-        days = time_difference.days
-        hours, remainder = divmod(time_difference.seconds, 3600)
-        minutes, seconds = divmod(remainder, 60)
-
-        gas_price_gwei = int(trans.get('gas_price'))  # Пример: 100 Gwei
+    async def parse_trans_data(self, trans, block_time, status, _hash):
+        # current_time = datetime.utcnow()
+        # past_time = datetime.strptime(block_time, "%Y-%m-%dT%H:%M:%S.%fZ")
+        # time_difference = current_time - past_time
+        # # Получение количества дней, часов, минут и секунд
+        # days = time_difference.days
+        # hours, remainder = divmod(time_difference.seconds, 3600)
+        # minutes, seconds = divmod(remainder, 60)
+        gas_price_gwei = int(trans.get('gasPrice'))  # Пример: 100 Gwei
         gas_limit = int(trans.get('gas'))  # Пример: стандартный лимит для отправки эфира
         txn_fee_wei = gas_price_gwei * gas_limit * 10 ** 9  # 1 Gwei = 10^9 Wei
         txn_fee_eth = txn_fee_wei / 10 ** 18
+
+        if status == 1:
+            status = "SUCCESS"
+        elif status == 0:
+            status = "FAILURE"
+        else:
+            status = "PENDING"
+
         transaction = {
-            "hash": trans.get('hash'),
-            "from_address": trans.get('from_address'),
-            "to_address": trans.get('to_address'),
+            "hash": _hash,
+            "from_address": trans.get('from'),
+            "to_address": trans.get('to'),
             "value": int(trans.get('value')) / 10 ** 18,
-            "age": f"Прошло {days} дней, {hours} часов, {minutes} минут, {seconds} секунд.",
+            "age": str(block_time),
             "txn_fee": txn_fee_eth / 10 ** 9,
-            'block_number': trans.get('block_number'),
-            "status": trans.get('receipt_status'),
+            'status': status
         }
         return transaction
 
@@ -67,14 +73,15 @@ class WalletService:
         result = await self.w3_service.get_transactions(address)
         transactions_list = []
         for trans in result:
-            transaction = await self.parse_trans_data(trans)
+            transaction = await self.parse_trans_data_moralis(trans)
             transactions_list.append(transaction)
         return transactions_list[:limit]
 
 
-    async def get_transaction(self, trans_hash):
-        transaction = await self.w3_service.get_transaction(trans_hash)
-        return transaction
+    async def get_transaction(self, _hash):
+        transaction = await self.w3_service.get_transaction(_hash)
+        return await self.parse_trans_data(transaction.get('transaction'), transaction.get('timestamp'), transaction.get('status'), _hash)
+
 
 
     @staticmethod
@@ -121,11 +128,40 @@ class WalletService:
 
     async def transaction_update(self, _hash):
         trans_hash = await self.w3_service.get_transaction(_hash)
-        return await self._repository.transaction_update(trans_hash)
+        trans_data = await self.parse_trans_data(trans_hash.get('transaction'), trans_hash.get('timestamp'), trans_hash.get('status'), _hash)
+        return await self._repository.transaction_update(trans_data)
 
     async def add_transaction(self, _hash):
-        trans_data = await self.w3_service.get_transaction(_hash)
+        trans_hash = await self.w3_service.get_transaction(_hash)
+        trans_data = await self.parse_trans_data(trans_hash.get('transaction'), trans_hash.get('timestamp'),
+                                                 trans_hash.get('status'), _hash)
         return await self._repository.add_transaction(trans_data)
+
+
+    async def parse_trans_data_moralis(self, trans):
+        current_time = datetime.utcnow()
+        past_time = datetime.strptime(trans.get('block_timestamp'), "%Y-%m-%dT%H:%M:%S.%fZ")
+        time_difference = current_time - past_time
+        # Получение количества дней, часов, минут и секунд
+        days = time_difference.days
+        hours, remainder = divmod(time_difference.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+
+        gas_price_gwei = int(trans.get('gas_price'))  # Пример: 100 Gwei
+        gas_limit = int(trans.get('gas'))  # Пример: стандартный лимит для отправки эфира
+        txn_fee_wei = gas_price_gwei * gas_limit * 10 ** 9  # 1 Gwei = 10^9 Wei
+        txn_fee_eth = txn_fee_wei / 10 ** 18
+        transaction = {
+            "hash": trans.get('hash'),
+            "from_address": trans.get('from_address'),
+            "to_address": trans.get('to_address'),
+            "value": int(trans.get('value')) / 10 ** 18,
+            "age": f"Прошло {days} дней, {hours} часов, {minutes} минут, {seconds} секунд.",
+            "txn_fee": txn_fee_eth / 10 ** 9,
+            'block_number': trans.get('block_number'),
+            "status": trans.get('receipt_status'),
+        }
+        return transaction
 
 
 

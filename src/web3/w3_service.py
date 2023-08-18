@@ -62,8 +62,8 @@ class WebService:
         transaction = self.w3.eth.get_transaction(_hash)
         block = await self.get_block(transaction.get('blockNumber'))
         transaction_receipt = self.w3.eth.get_transaction_receipt(_hash)
-        hash_data = await self.parse_trans_data(transaction, block.timestamp, transaction_receipt.get('status'), _hash)
-        return hash_data
+        # hash_data = await self.parse_trans_data(transaction, block.timestamp, transaction_receipt.get('status'), _hash)
+        return {'transaction': transaction, 'timestamp': block.timestamp, 'status': transaction_receipt.get('status')}
 
 
     async def transaction_info(self, tx_hash):
@@ -128,32 +128,3 @@ class WebService:
             raise HTTPException(status_code=401,
                                 detail='Something went wrong, please make sure you entered the correct details and/or you have enough funds to complete the transaction.')
 
-    async def parse_trans_data(self, trans, block_time, status, _hash):
-        # current_time = datetime.utcnow()
-        # past_time = datetime.strptime(block_time, "%Y-%m-%dT%H:%M:%S.%fZ")
-        # time_difference = current_time - past_time
-        # # Получение количества дней, часов, минут и секунд
-        # days = time_difference.days
-        # hours, remainder = divmod(time_difference.seconds, 3600)
-        # minutes, seconds = divmod(remainder, 60)
-        gas_price_gwei = int(trans.get('gasPrice'))  # Пример: 100 Gwei
-        gas_limit = int(trans.get('gas'))  # Пример: стандартный лимит для отправки эфира
-        txn_fee_wei = gas_price_gwei * gas_limit * 10 ** 9  # 1 Gwei = 10^9 Wei
-        txn_fee_eth = txn_fee_wei / 10 ** 18
-
-        if status == 1:
-            status = "SUCCESS"
-        elif status == 0:
-            status = "FAILURE"
-        else:
-            status = "PENDING"
-        transaction = {
-            "hash": _hash,
-            "from_address": trans.get('from'),
-            "to_address": trans.get('to'),
-            "value": int(trans.get('value')) / 10 ** 18,
-            "age": str(block_time),
-            "txn_fee": txn_fee_eth / 10 ** 9,
-            'status': status
-        }
-        return transaction

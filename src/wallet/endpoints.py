@@ -116,13 +116,13 @@ async def get_all_transaction(wallet_service: WalletService = Depends(Provide[Co
     return await wallet_service.get_all_transaction()
 
 
-@app.put('/update_db_transaction_w3', status_code=status.HTTP_200_OK)
+@app.put('/update_db_transaction', status_code=status.HTTP_200_OK)
 @inject
 async def transaction_update(_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.transaction_update(_hash)
 
 
-@app.put('/update_db_transactions_moralis', status_code=status.HTTP_200_OK)
+@app.put('/update_db_transactions', status_code=status.HTTP_200_OK)
 @inject
 async def update_all_transaction(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.update_all_transaction()
