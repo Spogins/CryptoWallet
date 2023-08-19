@@ -8,15 +8,20 @@ class ParserRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
-    async def get_trans_by_status(self, status):
+    async def get_db_trans(self, _hash):
         async with self.session_factory() as session:
-            result = await session.execute(select(Transaction).filter(Transaction.status == status))
-            transactions = result.scalars().all()
-            return [trans.hash for trans in transactions]
+            result = await session.execute(select(Transaction).where(Transaction.hash == _hash and Transaction.status == "PENDING"))
+            trans = result.scalars().first()
+            if trans:
+                return True
+            else:
+                return False
 
-    async def get_wallets(self):
+    async def get_wallet(self, address):
         async with self.session_factory() as session:
-            result = await session.execute(select(Wallet))
-            wallets = result.scalars().all()
-            return [wallet.address for wallet in wallets]
-
+            result = await session.execute(select(Wallet).where(Wallet.address == address))
+            wallets = result.scalars().first()
+            if wallets:
+                return True
+            else:
+                return False

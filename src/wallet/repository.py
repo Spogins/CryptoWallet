@@ -77,7 +77,7 @@ class WalletRepository:
         async with self.session_factory() as session:
             _blockchain = await session.execute(select(Blockchain).filter_by(name='Ethereum'))
             _blockchain = _blockchain.scalars().first()
-            asset = Asset(abbreviation='ETH', symbol='Ξ', blockchain=_blockchain)
+            asset = Asset(abbreviation='ether', symbol='Ξ', decimal_places=18, blockchain=_blockchain)
             session.add(asset)
             await session.commit()
             await session.refresh(asset)
@@ -113,6 +113,26 @@ class WalletRepository:
             await session.commit()
             await session.refresh(transaction)
             return {'transaction': transaction}
+
+    async def get_asset(self, from_address, to_address):
+        async with self.session_factory() as session:
+
+            from_address = await session.execute(select(Wallet).where(Wallet.address == from_address))
+            to_address = await session.execute(select(Wallet).where(Wallet.address == to_address))
+
+            result_from = from_address.scalars().first()
+            result_to = to_address.scalars().first()
+
+            if from_address:
+                asset = await session.get(Asset, result_from.asset_id)
+                return asset
+
+            elif to_address:
+                asset = await session.get(Asset, result_to.asset_id)
+                return asset
+            else:
+                return False
+
 
 
 

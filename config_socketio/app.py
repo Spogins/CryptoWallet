@@ -31,7 +31,7 @@ async def disconnect(sid):
 async def check_block(sid, web3_service: WebService = Provide[Container.web3_service]):
     while True:
         block = await web3_service.find_block()
-        await asyncio.sleep(1)
+        # await asyncio.sleep(1)
 
 
 

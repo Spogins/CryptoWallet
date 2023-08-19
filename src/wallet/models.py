@@ -9,7 +9,7 @@ class Wallet(Base):
     id = Column(Integer, primary_key=True, index=True)
     private_key = Column(String, unique=True)
     address = Column(String, unique=True)
-    balance = Column(Float, default=0)
+    balance = Column(DECIMAL, default=0.0)
     user_id = Column(Integer, ForeignKey('user.id'))
     asset_id = Column(Integer, ForeignKey('asset.id'))
 
@@ -20,7 +20,7 @@ class Asset(Base):
     abbreviation = Column(String)
     image = Column(URLType, nullable=True)
     symbol = Column(String)
-    decimal_places = Column(Float, default=0)
+    decimal_places = Column(Integer, default=0)
     blockchain_id = Column(Integer, ForeignKey('blockchain.id'))
     wallet = relationship('Wallet', backref='asset')
 
@@ -40,9 +40,9 @@ class Transaction(Base):
     hash = Column(String)
     from_address = Column(String)
     to_address = Column(String)
-    value = Column(Float)
+    value = Column(DECIMAL)
     date = Column(String, default='PENDING')
-    txn_fee = Column(Float, default=0)
+    txn_fee = Column(DECIMAL, default=0.0)
     status = Column(String, default='PENDING')
 
 

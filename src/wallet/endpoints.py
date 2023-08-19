@@ -95,6 +95,14 @@ async def update_all_wallets_balance(wallet_service: WalletService = Depends(Pro
     return await wallet_service.update_all()
 
 
+@app.post("/test_trans", status_code=status.HTTP_201_CREATED)
+@inject
+async def send_eth(trans: Transaction,
+                   wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+
+    return await wallet_service.test_transaction(private_key_sender=trans.private_key_sender,
+                                            receiver_address=trans.receiver_address, value=trans.value)
+
 @app.post("/send_eth", status_code=status.HTTP_201_CREATED)
 @inject
 async def send_eth(trans: Transaction,
@@ -144,7 +152,6 @@ async def get_transactions(address: str, limit: int = 10, wallet_service: Wallet
 @inject
 async def get_by_hash(trans_hash: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.get_transaction(trans_hash)
-
 
 
 # #CREATE ASSEY/BLOCKCHAIN MODEL

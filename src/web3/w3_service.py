@@ -1,10 +1,13 @@
+
+from asyncio import sleep
+
 import httpx
 from eth_account import Account
 from fastapi import HTTPException
 from propan import RabbitBroker
 from web3 import Web3, HTTPProvider
 from config.settings import QUICKNODE_URL, MORALIS_API_KEY, RABBITMQ_URL
-
+from src.web3.repository import WebRepository
 
 
 class WebService:
@@ -13,12 +16,32 @@ class WebService:
     headers = {
         "X-API-Key": moralis_api_key
     }
-    block = None
-    old_block = None
     new_block = None
+    old_block = None
+
+    def __init__(self, web3_repository: WebRepository) -> None:
+        self._repository: WebRepository = web3_repository
 
     async def get_trans(self, _hash):
         return self.w3.eth.get_transaction(_hash)
+
+    async def find_block(self) -> None:
+        self.old_block: int = await self._repository.get_old_block()
+
+        if self.old_block is None:
+            self.old_block: int = await self.get_block()
+            await self.send_block_to_parsing(self.old_block)
+
+        self.new_block: int = await self.get_block()
+
+        if self.old_block < self.new_block:
+            for value in range(self.old_block + 1, self.new_block + 1):
+                await self.send_block_to_parsing(value)
+            self.old_block: int = self.new_block
+
+        await self._repository.update_block(self.new_block)
+
+
 
     @staticmethod
     async def send_block_to_parsing(block: int):
@@ -26,18 +49,6 @@ class WebService:
         print(f'---{block}---')
         async with RabbitBroker(RABBITMQ_URL) as broker:
             await broker.publish(message=block, queue='parser/parse_block')
-
-    async def find_block(self):
-        if self.old_block is None:
-            self.old_block = await self.get_block()
-            await self.send_block_to_parsing(self.old_block)
-
-        self.new_block = await self.get_block()
-
-        if self.old_block < self.new_block:
-            for value in range(self.old_block + 1, self.new_block + 1):
-                await self.send_block_to_parsing(value)
-            self.old_block = self.new_block
 
     async def get_block(self, number: str = 'latest'):
         block = self.w3.eth.get_block(number)
@@ -65,7 +76,6 @@ class WebService:
         # hash_data = await self.parse_trans_data(transaction, block.timestamp, transaction_receipt.get('status'), _hash)
         return {'transaction': transaction, 'timestamp': block.timestamp, 'status': transaction_receipt.get('status')}
 
-
     async def transaction_info(self, tx_hash):
         tx = self.w3.eth.get_transaction(tx_hash)
         tx_receipt = self.w3.eth.get_transaction_receipt(tx_hash)
@@ -77,11 +87,13 @@ class WebService:
         else:
             status = "FAILURE"
 
+        asset = await self.get_wallet_asset(tx['from'], tx['to'])
+
         tx_info = {
             'hash': tx.hash.hex(),
             'from_address': tx['from'],
             'to_address': tx['to'],
-            'value': self.w3.from_wei(tx.value, 'ether'),
+            'value': self.w3.from_wei(tx.value, asset.abbreviation),
             'status': status
         }
         return tx_info
@@ -94,6 +106,7 @@ class WebService:
 
     async def transaction(self, private_key_sender, receiver_address, value):
         try:
+
             # Приватный ключ отправителя
             private_key_sender = private_key_sender
             # Адрес отправителя (получается из приватного ключа)
@@ -101,12 +114,15 @@ class WebService:
             sender_address = sender_account.address
             # Адрес получателя
             receiver_address = receiver_address
+
+            asset = await self.get_wallet_asset(sender_address, receiver_address)
+
             # Получение nonce для подписи транзакции
             nonce = self.w3.eth.get_transaction_count(sender_address)
             # Создание транзакции
             transaction = {
                 'to': receiver_address,
-                'value': self.w3.to_wei(value, 'ether'),  # Сумма для перевода в Wei (0.1 ETH)
+                'value': self.w3.to_wei(value, asset.abbreviation),  # Сумма для перевода в Wei (0.1 ETH)
                 'gas': 21000,  # Лимит газа для базовой транзакции
                 'gasPrice': self.w3.to_wei('50', 'gwei'),  # Цена газа в Wei
                 'nonce': nonce,
@@ -127,4 +143,12 @@ class WebService:
         except:
             raise HTTPException(status_code=401,
                                 detail='Something went wrong, please make sure you entered the correct details and/or you have enough funds to complete the transaction.')
+
+    async def get_wallet_asset(self, from_address, to_address):
+        asset = await self._repository.get_asset(from_address, to_address)
+        if asset:
+            return asset
+        else:
+            raise HTTPException(status_code=401,
+                                detail='Not found asset for wallet.')
 

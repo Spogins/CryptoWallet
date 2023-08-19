@@ -52,12 +52,13 @@ app = create_app()
 
 
 # @app.get('/test')
+# @inject
 # async def test():
 #     return {'message': 'text'}
 
 
 @app.on_event('startup')
-async def publish_smth():
+async def publish_smtp():
     app.broker = broker
     app.broker.include_router(parser_router)
     app.broker.include_router(wallet_router)
@@ -66,7 +67,7 @@ async def publish_smth():
 
 
 @app.on_event('shutdown')
-async def publish_smth():
+async def publish_smtp():
     print('shut_down')
     await broker.close()
 
