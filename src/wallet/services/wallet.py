@@ -98,13 +98,13 @@ class WalletService:
         for wallet in wallets:
             address = wallet.address
             balance = await self.get_balance(address)
-            updated = await self._repository.update_wallet_balance(address, balance.get('balance_eth'), wallet.user_id)
+            updated = await self._repository.update_wallet_balance(address, balance.get('balance_eth'))
             u_balance.append(updated)
         return u_balance
 
-    async def update_balance(self, address, user_id):
+    async def update_balance(self, address):
         balance = await self.w3_service.get_balance(address)
-        return await self._repository.update_wallet_balance(address, balance.get('balance_eth'), user_id)
+        return await self._repository.update_wallet_balance(address, balance.get('balance_eth'))
 
     async def test_transaction(self, private_key_sender, receiver_address, value):
         trans_data = await self.w3_service.transaction(private_key_sender, receiver_address, value)
@@ -132,13 +132,17 @@ class WalletService:
         trans_hash = await self.w3_service.get_transaction(_hash)
         trans_data = await self.parse_trans_data(trans_hash.get('transaction'), trans_hash.get('timestamp'),
                                                  trans_hash.get('status'), _hash)
-        return await self._repository.transaction_update(trans_data)
+        updated_transaction = await self._repository.transaction_update(trans_data)
+        await self.update_wallet_balance(trans_data.get('from_address'), trans_data.get('to_address'))
+        return updated_transaction
 
     async def add_transaction(self, _hash):
         trans_hash = await self.w3_service.get_transaction(_hash)
         trans_data = await self.parse_trans_data(trans_hash.get('transaction'), trans_hash.get('timestamp'),
                                                  trans_hash.get('status'), _hash)
-        return await self._repository.add_transaction(trans_data)
+        new_transaction = await self._repository.add_transaction(trans_data)
+        await self.update_wallet_balance(trans_data.get('from_address'), trans_data.get('to_address'))
+        return new_transaction
 
     async def get_wallet_asset(self, from_address, to_address):
         asset = await self._repository.get_asset(from_address, to_address)
@@ -147,6 +151,14 @@ class WalletService:
         else:
             raise HTTPException(status_code=401,
                                 detail='Not found asset for wallet.')
+
+    async def update_wallet_balance(self, from_address, to_address):
+        if await self._repository.check_wallet(from_address):
+            await self.update_balance(from_address)
+        if await self._repository.check_wallet(to_address):
+            await self.update_balance(to_address)
+
+
 
 
     # USED ONLY FOR MORALIS TEST

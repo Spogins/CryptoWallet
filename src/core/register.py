@@ -8,6 +8,7 @@ from src.wallet.containers import Container as WalletContainer
 from src.parser.containers import Container as ParserContainer
 from src.chat.containers import Container as ChatContainer
 from src.ibay.containers import Container as IBayContainer
+from src.delivery.containers import Container as DeliveryContainer
 
 
 class RegisterContainer(containers.DeclarativeContainer):
@@ -20,3 +21,4 @@ class RegisterContainer(containers.DeclarativeContainer):
     chat_container = providers.Container(ChatContainer)
     ibay_container = providers.Container(IBayContainer)
     web3_container = providers.Container(WebContainer)
+    delivery_container = providers.Container(DeliveryContainer)

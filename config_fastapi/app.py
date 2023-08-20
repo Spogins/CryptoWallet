@@ -9,7 +9,7 @@ from src.wallet.consumers import wallet_router
 from src.wallet.endpoints import app as wallet_app
 from src.chat.endpoints import app as chat_app
 from src.ibay.endpoints import app as ibay_app
-from src.parser.endpoints import app as parser
+from src.delivery.endpoints import app as delivery_app
 from fastapi import FastAPI
 
 broker = RabbitBroker("amqp://guest:guest@localhost:5672")
@@ -34,7 +34,7 @@ def create_app() -> FastAPI:
     app.include_router(auth_app, tags=["Auth"])
     app.include_router(user_app, tags=["User"])
     app.include_router(chat_app, tags=["Chat"])
-    app.include_router(parser, tags=['Parser'])
+    app.include_router(delivery_app, tags=["Delivery"])
     # app.include_router(router, tags=['Propan'])
 
     app.add_middleware(

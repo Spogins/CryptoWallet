@@ -44,7 +44,7 @@ ALLOWED_HOSTS = ['http://127.0.0.1:8000']
 WIRING_CONFIG = [
     'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
     'src.wallet', 'src.parser.services', 'src.parser', 'src.chat.services',
-    'src.chat', 'src.ibay', 'src.ibay.services', 'src.web3', 'config_socketio.app', 'src.celery'
+    'src.chat', 'src.ibay', 'src.ibay.services', 'src.web3', 'config_socketio.app', 'src.celery', 'src.delivery.services', 'src.delivery'
 ]
 
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')

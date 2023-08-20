@@ -83,10 +83,8 @@ async def wallet_balance(wallet_address: str, wallet_service: WalletService = De
 
 @app.put("/update_wallet_balance", status_code=status.HTTP_200_OK)
 @inject
-async def update_wallet_balance(wallet_address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
-                         bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
-    user_id = await get_user_from_bearer(bearer)
-    return await wallet_service.update_balance(wallet_address, user_id)
+async def update_wallet_balance(wallet_address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.update_balance(wallet_address)
 
 
 @app.put("/update_all_wallets_balance", status_code=status.HTTP_200_OK)

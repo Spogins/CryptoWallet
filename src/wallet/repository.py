@@ -48,9 +48,9 @@ class WalletRepository:
             wallets = result.scalars().all()
             return [UserWallet(id=wallet.id, address=wallet.address, balance=wallet.balance) for wallet in wallets]
 
-    async def update_wallet_balance(self, address, balance_eth, user_id):
+    async def update_wallet_balance(self, address, balance_eth):
         async with self.session_factory() as session:
-            result = await session.execute(select(Wallet).where(Wallet.address == address and Wallet.user_id == user_id))
+            result = await session.execute(select(Wallet).where(Wallet.address == address))
             wallet = result.scalar_one()
             if wallet:
                 wallet.balance = balance_eth
@@ -133,6 +133,14 @@ class WalletRepository:
             else:
                 return False
 
+    async def check_wallet(self, address):
+        async with self.session_factory() as session:
+            result = await session.execute(select(Wallet).where(Wallet.address == address))
+            wallets = result.scalars().first()
+            if wallets:
+                return True
+            else:
+                return False
 
 
 
