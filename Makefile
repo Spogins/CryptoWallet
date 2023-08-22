@@ -13,6 +13,11 @@ socket_connect:
 	python3 config_socketio/connect.py
 
 
+connect_to_chat:
+
+	python3 config_socketio/connect_to_chat.py
+
+
 worker:
 
 	celery -A config_celery.celery_app worker --loglevel=info

@@ -38,17 +38,32 @@ CELERY_RESULT_BACKEND = env('CELERY_RESULT_BACKEND')
 QUICKNODE_URL = env('QUICKNODE_URL')
 MORALIS_API_KEY = env('MORALIS_API_KEY')
 
-
 ALLOWED_HOSTS = ['http://127.0.0.1:8000']
 
-WIRING_CONFIG = [
-    'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
-    'src.wallet', 'src.parser.services', 'src.parser', 'src.chat.services',
-    'src.chat', 'src.ibay', 'src.ibay.services', 'src.web3', 'config_socketio.app', 'src.celery', 'src.delivery.services', 'src.delivery'
-]
+# WIRING_CONFIG = [
+#     'src.users', 'src.users.services', 'src.core', 'src.auth.services', 'src.auth', 'src.wallet.services',
+#     'src.wallet', 'src.parser.services', 'src.parser', 'src.chat.services',
+#     'src.chat', 'src.ibay', 'src.ibay.services', 'src.web3', 'config_socketio.app', 'src.celery',
+#     'src.delivery.services', 'src.delivery'
+# ]
+
 
 AWS_ACCESS_KEY_ID = env('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = env('AWS_SECRET_ACCESS_KEY')
 BUCKET = env('BUCKET')
 
-RABBITMQ_URL = "amqp://guest:guest@localhost:5672"
+RABBITMQ_URL = env('RABBITMQ_URL')
+
+WIRING_CONFIG = [
+    'src.users',
+    'src.core',
+    'src.auth',
+    'src.wallet',
+    'src.parser',
+    'src.chat',
+    'src.ibay',
+    'src.web3',
+    'config_socketio.app',
+    'src.celery',
+    'src.delivery'
+]

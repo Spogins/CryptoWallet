@@ -19,7 +19,12 @@ class AuthRepository:
     async def token(self, user):
         async with self.session_factory() as session:
             result = await session.execute(select(User).where(User.email == user.email))
-            _user = result.scalar_one()
+
+            try:
+                _user = result.scalar_one()
+            except:
+                raise HTTPException(status_code=401, detail="Wrong email address or password")
+
 
             if pbkdf2_sha256.verify(user.password, _user.password):
                 payload = {"id": _user.id,

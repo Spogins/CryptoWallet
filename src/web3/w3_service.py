@@ -1,17 +1,16 @@
-
-from asyncio import sleep
-
+from datetime import datetime
 import httpx
 from eth_account import Account
 from fastapi import HTTPException
 from propan import RabbitBroker
-from web3 import Web3, HTTPProvider
+from web3 import AsyncWeb3, AsyncHTTPProvider
+from web3.eth import AsyncEth
 from config.settings import QUICKNODE_URL, MORALIS_API_KEY, RABBITMQ_URL
 from src.web3.repository import WebRepository
 
 
 class WebService:
-    w3 = Web3(HTTPProvider(QUICKNODE_URL))
+    # w3 = Web3(HTTPProvider(QUICKNODE_URL))
     moralis_api_key = MORALIS_API_KEY
     headers = {
         "X-API-Key": moralis_api_key
@@ -21,9 +20,10 @@ class WebService:
 
     def __init__(self, web3_repository: WebRepository) -> None:
         self._repository: WebRepository = web3_repository
+        self.w3 = AsyncWeb3(AsyncHTTPProvider(QUICKNODE_URL), modules={'eth': (AsyncEth,)})
 
     async def get_trans(self, _hash):
-        return self.w3.eth.get_transaction(_hash)
+        return await self.w3.eth.get_transaction(_hash)
 
     async def find_block(self) -> None:
         self.old_block: int = await self._repository.get_old_block()
@@ -41,8 +41,6 @@ class WebService:
 
         await self._repository.update_block(self.new_block)
 
-
-
     @staticmethod
     async def send_block_to_parsing(block: int):
         print('---FIND_BLOCK---')
@@ -51,7 +49,7 @@ class WebService:
             await broker.publish(message=block, queue='parser/parse_block')
 
     async def get_block(self, number: str = 'latest'):
-        block = self.w3.eth.get_block(number)
+        block = await self.w3.eth.get_block(number)
         return block['number'] if number == 'latest' else block
 
     async def get_transactions(self, address):
@@ -70,15 +68,14 @@ class WebService:
                 raise HTTPException(status_code=401, detail=f"Ошибка при запросе к Moralis API:, {response.status_code}")
 
     async def get_transaction(self, _hash):
-        transaction = self.w3.eth.get_transaction(_hash)
+        transaction = await self.w3.eth.get_transaction(_hash)
         block = await self.get_block(transaction.get('blockNumber'))
-        transaction_receipt = self.w3.eth.get_transaction_receipt(_hash)
-        # hash_data = await self.parse_trans_data(transaction, block.timestamp, transaction_receipt.get('status'), _hash)
-        return {'transaction': transaction, 'timestamp': block.timestamp, 'status': transaction_receipt.get('status')}
+        transaction_receipt = await self.w3.eth.get_transaction_receipt(_hash)
+        return {'transaction': transaction, 'timestamp': datetime.fromtimestamp(block.timestamp).strftime('%Y-%m-%d %H:%M:%S'), 'status': transaction_receipt.get('status')}
 
     async def transaction_info(self, tx_hash):
-        tx = self.w3.eth.get_transaction(tx_hash)
-        tx_receipt = self.w3.eth.get_transaction_receipt(tx_hash)
+        tx = await self.w3.eth.get_transaction(tx_hash)
+        tx_receipt = await self.w3.eth.get_transaction_receipt(tx_hash)
 
         if tx_receipt is None:
             status = "PENDING"
@@ -100,7 +97,7 @@ class WebService:
 
 
     async def get_balance(self, address):
-        balance_wei = self.w3.eth.get_balance(address)
+        balance_wei = await self.w3.eth.get_balance(address)
         balance_eth = self.w3.from_wei(balance_wei, 'ether')
         return {"address": address, "balance_eth": balance_eth}
 
@@ -118,7 +115,7 @@ class WebService:
             asset = await self.get_wallet_asset(sender_address, receiver_address)
 
             # Получение nonce для подписи транзакции
-            nonce = self.w3.eth.get_transaction_count(sender_address)
+            nonce = await self.w3.eth.get_transaction_count(sender_address)
             # Создание транзакции
             transaction = {
                 'to': receiver_address,
@@ -126,12 +123,12 @@ class WebService:
                 'gas': 21000,  # Лимит газа для базовой транзакции
                 'gasPrice': self.w3.to_wei('50', 'gwei'),  # Цена газа в Wei
                 'nonce': nonce,
-                'chainId': self.w3.eth.chain_id,  # ID сети (Ropsten)
+                'chainId': await self.w3.eth.chain_id,  # ID сети (Ropsten)
             }
             # Подпись транзакции с использованием приватного ключа
             signed_txn = self.w3.eth.account.sign_transaction(transaction, private_key_sender)
             # Отправка транзакции на блокчейн
-            tx_hash = self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
+            tx_hash = await self.w3.eth.send_raw_transaction(signed_txn.rawTransaction)
             # return {'tx_hash': tx_hash.hex()}
             trans_data = {
                 "hash": tx_hash.hex(),

@@ -12,11 +12,9 @@ async def message(data):
 
 async def main():
     await sio.connect("http://localhost:8001")
-    await sio.emit("parse_block")
+    await sio.emit('chat_room', {'room_name': 'chat_room'})
     await sio.wait()
 
 
 if __name__ == '__main__':
-
     asyncio.run(main())
-

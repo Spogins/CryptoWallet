@@ -116,22 +116,23 @@ class WalletRepository:
 
     async def get_asset(self, from_address, to_address):
         async with self.session_factory() as session:
-
-            from_address = await session.execute(select(Wallet).where(Wallet.address == from_address))
-            to_address = await session.execute(select(Wallet).where(Wallet.address == to_address))
-
-            result_from = from_address.scalars().first()
-            result_to = to_address.scalars().first()
-
-            if from_address:
-                asset = await session.get(Asset, result_from.asset_id)
+            try:
+                from_address = await session.execute(select(Wallet).where(Wallet.address == from_address))
+                result_from = from_address.scalars().first()
+                if from_address:
+                    asset = await session.get(Asset, result_from.asset_id)
                 return asset
+            except:
+                to_address = await session.execute(select(Wallet).where(Wallet.address == to_address))
+                result_to = to_address.scalars().first()
 
-            elif to_address:
-                asset = await session.get(Asset, result_to.asset_id)
+                if to_address:
+                    asset = await session.get(Asset, result_to.asset_id)
+                    return asset
+            finally:
+                result = await session.execute(select(Asset))
+                asset = result.scalars().first()
                 return asset
-            else:
-                return False
 
     async def check_wallet(self, address):
         async with self.session_factory() as session:

@@ -1,5 +1,4 @@
 from celery import Celery
-
 from config_celery.celery import celery
 from src.core.register import RegisterContainer
 

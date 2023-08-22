@@ -10,18 +10,13 @@ class ParserRepository:
 
     async def get_db_trans(self, _hash):
         async with self.session_factory() as session:
-            result = await session.execute(select(Transaction).where(Transaction.hash == _hash and Transaction.status == "PENDING"))
-            trans = result.scalars().first()
-            if trans:
-                return True
-            else:
-                return False
+            result = await session.execute(select(Transaction).where(Transaction.hash.in_(_hash)))
+            trans = result.scalars().all()
+            return [data.hash for data in trans]
 
     async def get_wallet(self, address):
         async with self.session_factory() as session:
-            result = await session.execute(select(Wallet).where(Wallet.address == address))
-            wallets = result.scalars().first()
-            if wallets:
-                return True
-            else:
-                return False
+            result = await session.execute(select(Wallet).where(Wallet.address.in_(address)))
+            wallets = result.scalars().all()
+            return [data.address for data in wallets]
+

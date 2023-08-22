@@ -2,6 +2,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from propan import RabbitBroker
 from config_socketio.socket_app import socket_app
 from src.core.register import RegisterContainer
+from src.delivery.consumers import delivery_router
 from src.parser.consumers import parser_router
 from src.users.endpoints import app as user_app
 from src.auth.endpoints import app as auth_app
@@ -51,17 +52,12 @@ def create_app() -> FastAPI:
 app = create_app()
 
 
-# @app.get('/test')
-# @inject
-# async def test():
-#     return {'message': 'text'}
-
-
 @app.on_event('startup')
 async def publish_smtp():
     app.broker = broker
     app.broker.include_router(parser_router)
     app.broker.include_router(wallet_router)
+    app.broker.include_router(delivery_router)
     print('startup')
     await broker.start()
 

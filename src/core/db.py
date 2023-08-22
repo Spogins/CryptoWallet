@@ -13,7 +13,7 @@ Base = declarative_base()
 class Database(Singleton):
     def __init__(self) -> None:
         super().__init__()
-        self.engine = create_async_engine(URL, echo=True, future=True)
+        self.engine = create_async_engine(URL, echo=False, future=True)
         self._session_factory = async_sessionmaker(self.engine, autoflush=False, expire_on_commit=False)
 
     async def create_database(self) -> None:
