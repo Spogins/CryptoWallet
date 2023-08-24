@@ -1,11 +1,11 @@
 import datetime
 import json
-import socketio
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status, Cookie
 import jwt
 from fastapi.security import HTTPAuthorizationCredentials
 from config.settings import JWT_SECRET, ALGORITHM, RABBITMQ_URL
+from config_fastapi.fastapi_mgr import fastapi_mgr
 from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.auth.schemas import AuthUsers, RegisterUserModel
@@ -16,14 +16,7 @@ from src.celery.chat_access_tasks import chat_access
 app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
-mgr = socketio.AsyncAioPikaManager(RABBITMQ_URL, write_only=True)
-
-
-@app.get('/mgr_test')
-async def mgr_test():
-
-    await mgr.emit('message', {'message': 'Hello from delivery'})
-    return 'ok'
+mgr = fastapi_mgr
 
 
 @app.post("/log_in", status_code=status.HTTP_200_OK)

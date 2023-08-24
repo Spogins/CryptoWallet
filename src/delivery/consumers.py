@@ -1,17 +1,26 @@
-# import pickle
-#
-# from celery.result import AsyncResult
-# from propan.brokers.rabbit import RabbitQueue, RabbitExchange, ExchangeType
-# from propan import RabbitRouter
-# from src.celery.wallet_tasks import wallet_hash
-# from utils.base.decode_data import decode_data
-#
-# delivery_router = RabbitRouter('delivery/')
-#
-# queue_parser = RabbitQueue(name='delivery')
-#
-# # rabbit_exchange = RabbitExchange(name='delivery', type=ExchangeType.FANOUT)
-#
-# @delivery_router.handle(queue_parser)
-# async def delivery_handle(data):
-#     print(f"delivery_router---{data}---")
+from dependency_injector.wiring import inject, Provide
+from propan import RabbitRouter
+from src.delivery.services.delivery import DeliveryService
+from src.delivery.containers import Container
+
+delivery_router = RabbitRouter('delivery/')
+
+
+@inject
+async def delivery_service(service: DeliveryService = Provide[Container.delivery_service]):
+    return service
+
+
+@delivery_router.handle('create_order')
+async def delivery_handle(data):
+    service: DeliveryService = await delivery_service()
+    await service.create_order(data)
+    print(f"delivery_router---{data}---")
+
+
+@delivery_router.handle('transaction_status')
+async def transaction_status(data):
+    service: DeliveryService = await delivery_service()
+    await service.update_order_status(data)
+    print(f"delivery_router---{data}---")
+

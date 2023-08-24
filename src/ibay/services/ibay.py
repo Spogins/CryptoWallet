@@ -1,6 +1,9 @@
+from propan import RabbitBroker
+from config.settings import RABBITMQ_URL
 from src.boto3.boto3_service import BotoService
+from src.ibay.models import Product
 from src.ibay.repository import IBayRepository
-from src.ibay.schemas import ProductEdit
+from src.ibay.schemas import ProductEdit, BuyProduct
 
 
 class IBayService:
@@ -9,14 +12,26 @@ class IBayService:
         self._repository: IBayRepository = ibay_repository
         self.boto3_service: BotoService = boto3_service
 
-    async def test(self):
-        print('test')
-        return {'mn': 'test'}
+    async def buy_product(self, product: BuyProduct):
+        product_item: Product = await self._repository.get(product.id)
 
-    async def add_product(self, product):
+        from_wallet: str = product.wallet
+
+        data: dict = {
+            'from_wallet': from_wallet,
+            'to_wallet': product_item.wallet,
+            'value': product_item.price,
+            'product_id': product_item.id
+        }
+
+        async with RabbitBroker(RABBITMQ_URL) as broker:
+            await broker.publish(message=data, queue='wallet/buy_product')
+        return await self._repository.to_order(product_item.id)
+
+    async def add_product(self, product, user_id):
         if not product.image == '':
             product.image = await self.boto3_service.upload_image(product.image)
-        return await self._repository.add(product)
+        return await self._repository.add(product, user_id)
 
     async def get_products(self):
         return await self._repository.get_all()

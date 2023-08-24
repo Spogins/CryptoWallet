@@ -40,10 +40,10 @@ class ParserService:
             if _hash in parsed_hash:
                 continue
             if _hash in hash_list:
-                await self.send_hash({'update': _hash})
+                await self.send_hash({'hash': _hash})
                 parsed_hash.append(_hash)
             elif hash_data.get('from') in from_wallet or hash_data.get('to') in to_wallet:
-                await self.send_hash({'create': _hash})
+                await self.send_hash({'hash': _hash})
                 parsed_hash.append(_hash)
 
 

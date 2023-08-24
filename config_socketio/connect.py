@@ -10,6 +10,11 @@ async def message(data):
     print(data)
 
 
+@sio.on('balance')
+async def message(data):
+    print(data)
+
+
 async def main():
     await sio.connect("http://localhost:8001")
     await sio.emit("parse_block")

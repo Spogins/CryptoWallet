@@ -1,3 +1,4 @@
+import asyncio
 import socketio
 from dependency_injector.wiring import inject, Provide
 from socketio import AsyncAioPikaManager, AsyncServer
@@ -56,8 +57,7 @@ async def join_room(sid, data):
     print(f"Client {sid} leave room {room_name}")
 
 
-
-
-
+async def main():
+    asyncio.create_task(check_block())
 
 

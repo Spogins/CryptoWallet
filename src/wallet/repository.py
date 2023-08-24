@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Type
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -10,6 +10,34 @@ from src.wallet.schemas import UserWallet
 class WalletRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
+
+    async def get_transaction(self, trans_id):
+        async with self.session_factory() as session:
+            transaction = await session.get(Transaction, trans_id)
+            return transaction
+
+    async def create_or_update(self, trans_data):
+        async with self.session_factory() as session:
+            result = await session.execute(select(Transaction).where(Transaction.hash == trans_data.get('hash')))
+            transaction = result.scalar_one_or_none()
+            if transaction:
+                transaction.status = trans_data.get('status')
+                transaction.date = trans_data.get('age')
+                transaction.txn_fee = trans_data.get('txn_fee')
+            else:
+                transaction = Transaction(
+                    hash=trans_data.get('hash'),
+                    from_address=trans_data.get('from_address'),
+                    to_address=trans_data.get('to_address'),
+                    value=trans_data.get('value'),
+                    status=trans_data.get('status') if trans_data.get('status') else "PENDING",
+                    date=trans_data.get('age') if trans_data.get('age') else "PENDING",
+                    txn_fee=trans_data.get('txn_fee') if trans_data.get('txn_fee') else 0
+                )
+                session.add(transaction)
+            await session.commit()
+            await session.refresh(transaction)
+            return {'transaction': transaction}
 
     async def user_add_wallet(self, user_id, wallet, balance: float = 0):
         try:
@@ -36,9 +64,16 @@ class WalletRepository:
             wallet = await session.get(Wallet, wallet_id)
             return wallet
 
-    async def get_wallets(self):
+    async def get_wallet_by_address(self, address):
         async with self.session_factory() as session:
-            wallet = await session.execute(select(Wallet))
+            wallet = await session.execute(select(Wallet).where(Wallet.address == address))
+            wallet = wallet.scalars().first()
+            return wallet
+
+
+    async def get_wallets(self, user_id):
+        async with self.session_factory() as session:
+            wallet = await session.execute(select(Wallet).where(Wallet.user_id == user_id))
             wallets = wallet.scalars().all()
             return wallets
 
@@ -84,35 +119,6 @@ class WalletRepository:
             _asset = await session.execute(select(Asset).filter_by(abbreviation='ETH'))
             _asset = _asset.scalars().first()
             return {'blockchain': _blockchain, 'asset': _asset}
-
-    async def add_transaction(self, trans_data):
-        async with self.session_factory() as session:
-            transaction = Transaction(
-                hash=trans_data.get('hash'),
-                from_address=trans_data.get('from_address'),
-                to_address=trans_data.get('to_address'),
-                value=trans_data.get('value'),
-                status=trans_data.get('status') if trans_data.get('status') else "PENDING",
-                date=trans_data.get('age') if trans_data.get('age') else "PENDING",
-                txn_fee=trans_data.get('txn_fee') if trans_data.get('txn_fee') else 0
-            )
-            session.add(transaction)
-            await session.commit()
-            await session.refresh(transaction)
-            return {'transaction': transaction}
-
-    async def transaction_update(self, trans_data):
-        async with self.session_factory() as session:
-            result = await session.execute(select(Transaction).where(Transaction.hash == trans_data.get('hash')))
-            transaction = result.scalar_one()
-
-            transaction.status = trans_data.get('status')
-            transaction.date = trans_data.get('age')
-            transaction.txn_fee = trans_data.get('txn_fee')
-
-            await session.commit()
-            await session.refresh(transaction)
-            return {'transaction': transaction}
 
     async def get_asset(self, from_address, to_address):
         async with self.session_factory() as session:

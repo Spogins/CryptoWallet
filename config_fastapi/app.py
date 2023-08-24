@@ -31,11 +31,12 @@ def create_app() -> FastAPI:
     app.container = container
 
     app.include_router(ibay_app, tags=["iBay"])
+    app.include_router(delivery_app, tags=["Delivery"])
     app.include_router(wallet_app, tags=["Wallets"])
     app.include_router(auth_app, tags=["Auth"])
     app.include_router(user_app, tags=["User"])
     app.include_router(chat_app, tags=["Chat"])
-    app.include_router(delivery_app, tags=["Delivery"])
+
     # app.include_router(router, tags=['Propan'])
 
     app.add_middleware(

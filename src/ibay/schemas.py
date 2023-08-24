@@ -15,3 +15,9 @@ class ProductEdit(BaseModel):
     wallet: str
     price: float
     image: Optional[str] = ''
+
+
+class BuyProduct(BaseModel):
+    id: int
+    wallet: str
+

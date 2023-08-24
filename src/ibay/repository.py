@@ -10,7 +10,18 @@ class IBayRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
-    async def add(self, _product: ProductForm):
+    async def to_order(self, product_id):
+        async with self.session_factory() as session:
+            product: Product = await session.get(Product, product_id)
+            if not product:
+                raise HTTPException(status_code=401,
+                                    detail=f"Product not found, id: {product_id}")
+            product.in_order = False
+            await session.commit()
+            await session.refresh(product)
+            return product
+
+    async def add(self, _product: ProductForm, user_id):
         try:
             async with self.session_factory() as session:
                 product = Product(
@@ -18,6 +29,7 @@ class IBayRepository:
                     image=_product.image,
                     price=_product.price,
                     wallet=_product.wallet,
+                    user_id=user_id
                 )
                 session.add(product)
                 await session.commit()
@@ -29,7 +41,7 @@ class IBayRepository:
 
     async def get_all(self):
         async with self.session_factory() as session:
-            result = await session.execute(select(Product))
+            result = await session.execute(select(Product).where(Product.in_order == False))
             products = result.scalars().all()
             return products
 

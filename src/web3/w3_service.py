@@ -109,6 +109,7 @@ class WebService:
             # Адрес отправителя (получается из приватного ключа)
             sender_account = Account.from_key(private_key_sender)
             sender_address = sender_account.address
+
             # Адрес получателя
             receiver_address = receiver_address
 

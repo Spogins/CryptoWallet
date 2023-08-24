@@ -5,7 +5,6 @@ import logging
 import boto3
 from botocore.exceptions import ClientError
 from fastapi import HTTPException
-
 from config.settings import AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, BUCKET
 
 
