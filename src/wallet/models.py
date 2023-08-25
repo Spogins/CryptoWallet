@@ -44,7 +44,7 @@ class Transaction(Base):
     date = Column(String, default='PENDING')
     txn_fee = Column(DECIMAL, default=0.0)
     status = Column(String, default='PENDING')
-    order = relationship('Order', backref='transaction')
+
 
 
 

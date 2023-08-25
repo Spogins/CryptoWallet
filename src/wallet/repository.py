@@ -2,6 +2,8 @@ from typing import Callable, Type
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+
+from src.delivery.models import Order
 from src.users.models import User
 from src.wallet.models import Wallet, Blockchain, Asset, Transaction
 from src.wallet.schemas import UserWallet
@@ -11,10 +13,20 @@ class WalletRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
-    async def get_transaction(self, trans_id):
+    async def get_order_transaction(self, _hash, refund):
         async with self.session_factory() as session:
-            transaction = await session.get(Transaction, trans_id)
-            return transaction
+            if not refund:
+                transaction = await session.execute(select(Order).where(Order.transaction == _hash))
+            else:
+                transaction = await session.execute(select(Order).where(Order.refund == _hash))
+            result = transaction.scalar_one_or_none()
+            return result
+
+    async def get_transaction(self, _hash):
+        async with self.session_factory() as session:
+            transaction = await session.execute(select(Transaction).where(Transaction.hash == _hash))
+            result = transaction.scalar_one_or_none()
+            return result
 
     async def create_or_update(self, trans_data):
         async with self.session_factory() as session:
@@ -37,12 +49,12 @@ class WalletRepository:
                 session.add(transaction)
             await session.commit()
             await session.refresh(transaction)
-            return {'transaction': transaction}
+            return transaction
 
     async def user_add_wallet(self, user_id, wallet, balance: float = 0):
         try:
             async with self.session_factory() as session:
-                _asset = await session.execute(select(Asset).filter_by(abbreviation='ETH'))
+                _asset = await session.execute(select(Asset).filter_by(abbreviation='ether'))
                 _asset = _asset.scalars().first()
                 user = await session.get(User, user_id)
                 _wallet = Wallet(private_key=wallet.get('private_key'), address=wallet.get('address'), user=user, asset=_asset, balance=balance)
@@ -98,8 +110,11 @@ class WalletRepository:
 
     async def get_db_transaction(self, address):
         async with self.session_factory() as session:
-            result = await session.execute(select(Transaction).filter_by(from_address=address))
-            transactions = result.scalars().all()
+            result_from = await session.execute(select(Transaction).where(Transaction.from_address == address))
+            result_to = await session.execute(select(Transaction).where(Transaction.to_address == address))
+            transactions: list = result_from.scalars().all()
+            transactions_to = result_to.scalars().all()
+            transactions.extend(transactions_to)
             return transactions
 
     async def create_eth(self):

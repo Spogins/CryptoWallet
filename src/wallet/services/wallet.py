@@ -20,16 +20,17 @@ class WalletService:
     async def buy_product(self, data):
         from_wallet: Wallet = await self.get_wallet_by_address(data.get('from_wallet'))
         transaction = await self.transaction(from_wallet.private_key, data.get('to_wallet'), float(data.get('value')))
-        trans: Transaction = transaction.get('transaction')
-        data: dict = {'trans_id': trans.id, 'product_id': data.get('product_id')}
+        data: dict = {'transaction': transaction.hash, 'product_id': data.get('product_id'), 'user_id': data.get('user_id')}
         async with RabbitBroker(RABBITMQ_URL) as broker:
             await broker.publish(message=data, queue='delivery/create_order')
 
-    async def refund(self, trans_id):
-        trans: Transaction = await self._repository.get_transaction(trans_id)
+    async def refund(self, _hash):
+        trans: Transaction = await self._repository.get_transaction(_hash)
         wallet: Wallet = await self._repository.get_wallet_by_address(trans.to_address)
         value = trans.value + (Decimal(trans.txn_fee) * Decimal('1.5'))
-        await self.transaction(wallet.private_key, trans.from_address, value)
+        transaction: Transaction = await self.transaction(wallet.private_key, trans.from_address, value)
+        async with RabbitBroker(RABBITMQ_URL) as broker:
+            await broker.publish(message={'trans_hash': _hash, 'ref_hash': transaction.hash}, queue='delivery/refund_transaction')
 
     async def get_wallet(self, wallet_id):
         return await self._repository.get_wallet(wallet_id)
@@ -126,16 +127,28 @@ class WalletService:
     async def transaction_info(self, tx_hash):
         return await self.w3_service.transaction_info(tx_hash)
 
-    @staticmethod
-    async def send_transaction_status(trans_id, _hash, status):
+
+    async def send_transaction_status(self, _hash, status):
         if not status == "PENDING":
-            data = {
-                'trans_id': trans_id,
-                'hash': _hash,
-                'status': status
-            }
-            async with RabbitBroker(RABBITMQ_URL) as broker:
-                await broker.publish(message=data, queue='delivery/transaction_status')
+            order_transaction = await self._repository.get_order_transaction(_hash, False)
+            if order_transaction is not None:
+                data = {
+                    'hash': _hash,
+                    'status': status
+                }
+                async with RabbitBroker(RABBITMQ_URL) as broker:
+                    await broker.publish(message=data, queue='delivery/transaction_status')
+
+            ref_transaction = await self._repository.get_order_transaction(_hash, True)
+            if ref_transaction is not None:
+
+                data = {
+                    'hash': _hash,
+                    'status': "REFUND"
+                }
+                async with RabbitBroker(RABBITMQ_URL) as broker:
+                    await broker.publish(message=data, queue='delivery/refund_status')
+
 
     async def create_or_update(self, _hash):
         trans_hash = await self.w3_service.get_transaction(_hash)
@@ -143,7 +156,9 @@ class WalletService:
                                                  trans_hash.get('status'), _hash)
         value = trans_data.get('value')
         transaction = await self._repository.create_or_update(trans_data)
-        await self.send_transaction_status(transaction.get('transaction').id, transaction.get('transaction').hash, transaction.get('transaction').status)
+
+        await self.send_transaction_status(transaction.hash, transaction.status)
+
         await self.update_wallet_balance(trans_data.get('from_address'), trans_data.get('to_address'))
         return transaction
 

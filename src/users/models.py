@@ -18,5 +18,6 @@ class User(Base):
     chat_access = Column(Boolean, default=False)
     wallets = relationship('Wallet', backref='user')
     chat_messages = relationship('ChatMessage', backref='user')
+    order = relationship('Order', backref='user')
 
 

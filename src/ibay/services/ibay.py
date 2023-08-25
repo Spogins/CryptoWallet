@@ -12,7 +12,7 @@ class IBayService:
         self._repository: IBayRepository = ibay_repository
         self.boto3_service: BotoService = boto3_service
 
-    async def buy_product(self, product: BuyProduct):
+    async def buy_product(self, product: BuyProduct, user_id):
         product_item: Product = await self._repository.get(product.id)
 
         from_wallet: str = product.wallet
@@ -21,7 +21,8 @@ class IBayService:
             'from_wallet': from_wallet,
             'to_wallet': product_item.wallet,
             'value': product_item.price,
-            'product_id': product_item.id
+            'product_id': product_item.id,
+            'user_id': user_id
         }
 
         async with RabbitBroker(RABBITMQ_URL) as broker:
@@ -43,6 +44,3 @@ class IBayService:
         if not _product.image == '':
             _product.image = await self.boto3_service.upload_image(_product.image)
         return await self._repository.update(_product)
-
-    async def remove_product(self, pr_id):
-        return await self._repository.remove_pr(pr_id)

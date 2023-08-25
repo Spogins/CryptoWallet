@@ -3,8 +3,10 @@ import socketio
 from dependency_injector.wiring import inject, Provide
 from socketio import AsyncAioPikaManager, AsyncServer
 from config.settings import ALLOWED_HOSTS, RABBITMQ_URL
-from src.web3.containers import Container
+from src.web3.containers import Container as WebContainer
 from src.web3.w3_service import WebService
+from src.delivery.containers import Container as DeliveryContainer
+from src.delivery.services.delivery import DeliveryService
 
 
 mgr: AsyncAioPikaManager = socketio.AsyncAioPikaManager(RABBITMQ_URL)
@@ -30,10 +32,19 @@ async def disconnect(sid):
 
 @sio.on('parse_block')
 @inject
-async def check_block(sid, web3_service: WebService = Provide[Container.web3_service]):
+async def check_block(sid, web3_service: WebService = Provide[WebContainer.web3_service]):
     while True:
-        block = await web3_service.find_block()
-        # await asyncio.sleep(1)
+        await web3_service.find_block()
+        await asyncio.sleep(1)
+
+
+@sio.on('delivery')
+@inject
+async def delivery(sid, delivery_service: DeliveryService = Provide[DeliveryContainer.delivery_service]):
+    while True:
+        await asyncio.sleep(5)
+        await delivery_service.close_or_refund()
+
 
 
 @sio.on('join_room')

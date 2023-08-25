@@ -40,11 +40,7 @@ async def update_product(product: ProductEdit, ibay_service: IBayService = Depen
 
 @app.post('/buy_product', status_code=status.HTTP_200_OK)
 @inject
-async def remove_product(buy: BuyProduct, ibay_service: IBayService = Depends(Provide[Container.ibay_service])):
-    return await ibay_service.buy_product(buy)
+async def remove_product(buy: BuyProduct, ibay_service: IBayService = Depends(Provide[Container.ibay_service]), bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    user_id = await get_user_from_bearer(bearer)
+    return await ibay_service.buy_product(buy, user_id)
 
-
-@app.delete('/delete_product', status_code=status.HTTP_204_NO_CONTENT)
-@inject
-async def remove_product(product: int, ibay_service: IBayService = Depends(Provide[Container.ibay_service])):
-    return await ibay_service.remove_product(product)

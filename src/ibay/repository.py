@@ -68,13 +68,5 @@ class IBayRepository:
             await session.refresh(product)
             return product
 
-    async def remove_pr(self, pr_id):
-        async with self.session_factory() as session:
-            product = await session.get(Product, pr_id)
-            if not product:
-                raise HTTPException(status_code=401,
-                                    detail=f"Product not found, id: {pr_id}")
-            await session.delete(product)
-            await session.commit()
 
 

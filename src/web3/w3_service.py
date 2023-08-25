@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 import httpx
 from eth_account import Account
@@ -26,6 +27,7 @@ class WebService:
         return await self.w3.eth.get_transaction(_hash)
 
     async def find_block(self) -> None:
+
         self.old_block: int = await self._repository.get_old_block()
 
         if self.old_block is None:
@@ -37,6 +39,7 @@ class WebService:
         if self.old_block < self.new_block:
             for value in range(self.old_block + 1, self.new_block + 1):
                 await self.send_block_to_parsing(value)
+                await asyncio.sleep(1)
             self.old_block: int = self.new_block
 
         await self._repository.update_block(self.new_block)

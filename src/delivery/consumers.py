@@ -15,12 +15,23 @@ async def delivery_service(service: DeliveryService = Provide[Container.delivery
 async def delivery_handle(data):
     service: DeliveryService = await delivery_service()
     await service.create_order(data)
-    print(f"delivery_router---{data}---")
+    # print(f"delivery_router---{data}---")
 
 
 @delivery_router.handle('transaction_status')
 async def transaction_status(data):
     service: DeliveryService = await delivery_service()
     await service.update_order_status(data)
-    print(f"delivery_router---{data}---")
+    # print(f"delivery_router---{data}---")
 
+
+@delivery_router.handle('refund_transaction')
+async def refund_transaction(data):
+    service: DeliveryService = await delivery_service()
+    await service.update_order_refund(data)
+
+
+@delivery_router.handle('refund_status')
+async def refund_status(data):
+    service: DeliveryService = await delivery_service()
+    await service.update_refund_status(data)
