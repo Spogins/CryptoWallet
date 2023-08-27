@@ -4,7 +4,7 @@ from pydantic import BaseModel
 
 class ProductForm(BaseModel):
     title: str
-    wallet: str
+    wallet: int
     price: float
     image: Optional[str] = ''
 
@@ -12,7 +12,7 @@ class ProductForm(BaseModel):
 class ProductEdit(BaseModel):
     id: int
     title: str
-    wallet: str
+    wallet: int
     price: float
     image: Optional[str] = ''
 
@@ -20,4 +20,12 @@ class ProductEdit(BaseModel):
 class BuyProduct(BaseModel):
     id: int
     wallet: str
+
+
+class ProductsForm(BaseModel):
+    id: int
+    title: str
+    wallet: str
+    price: float
+    image: str
 

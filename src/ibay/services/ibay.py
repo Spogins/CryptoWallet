@@ -16,7 +16,6 @@ class IBayService:
         product_item: Product = await self._repository.get(product.id)
 
         from_wallet: str = product.wallet
-
         data: dict = {
             'from_wallet': from_wallet,
             'to_wallet': product_item.wallet,
@@ -24,7 +23,6 @@ class IBayService:
             'product_id': product_item.id,
             'user_id': user_id
         }
-
         async with RabbitBroker(RABBITMQ_URL) as broker:
             await broker.publish(message=data, queue='wallet/buy_product')
         return await self._repository.to_order(product_item.id)

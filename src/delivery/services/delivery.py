@@ -12,13 +12,14 @@ class DeliveryService:
 
     async def close_or_refund(self):
         order: Order = await self._repository.get_oldest()
-        _random = random.randint(0, 1)
-        if _random:
-            await self._repository.update_order_status("SUCCESS", order.transaction)
-            return "SUCCESS"
-        else:
-            await self.refund_transaction(order.transaction)
-            return "REFUND"
+        if order:
+            _random = random.randint(0, 1)
+            if _random:
+                await self._repository.update_order_status("SUCCESS", order.transaction_id)
+                return "SUCCESS"
+            else:
+                await self.refund_transaction(order.transaction_id)
+                return "REFUND"
 
 
     async def update_order_refund(self, data):
@@ -31,25 +32,27 @@ class DeliveryService:
         await self._repository.update_refund_status(status, _hash)
 
     async def update_order_status(self, data):
+
         status = data.get('status')
-        _hash = data.get('hash')
+        trans_id = data.get('transaction_id')
+
         if status == "SUCCESS":
-            # loop = asyncio.get_event_loop()
+            status = "DELIVERY"
             result = await fetch()
             if not result:
                 status = "FAILURE"
-                await self.refund_transaction(_hash)
-            status = "DELIVERY"
+                await self.refund_transaction(trans_id)
+
 
         if status == "FAILURE":
-            await self.refund_transaction(_hash)
+            await self.refund_transaction(trans_id)
 
-        await self._repository.update_order_status(status, _hash)
+        await self._repository.update_order_status(status, trans_id)
 
     @staticmethod
-    async def refund_transaction(_hash):
+    async def refund_transaction(trans_id):
         async with RabbitBroker(RABBITMQ_URL) as broker:
-            await broker.publish(message=_hash, queue='wallet/refund_transaction')
+            await broker.publish(message=trans_id, queue='wallet/refund_transaction')
 
     async def create_order(self, data):
         return await self._repository.add(data)

@@ -58,10 +58,10 @@ async def get_wallet(wallet_id: int, wallet_service: WalletService = Depends(Pro
     return await wallet_service.get_wallet(wallet_id)
 
 
-@app.get('/get_wallet_by_address', status_code=status.HTTP_200_OK)
-@inject
-async def get_wallet_by_address(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.get_wallet_by_address(address)
+# @app.get('/get_wallet_by_address', status_code=status.HTTP_200_OK)
+# @inject
+# async def get_wallet_by_address(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+#     return await wallet_service.get_wallet_by_address(address)
 
 
 @app.post("/create_eth_wallet", status_code=status.HTTP_201_CREATED)

@@ -2,7 +2,14 @@ from pydantic import BaseModel
 
 
 class OrderForm(BaseModel):
-    order: str
+    id: int
+    date: str
+    status: str
+    refund: str | None
+    transaction: str
+    product: str
+
+
 
 
 class OrderEdit(BaseModel):

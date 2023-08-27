@@ -33,6 +33,15 @@ migrate:
 	alembic upgrade head
 
 
+alembic:
+
+	alembic init -t async migrations
+
+
+celery_clear:
+
+	celery purge
+
 
 
 

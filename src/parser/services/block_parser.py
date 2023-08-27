@@ -19,17 +19,18 @@ class ParserService:
         block = await self.w3_service.get_block(block)
 
         parsed_hash = []
-        hash_data_list: list = [await self.w3_service.get_trans(trans.hex()) for trans in block.transactions]
-
+        hash_data_list: list = []
         hash_list: list = []
         from_wallet: list = []
         to_wallet: list = []
 
-        iterator = self.forward_iterator(hash_data_list)
+        iterator = self.forward_iterator(block.transactions)
         async for data in iterator:
-            hash_list.append(data.get('hash').hex())
-            from_wallet.append(data.get('from'))
-            to_wallet.append(data.get('to'))
+            hash_data = await self.w3_service.get_trans(data.hex())
+            hash_list.append(hash_data.get('hash').hex())
+            from_wallet.append(hash_data.get('from'))
+            to_wallet.append(hash_data.get('to'))
+            hash_data_list.append(hash_data)
 
         hash_list: list = await self._repository.get_db_trans(hash_list)
         from_wallet: list = await self._repository.get_wallet(from_wallet)
@@ -45,7 +46,6 @@ class ParserService:
             elif hash_data.get('from') in from_wallet or hash_data.get('to') in to_wallet:
                 await self.send_hash({'hash': _hash})
                 parsed_hash.append(_hash)
-
 
     @staticmethod
     async def send_hash(data):

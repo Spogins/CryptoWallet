@@ -18,7 +18,7 @@ async def message(data):
 async def main():
     await sio.connect("http://localhost:8001")
     await sio.emit("parse_block")
-    await sio.emit("delivery")
+    # await sio.emit("delivery")
     await sio.wait()
 
 

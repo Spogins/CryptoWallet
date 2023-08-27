@@ -10,7 +10,10 @@ class Product(Base):
     title = Column(String, default='Product')
     image = Column(URLType, nullable=True)
     price = Column(DECIMAL, default=0)
-    wallet = Column(String)
-    user_id = Column(Integer, ForeignKey('user.id'))
     in_order = Column(Boolean, default=False)
-    order = relationship('Order', backref='product')
+
+    wallet_id = Column(Integer, ForeignKey('wallet.id'))
+    wallet = relationship('Wallet', foreign_keys=[wallet_id])
+
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship('User', foreign_keys=[user_id])

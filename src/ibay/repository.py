@@ -2,8 +2,11 @@ from typing import Callable
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+
 from src.ibay.models import Product
-from src.ibay.schemas import ProductForm, ProductEdit
+from src.ibay.schemas import ProductForm, ProductEdit, ProductsForm
+from src.wallet.models import Transaction, Wallet
 
 
 class IBayRepository:
@@ -28,7 +31,7 @@ class IBayRepository:
                     title=_product.title,
                     image=_product.image,
                     price=_product.price,
-                    wallet=_product.wallet,
+                    wallet_id=_product.wallet,
                     user_id=user_id
                 )
                 session.add(product)
@@ -41,15 +44,26 @@ class IBayRepository:
 
     async def get_all(self):
         async with self.session_factory() as session:
-            result = await session.execute(select(Product).where(Product.in_order == False))
+            result = await session.execute(select(Product).options(joinedload(Product.wallet)))
             products = result.scalars().all()
-            return products
+            return [ProductsForm(
+                id=product.id,
+                title=product.title,
+                wallet=product.wallet.address,
+                price=product.price,
+                image=product.image) for product in products]
 
     async def get(self, pr_id):
         async with self.session_factory() as session:
-            product = await session.get(Product, pr_id)
+            result = await session.execute(select(Product).options(joinedload(Product.wallet)).where(Product.id == pr_id))
+            product = result.scalar_one_or_none()
             if product:
-                return product
+                return ProductsForm(
+                    id=product.id,
+                    title=product.title,
+                    wallet=product.wallet.address,
+                    price=product.price,
+                    image=product.image)
             else:
                 raise HTTPException(status_code=401,
                                     detail=f"Product not found, id: {pr_id}")
@@ -61,7 +75,7 @@ class IBayRepository:
                 raise HTTPException(status_code=401,
                                     detail=f"Product not found, id: {_product.id}")
             product.title = _product.title
-            product.wallet = _product.wallet
+            product.wallet_id = _product.wallet
             product.price = _product.price
             product.image = _product.image
             await session.commit()

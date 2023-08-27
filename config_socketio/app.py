@@ -11,7 +11,6 @@ from src.delivery.services.delivery import DeliveryService
 
 mgr: AsyncAioPikaManager = socketio.AsyncAioPikaManager(RABBITMQ_URL)
 sio: AsyncServer = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=ALLOWED_HOSTS, client_manager=mgr)
-socket_app = socketio.ASGIApp(sio)
 
 
 room_clients = set()
@@ -46,19 +45,11 @@ async def delivery(sid, delivery_service: DeliveryService = Provide[DeliveryCont
         await delivery_service.close_or_refund()
 
 
-
-@sio.on('join_room')
-async def join_room(sid, data):
-    room_name = data['room_name']
-    sio.enter_room(sid, room_name)
-    print(f"Client {sid} joined room {room_name}")
-
-
-@sio.on('chat_room')
-async def chat_room(sid, data):
-    room_name = data['room_name']
-    sio.enter_room(sid, room_name)
-    print(f"Client {sid} joined room {room_name}")
+@sio.on('join')
+async def join(sid, data):
+    room = data['room']
+    sio.enter_room(sid, room)
+    await sio.emit('message', {'username': 'User', 'message': f'You joined the room "{room}".'}, room=sid)
 
 
 @sio.on('leave')
@@ -68,7 +59,7 @@ async def join_room(sid, data):
     print(f"Client {sid} leave room {room_name}")
 
 
-async def main():
-    asyncio.create_task(check_block())
+# async def main():
+#     asyncio.create_task(check_block())
 
 

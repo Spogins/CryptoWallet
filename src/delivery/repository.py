@@ -4,7 +4,10 @@ from asyncpg import Record
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
+
 from src.delivery.models import Order
+from src.delivery.schemas import OrderForm
 
 
 class DeliveryRepository:
@@ -22,10 +25,10 @@ class DeliveryRepository:
 
     async def update_order_refund(self, data):
         async with self.session_factory() as session:
-            result = await session.execute(select(Order).where(Order.transaction == data.get('trans_hash')))
+            result = await session.execute(select(Order).where(Order.transaction_id == data.get('transaction_id')))
             order: Order = result.scalar_one_or_none()
             if order:
-                order.refund = data.get('ref_hash')
+                order.refund_id = data.get('ref_transaction_id')
                 await session.commit()
                 await session.refresh(order)
 
@@ -35,9 +38,9 @@ class DeliveryRepository:
             res = oldest_record.scalars().first()
             return res
 
-    async def update_order_status(self, status, _hash):
+    async def update_order_status(self, status, trans_id):
         async with self.session_factory() as session:
-            result = await session.execute(select(Order).where(Order.transaction == _hash))
+            result = await session.execute(select(Order).where(Order.transaction_id == trans_id))
             order: Order = result.scalar_one_or_none()
             if order:
                 order.status = status
@@ -45,12 +48,10 @@ class DeliveryRepository:
                 await session.refresh(order)
 
     async def add(self, data):
-        print(data)
-
         async with self.session_factory() as session:
             order: Order = Order(
                 product_id=data.get('product_id'),
-                transaction=data.get('transaction'),
+                transaction_id=data.get('transaction_id'),
                 user_id=data.get('user_id')
             )
             session.add(order)
@@ -60,18 +61,30 @@ class DeliveryRepository:
 
     async def get_order(self, order_id):
         async with self.session_factory() as session:
-            order = await session.get(Order, order_id)
-            if order:
-                return order
-            else:
+            result = await session.execute(select(Order).options(joinedload(Order.product)).options(joinedload(Order.transaction)).options(joinedload(Order.refund)).where(Order.id == order_id))
+            order = result.scalar_one_or_none()
+            if not order:
                 raise HTTPException(status_code=401,
                                     detail=f"Product not found, id: {order_id}")
+            return OrderForm(
+                id=order.id,
+                date=str(order.date),
+                status=order.status,
+                refund=order.refund.hash if order.refund else None,
+                transaction=order.transaction.hash,
+                product=order.product.title)
 
     async def get_orders(self, user_id):
         async with self.session_factory() as session:
-            result = await session.execute(select(Order).where(Order.user_id == user_id))
+            result = await session.execute(select(Order).options(joinedload(Order.product)).options(joinedload(Order.transaction)).options(joinedload(Order.refund)).where(Order.user_id == user_id))
             orders = result.scalars().all()
-            return orders
+            return [OrderForm(
+                id=order.id,
+                date=str(order.date),
+                status=order.status,
+                refund=order.refund.hash if order.refund else None,
+                transaction=order.transaction.hash,
+                product=order.product.title) for order in orders]
 
 
 

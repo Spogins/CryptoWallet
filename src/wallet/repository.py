@@ -13,18 +13,18 @@ class WalletRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
-    async def get_order_transaction(self, _hash, refund):
+    async def get_order_transaction(self, trans_id, refund):
         async with self.session_factory() as session:
             if not refund:
-                transaction = await session.execute(select(Order).where(Order.transaction == _hash))
+                transaction = await session.execute(select(Order).where(Order.transaction_id == trans_id))
             else:
-                transaction = await session.execute(select(Order).where(Order.refund == _hash))
+                transaction = await session.execute(select(Order).where(Order.refund_id == trans_id))
             result = transaction.scalar_one_or_none()
             return result
 
-    async def get_transaction(self, _hash):
+    async def get_transaction(self, trans_id):
         async with self.session_factory() as session:
-            transaction = await session.execute(select(Transaction).where(Transaction.hash == _hash))
+            transaction = await session.execute(select(Transaction).where(Transaction.id == trans_id))
             result = transaction.scalar_one_or_none()
             return result
 
@@ -73,8 +73,12 @@ class WalletRepository:
 
     async def get_wallet(self, wallet_id):
         async with self.session_factory() as session:
-            wallet = await session.get(Wallet, wallet_id)
-            return wallet
+            result = await session.execute(select(Wallet).where(Wallet.id == wallet_id))
+            wallet: Wallet = result.scalar_one_or_none()
+            if not wallet:
+                raise HTTPException(status_code=401,
+                                    detail=f"Wallet not found, id: {wallet_id}")
+            return UserWallet(id=wallet.id, address=wallet.address, balance=wallet.balance)
 
     async def get_wallet_by_address(self, address):
         async with self.session_factory() as session:
