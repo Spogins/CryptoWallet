@@ -20,6 +20,12 @@ DB_PASSWORD = env('DB_PASSWORD')
 DB_HOST = env('DB_HOST')
 DB_PORT = env('DB_PORT')
 
+DB_NAME_TEST = 'test_db'
+DB_USER_TEST = 'test_user'
+DB_PASSWORD_TEST = 'root'
+DB_HOST_TEST = env('DB_HOST')
+DB_PORT_TEST = env('DB_PORT')
+
 URL = f'postgresql+asyncpg://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}'
 
 JWT_SECRET = env('JWT_SECRET')
@@ -65,5 +71,8 @@ WIRING_CONFIG = [
     'src.web3',
     'config_socketio.app',
     'src.celery',
-    'src.delivery'
+    'src.delivery',
+
 ]
+
+DATABASE_TEST_URL = f'postgresql+asyncpg://{DB_USER_TEST}:{DB_PASSWORD_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}'

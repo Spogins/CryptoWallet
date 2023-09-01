@@ -4,7 +4,7 @@ import httpx
 from eth_account import Account
 from fastapi import HTTPException
 from propan import RabbitBroker
-from web3 import AsyncWeb3, AsyncHTTPProvider
+from web3 import AsyncWeb3, AsyncHTTPProvider, Web3
 from web3.eth import AsyncEth
 from config.settings import QUICKNODE_URL, MORALIS_API_KEY, RABBITMQ_URL
 from src.web3.repository import WebRepository
@@ -22,6 +22,7 @@ class WebService:
     def __init__(self, web3_repository: WebRepository) -> None:
         self._repository: WebRepository = web3_repository
         self.w3 = AsyncWeb3(AsyncHTTPProvider(QUICKNODE_URL), modules={'eth': (AsyncEth,)})
+        self.socket_w3 = Web3(Web3.WebsocketProvider('wss://damp-cosmopolitan-sea.ethereum-sepolia.discover.quiknode.pro/f9b662c08002faf65b111387307c448466c1ecc0/'))
 
     async def get_trans(self, _hash):
         return await self.w3.eth.get_transaction(_hash)
@@ -71,10 +72,13 @@ class WebService:
                 raise HTTPException(status_code=401, detail=f"Ошибка при запросе к Moralis API:, {response.status_code}")
 
     async def get_transaction(self, _hash):
-        transaction = await self.w3.eth.get_transaction(_hash)
-        block = await self.get_block(transaction.get('blockNumber'))
-        transaction_receipt = await self.w3.eth.get_transaction_receipt(_hash)
-        return {'transaction': transaction, 'timestamp': datetime.fromtimestamp(block.timestamp).strftime('%Y-%m-%d %H:%M:%S'), 'status': transaction_receipt.get('status')}
+        try:
+            transaction = await self.w3.eth.get_transaction(_hash)
+            block = await self.get_block(transaction.get('blockNumber'))
+            transaction_receipt = await self.w3.eth.get_transaction_receipt(_hash)
+            return {'transaction': transaction, 'timestamp': datetime.fromtimestamp(block.timestamp).strftime('%Y-%m-%d %H:%M:%S'), 'status': transaction_receipt.get('status')}
+        except ValueError:
+            raise HTTPException(status_code=401, detail=f"Ошибка не правильный хэш:, {_hash}")
 
     async def transaction_info(self, tx_hash):
         tx = await self.w3.eth.get_transaction(tx_hash)

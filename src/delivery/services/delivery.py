@@ -18,7 +18,7 @@ class DeliveryService:
                 await self._repository.update_order_status("SUCCESS", order.transaction_id)
                 return "SUCCESS"
             else:
-                await self.refund_transaction(order.transaction_id)
+                await self.refund_transaction({'trans_id': order.transaction_id, 'status': 'REFUND'})
                 return "REFUND"
 
 
@@ -28,8 +28,8 @@ class DeliveryService:
 
     async def update_refund_status(self, data):
         status = data.get('status')
-        _hash = data.get('hash')
-        await self._repository.update_refund_status(status, _hash)
+        refund_id = data.get('refund_id')
+        await self._repository.update_refund_status(status, refund_id)
 
     async def update_order_status(self, data):
 
@@ -41,11 +41,11 @@ class DeliveryService:
             result = await fetch()
             if not result:
                 status = "FAILURE"
-                await self.refund_transaction(trans_id)
-
+                await self.refund_transaction({'trans_id': trans_id, 'status': status})
 
         if status == "FAILURE":
-            await self.refund_transaction(trans_id)
+            status = "FAILURE"
+            await self.refund_transaction({'trans_id': trans_id, 'status': status})
 
         await self._repository.update_order_status(status, trans_id)
 

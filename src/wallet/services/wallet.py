@@ -17,19 +17,20 @@ class WalletService:
 
     async def buy_product(self, data):
         from_wallet: Wallet = await self.get_wallet_by_address(data.get('from_wallet'))
-        transaction = await self.transaction(from_wallet.private_key, data.get('to_wallet'), Decimal(data.get('value')))
+        transaction: Transaction = await self.transaction(from_wallet.private_key, data.get('to_wallet'), Decimal(data.get('value')))
         data: dict = {'transaction_id': transaction.id, 'product_id': data.get('product_id'), 'user_id': data.get('user_id')}
         async with RabbitBroker(RABBITMQ_URL) as broker:
             await broker.publish(message=data, queue='delivery/create_order')
 
-    async def refund(self, trans_id):
-        trans: Transaction = await self._repository.get_transaction(trans_id)
+    async def refund(self, _data):
+        trans: Transaction = await self._repository.get_transaction(_data.get('trans_id'))
         wallet: Wallet = await self._repository.get_wallet_by_address(trans.to_address)
         value = trans.value + (Decimal(trans.txn_fee) * Decimal('1.5'))
         transaction: Transaction = await self.transaction(wallet.private_key, trans.from_address, value)
-        data = {'transaction_id': trans_id, 'ref_transaction_id': transaction.id}
-        async with RabbitBroker(RABBITMQ_URL) as broker:
-            await broker.publish(message=data, queue='delivery/refund_transaction')
+        data = {'transaction_id': _data.get('trans_id'), 'ref_transaction_id': transaction.id}
+        if _data.get('status') == 'REFUND':
+            async with RabbitBroker(RABBITMQ_URL) as broker:
+                await broker.publish(message=data, queue='delivery/refund_transaction')
 
     async def get_wallet(self, wallet_id):
         return await self._repository.get_wallet(wallet_id)
@@ -142,6 +143,10 @@ class WalletService:
         ref_transaction = await self._repository.get_order_transaction(trans_id, True)
         if ref_transaction is not None:
             async with RabbitBroker(RABBITMQ_URL) as broker:
+                data = {
+                    'refund_id': trans_id,
+                    'status': "REFUND"
+                }
                 await broker.publish(message=data, queue='delivery/refund_status')
             return
 

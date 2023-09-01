@@ -14,9 +14,9 @@ class DeliveryRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
-    async def update_refund_status(self, status, _hash):
+    async def update_refund_status(self, status, refund_id):
         async with self.session_factory() as session:
-            result = await session.execute(select(Order).where(Order.refund == _hash))
+            result = await session.execute(select(Order).where(Order.refund_id == refund_id))
             order: Order = result.scalar_one_or_none()
             if order:
                 order.status = status
@@ -34,7 +34,7 @@ class DeliveryRepository:
 
     async def get_oldest(self):
         async with self.session_factory() as session:
-            oldest_record = await session.execute(select(Order).where(Order.status == "DELIVERY").order_by(Order.date))
+            oldest_record = await session.execute(select(Order).where(Order.status == "DELIVERY" and Order.refund_id is None).order_by(Order.date))
             res = oldest_record.scalars().first()
             return res
 

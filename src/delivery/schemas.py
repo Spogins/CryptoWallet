@@ -14,3 +14,4 @@ class OrderForm(BaseModel):
 
 class OrderEdit(BaseModel):
     order: str
+

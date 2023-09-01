@@ -18,6 +18,7 @@ user_auth = AutoModernJWTAuth()
 @app.get('/test', status_code=status.HTTP_200_OK)
 @inject
 async def test(delivery_service: DeliveryService = Depends(Provide[Container.delivery_service])):
+
     return await delivery_service.close_or_refund()
 
 

@@ -36,7 +36,6 @@ async def check_block(sid, web3_service: WebService = Provide[WebContainer.web3_
         await web3_service.find_block()
         await asyncio.sleep(1)
 
-
 @sio.on('delivery')
 @inject
 async def delivery(sid, delivery_service: DeliveryService = Provide[DeliveryContainer.delivery_service]):
@@ -59,7 +58,9 @@ async def join_room(sid, data):
     print(f"Client {sid} leave room {room_name}")
 
 
-# async def main():
-#     asyncio.create_task(check_block())
+async def test():
+    while True:
+        print('*'*20)
+        await asyncio.sleep(1)
 
 

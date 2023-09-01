@@ -35,7 +35,7 @@ class RegisterUserModel(BaseModel):
 
     @field_validator('password')
     @classmethod
-    def email_validator(cls, password: str) -> str:
+    def password_validator(cls, password: str) -> str:
         pattern = r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$'
         if re.match(pattern, password) is None:
             raise ValueError('password has incorrect format.')

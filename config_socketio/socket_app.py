@@ -1,5 +1,4 @@
 import asyncio
-
 import socketio
 from config_socketio.app import sio, check_block
 from src.core.register import RegisterContainer
@@ -13,3 +12,4 @@ def create_socket_app() -> socketio.ASGIApp:
 
 
 socket_app = create_socket_app()
+

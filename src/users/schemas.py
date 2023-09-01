@@ -25,7 +25,7 @@ class RegisterUserModel(BaseModel):
 
     @field_validator('email')
     @classmethod
-    def email_validator(cls, email: str) -> str:
+    def _email_validator(cls, email: str) -> str:
         try:
             emailinfo = validate_email(email, check_deliverability=False)
             email = emailinfo.normalized
