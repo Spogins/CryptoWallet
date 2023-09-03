@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block ibay %}
+<div class="row">
+    Ibay!
+</div>
+
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function() {
+        // Находим элемент <li> по классу и идентификатору
+        var menuItem = $('li.menu-item#nav_ibay');
+
+        // Проверяем, что элемент найден
+        if (menuItem.length > 0) {
+            // Добавляем класс "active" к элементу <li>
+            menuItem.addClass('active');
+        }
+    });
+</script>
+{% endblock %}

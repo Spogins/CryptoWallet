@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block wallets %}
+<div class="row">
+    Wallets!
+</div>
+{% endblock %}
+{% block script %}
+<script>
+    $(document).ready(function() {
+        // Находим элемент <li> по классу и идентификатору
+        var menuItem = $('#nav_wallets');
+
+        // Проверяем, что элемент найден
+        if (menuItem.length > 0) {
+            // Добавляем класс "active" к элементу <li>
+            menuItem.addClass('active');
+        }
+    });
+</script>
+{% endblock %}
