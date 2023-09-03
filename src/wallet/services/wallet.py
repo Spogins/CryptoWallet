@@ -3,6 +3,8 @@ from eth_account import Account
 import secrets
 from fastapi import HTTPException
 from propan import RabbitBroker
+from web3.exceptions import InvalidAddress
+
 from config.settings import RABBITMQ_URL
 from src.wallet.models import Asset, Wallet, Transaction
 from src.wallet.repository import WalletRepository
@@ -42,25 +44,29 @@ class WalletService:
         wallet = await self.generate_wallet()
         return await self._repository.user_add_wallet(user_id, wallet)
 
-    async def get_db_transaction(self, address):
-        return await self._repository.get_db_transaction(address)
+    async def get_db_transaction(self, address, limit):
+        return await self._repository.get_db_transaction(address, limit)
 
     async def user_wallets(self, user_id):
         return await self._repository.user_wallets(user_id)
 
-    async def get_all_transaction(self):
-        return await self._repository.get_all_trans()
+    async def get_all_transaction(self, limit):
+        return await self._repository.get_all_trans(limit)
 
     async def import_user_wallet(self, user_id, private_key):
-        account = Account.from_key(private_key)
-        address = account.address
-        wallet = {
-            "private_key": private_key,
-            "address": address
-        }
-        balance = await self.get_balance(address)
-        balance = balance.get('balance_eth')
-        return await self._repository.user_add_wallet(user_id, wallet, balance)
+        try:
+            account = Account.from_key(private_key)
+            address = account.address
+            wallet = {
+                "private_key": private_key,
+                "address": address
+            }
+            balance = await self.get_balance(address)
+            balance = balance.get('balance_eth')
+            return await self._repository.user_add_wallet(user_id, wallet, balance)
+        except ValueError:
+            raise HTTPException(status_code=401,
+                                detail='Wrong input data.')
 
     async def parse_trans_data(self, trans, block_time, status, _hash):
         asset = await self.get_wallet_asset(trans.get('from'), trans.get('to'))
@@ -101,7 +107,11 @@ class WalletService:
         return {"private_key": private_key, "address": acct.address}
 
     async def get_balance(self, address):
-        return await self.w3_service.get_balance(address)
+        try:
+            return await self.w3_service.get_balance(address)
+        except InvalidAddress:
+            raise HTTPException(status_code=401,
+                                detail='Wrong input data.')
 
     async def update_all(self, user_id):
         wallets = await self._repository.get_wallets(user_id)
@@ -114,8 +124,12 @@ class WalletService:
         return u_balance
 
     async def update_balance(self, address):
-        balance = await self.w3_service.get_balance(address)
-        return await self._repository.update_wallet_balance(address, balance.get('balance_eth'))
+        try:
+            balance = await self.w3_service.get_balance(address)
+            return await self._repository.update_wallet_balance(address, balance.get('balance_eth'))
+        except InvalidAddress:
+            raise HTTPException(status_code=401,
+                                detail='Wrong input data.')
 
     async def test_transaction(self, private_key_sender, receiver_address, value):
         trans_data = await self.w3_service.transaction(private_key_sender, receiver_address, value)

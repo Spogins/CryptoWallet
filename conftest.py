@@ -4,20 +4,16 @@ import httpx
 import pytest
 from fastapi import FastAPI
 import pytest_asyncio
-from sqlalchemy.ext.asyncio import create_async_engine
+from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
 
 from config.settings import DATABASE_TEST_URL
-from src.core.containers import Container
+from src.core.containers import Container, TestContainer
 from src.core.db import Base
 from src.core.routers import router_app
-from src.users.endpoints import app as user_app
-from src.auth.endpoints import app as auth_app
-from src.wallet.endpoints import app as wallet_app
-from src.chat.endpoints import app as chat_app
-from src.ibay.endpoints import app as ibay_app
-from src.delivery.endpoints import app as delivery_app
+
 
 from src.core.register import RegisterContainer
+from src.users.models import User
 
 
 @pytest.fixture(scope="session", autouse=True)
@@ -32,11 +28,10 @@ async def test_db_engine():
         await conn.run_sync(Base.metadata.drop_all)
 
 
+
+
 def create_test_app() -> FastAPI:
-    db_cont = Container()
-    db_cont.db()
     container = RegisterContainer()
-    # container.db_container.db(db_url=DATABASE_TEST_URL)
     test_app = FastAPI()
     test_app.container = container
     test_app.include_router(router_app)

@@ -1,5 +1,7 @@
 from fastapi.middleware.cors import CORSMiddleware
 from propan import RabbitBroker
+from starlette.staticfiles import StaticFiles
+
 from config_socketio.app import sio, check_block
 from config_socketio.socket_app import socket_app
 from src.core.register import RegisterContainer
@@ -34,6 +36,7 @@ def create_app() -> FastAPI:
         allow_headers=["*"],
     )
     app.mount("/socket.io", socket_app)
+    app.mount("/static", StaticFiles(directory="static"), name="static")
     return app
 
 

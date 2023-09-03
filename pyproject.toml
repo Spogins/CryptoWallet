@@ -33,7 +33,12 @@ alembic = "^1.12.0"
 
 [tool.pytest.ini_options]
 testpaths = [
-    "src/auth/tests/tests_auth.py"
+    "src/auth/tests/tests_auth.py",
+    "src/chat/tests/tests_chat.py",
+    "src/wallet/tests/tests_wallet.py",
+    "src/ibay/tests/tests_ibay.py",
+    "src/delivery/tests/tests_delivery.py",
+    "src/users/tests/tests_users.py",
 ]
 asyncio_mode="auto"
 

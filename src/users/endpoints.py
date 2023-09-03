@@ -34,13 +34,13 @@ async def get_by_id(
         return Response(status_code=status.HTTP_404_NOT_FOUND)
 
 
-@app.post("/user", status_code=status.HTTP_201_CREATED)
-@inject
-async def add(user: UserModel,
-              user_service: UserService = Depends(Provide[Container.user_service]),
-              bearer: HTTPAuthorizationCredentials = Depends(user_auth)
-              ):
-    return await user_service.create_user(user)
+# @app.post("/user", status_code=status.HTTP_201_CREATED)
+# @inject
+# async def add(user: UserModel,
+#               user_service: UserService = Depends(Provide[Container.user_service]),
+#               bearer: HTTPAuthorizationCredentials = Depends(user_auth)
+#               ):
+#     return await user_service.create_user(user)
 
 
 @app.delete("/user/{user_id}", status_code=status.HTTP_204_NO_CONTENT)

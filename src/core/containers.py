@@ -22,7 +22,7 @@ class Container(containers.DeclarativeContainer):
 #     wiring_config = containers.WiringConfiguration(packages=WIRING_CONFIG)
 #     db = providers.Singleton(Database, db_url=DATABASE_TEST_URL)
 #     session = providers.Callable(db.provided.session)
-#
-#
+
+
 
 

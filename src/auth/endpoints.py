@@ -4,8 +4,11 @@ from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status, Cookie
 import jwt
 from fastapi.security import HTTPAuthorizationCredentials
+from starlette.requests import Request
+from starlette.responses import HTMLResponse
+
 from config.settings import JWT_SECRET, ALGORITHM, RABBITMQ_URL
-from config_fastapi.fastapi_mgr import fastapi_mgr
+from config_fastapi.fastapi_mgr import fastapi_mgr, templates
 from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.auth.schemas import AuthUsers, RegisterUserModel
@@ -35,6 +38,7 @@ async def get_token(user: AuthUsers, auth_service: AuthService = Depends(Provide
     return response
 
 
+
 @app.post("/log_out", status_code=status.HTTP_200_OK)
 @inject
 async def log_out(bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
@@ -42,21 +46,21 @@ async def log_out(bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
     response.set_cookie("access_token", value="", max_age=0)
     return response
 
-
-@app.get("/token_user", status_code=status.HTTP_200_OK)
-@inject
-async def token_user(access_token: str = Cookie(None)):
-    return access_token
-
-
-@app.get("/verify_token", status_code=status.HTTP_200_OK)
-@inject
-async def verify_token(access_token: str = Cookie(None)):
-    try:
-        verify = jwt.decode(access_token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
-        return {'access_token': verify}
-    except:
-        return {'access_token': 'expire token'}
+#
+# @app.get("/token_user", status_code=status.HTTP_200_OK)
+# @inject
+# async def token_user(access_token: str = Cookie(None)):
+#     return access_token
+#
+#
+# @app.get("/verify_token", status_code=status.HTTP_200_OK)
+# @inject
+# async def verify_token(access_token: str = Cookie(None)):
+#     try:
+#         verify = jwt.decode(access_token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
+#         return {'access_token': verify}
+#     except:
+#         return {'access_token': 'expire token'}
 
 
 @app.post("/registration", status_code=status.HTTP_201_CREATED)

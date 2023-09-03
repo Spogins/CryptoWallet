@@ -35,7 +35,7 @@ async def get_order(product: int, delivery_service: DeliveryService = Depends(Pr
     return await delivery_service.get_order(product)
 
 
-@app.put('/update_order', status_code=status.HTTP_200_OK)
-@inject
-async def update_order(order: OrderEdit, delivery_service: DeliveryService = Depends(Provide[Container.delivery_service])):
-    return await delivery_service.update_order(order)
+# @app.put('/update_order', status_code=status.HTTP_200_OK)
+# @inject
+# async def update_order(order: OrderEdit, delivery_service: DeliveryService = Depends(Provide[Container.delivery_service])):
+#     return await delivery_service.update_order(order)

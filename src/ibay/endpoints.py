@@ -32,10 +32,10 @@ async def get_product(product: int, ibay_service: IBayService = Depends(Provide[
     return await ibay_service.get_product(product)
 
 
-@app.put('/update_product', status_code=status.HTTP_200_OK)
-@inject
-async def update_product(product: ProductEdit, ibay_service: IBayService = Depends(Provide[Container.ibay_service])):
-    return await ibay_service.update_product(product)
+# @app.put('/update_product', status_code=status.HTTP_200_OK)
+# @inject
+# async def update_product(product: ProductEdit, ibay_service: IBayService = Depends(Provide[Container.ibay_service])):
+#     return await ibay_service.update_product(product)
 
 
 @app.post('/buy_product', status_code=status.HTTP_200_OK)
