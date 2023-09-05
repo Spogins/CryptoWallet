@@ -1,20 +1,339 @@
 {% extends "base.html" %}
 {% block profile %}
-<div class="row">
-    Profile!
-</div>
+    <div class="row">
+        <!-- User Sidebar -->
+        <div class="col-xl-0 col-lg-0 col-md-0 order-0 order-md-0">
+            <p class="mt-4 small text-uppercase text-muted">Profile</p>
+            <!-- User Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row" style="display: flex; justify-content: center;">
+                        <div class="col-xl-4 col-lg-5 col-md-5 order-1 order-md-0">
+                            <div class="user-avatar-section">
+                                <div class="d-flex align-items-center flex-column">
+                                    <div id="avatarSection">
+                                        {% if user.avatar == '#' %}
+                                            <i id="iconUser" class="menu-icon tf-icons ti ti-user mb-3"
+                                               style="font-size: 100px;"></i>
+                                        {% else %}
+                                            <img
+                                                    class="img-fluid rounded pt-1 mb-3"
+                                                    src="{{ user.avatar }}"
+                                                    height="100"
+                                                    width="100"
+                                                    alt="User avatar"
+                                                    id="userAvatar"
+                                            />
+                                        {% endif %}
+                                    </div>
+                                    <div id="imageContainer">
+
+                                    </div>
+
+
+                                </div>
+                            </div>
+                            <div>
+                                <div class="user-info text-center">
+                                    <h4 class="mb-2">{{ user.username }}</h4>
+                                </div>
+                                <div class="d-flex justify-content-center">
+
+                                    <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                                    <button class="btn btn-primary me-3" id="chooseImageButton">Edit</button>
+                                    <button onclick="remove_avatar()" class="btn btn-label-danger">Remove</button>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col order-1 order-md-1">
+                        <div id="formEditUser" class="mb-3">
+                            <div class="row mt-4">
+                                <div class="col" id="usernameForm">
+                                    <div class="mb-3">
+                                        <label for="username" class="form-label">Username</label>
+                                        <input
+                                                type="text"
+                                                class="form-control"
+                                                id="username"
+                                                name="username"
+                                                placeholder="Enter your username"
+                                                autofocus
+                                        />
+                                    </div>
+                                    <div class="invalid-feedback mb-2"></div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3">
+                                        <label for="email" class="form-label">Email</label>
+                                        <input type="text" class="form-control" id="email" name="email"
+                                               placeholder="{{ user.email }}" readonly/>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="col" id="passwordForm">
+                                    <div class="mb-3 form-password-toggle">
+                                        <label class="form-label" for="password">Password</label>
+                                        <div class="input-group input-group-merge">
+                                            <input
+                                                    type="password"
+                                                    id="password"
+                                                    class="form-control"
+                                                    name="password"
+                                                    placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                                    aria-describedby="password"
+                                            />
+                                            <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+                                        </div>
+                                        <div class="invalid-feedback"></div>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <div class="mb-3 form-password-toggle">
+                                        <label class="form-label" for="confirm-password">Confirm password</label>
+                                        <div class="input-group input-group-merge">
+                                            <input
+                                                    type="password"
+                                                    id="confirm-password"
+                                                    class="form-control"
+                                                    name="confirm-password"
+                                                    placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;"
+                                                    aria-describedby="confirm-password"
+                                            />
+                                            <span class="input-group-text cursor-pointer"><i class="ti ti-eye-off"></i></span>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="row d-flex justify-content-center mt-2">
+                                <div class="w-25">
+                                    <button onclick="update_user()" class="btn btn-primary d-grid w-100">Save</button>
+                                </div>
+                            </div>
+
+
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            <!-- /User Card -->
+        </div>
+        <!--/ User Sidebar -->
+    </div>
+
 {% endblock %}
 {% block script %}
-<script>
-    $(document).ready(function() {
-        // Находим элемент <li> по классу и идентификатору
-        var menuItem = $('li.menu-item#nav_profile');
+    <script>
+        let validData = true
+        let base64Image = ''
+        var usernameInput = document.getElementById("username");
+        var passwordInput = document.getElementById("password");
+        var confirmInput = document.getElementById("confirm-password");
+        var errorDiv = document.querySelector("#passwordForm .invalid-feedback");
+        var errorUserDiv = document.querySelector("#usernameForm .invalid-feedback");
 
-        // Проверяем, что элемент найден
-        if (menuItem.length > 0) {
-            // Добавляем класс "active" к элементу <li>
-            menuItem.addClass('active');
+        passwordInput.addEventListener("input", function () {
+            // Получите значение введенного пароля
+            var password = passwordInput.value;
+            var confirm_password = confirmInput.value;
+            if (password.length > 0) {
+                if (!/^[a-zA-Z0-9]+$/.test(password)) {
+                    errorDiv.textContent = "Password must contain only English letters and digits";
+                    errorDiv.style.display = "block";
+                    passwordInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+                if (password.length < 8) {
+                    errorDiv.textContent = "Password must be more than 6 characters";
+                    errorDiv.style.display = "block";
+                    passwordInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+                if (!/[a-z]/.test(password)) {
+                    errorDiv.textContent = "Password must contain at least one lowercase letter";
+                    errorDiv.style.display = "block";
+                    passwordInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+                if (!/[A-Z]/.test(password)) {
+                    errorDiv.textContent = "Password must contain at least one uppercase letter";
+                    errorDiv.style.display = "block";
+                    passwordInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+                if (!/\d/.test(password)) {
+                    errorDiv.textContent = "Password must contain at least one digit";
+                    errorDiv.style.display = "block";
+                    passwordInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+                if (password !== confirm_password) {
+                    errorDiv.textContent = "Passwords do not match.";
+                    errorDiv.style.display = "block";
+                    passwordInput.classList.add("is-invalid");
+                    confirmInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+            }
+
+            // Если условие валидации прошло успешно, уберите сообщение об ошибке и класс is-invalid
+            errorDiv.textContent = "";
+            errorDiv.style.display = "none";
+            passwordInput.classList.remove("is-invalid");
+            confirmInput.classList.remove("is-invalid")
+            validData = true
+        });
+        confirmInput.addEventListener("input", function () {
+            // Получите значение введенного пароля
+            var password = passwordInput.value;
+            var confirm_password = confirmInput.value;
+
+            if (password !== confirm_password) {
+                errorDiv.textContent = "Passwords do not match.";
+                errorDiv.style.display = "block";
+                passwordInput.classList.add("is-invalid");
+                confirmInput.classList.add("is-invalid");
+                validData = false
+                return;
+            }
+
+            // Если условие валидации прошло успешно, уберите сообщение об ошибке и класс is-invalid
+            errorDiv.textContent = "";
+            errorDiv.style.display = "none";
+            passwordInput.classList.remove("is-invalid");
+            confirmInput.classList.remove("is-invalid")
+            validData = true
+        });
+        usernameInput.addEventListener("input", function () {
+            var username = usernameInput.value;
+            if (username.length > 0) {
+                if (!/^[a-zA-Z0-9]+$/.test(username)) {
+                    errorUserDiv.textContent = "Username must contain only English letters and digits";
+                    errorUserDiv.style.display = "block";
+                    usernameInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+                if (username.length < 6) {
+                    errorUserDiv.textContent = "Username must be more than 6 characters";
+                    errorUserDiv.style.display = "block";
+                    usernameInput.classList.add("is-invalid");
+                    validData = false
+                    return;
+                }
+            }
+            errorUserDiv.textContent = "";
+            errorUserDiv.style.display = "none";
+            usernameInput.classList.remove("is-invalid");
+            validData = true
+        });
+
+        function remove_avatar() {
+            var iconUser = $('<i>', {
+                id: 'iconUser',
+                class: 'menu-icon tf-icons ti ti-user mb-3',
+                style: 'font-size: 100px;'
+            });
+
+            $("#imageContainer").hide()
+            $("#avatarSection").empty().append(iconUser).css("display", "block");
+            base64Image = '#'
         }
-    });
-</script>
+
+
+        function update_user() {
+            let profile_api_url = window.location.origin + "/api/v1/edit_profile"
+            let username = $('#username').val()
+            let password = $("#password").val()
+            let confirm_password = $('#confirm-password').val()
+
+
+            console.log(username)
+            console.log(password)
+            console.log(confirm_password)
+
+            if (username.length || password.length && confirm_password.length || base64Image !== '') {
+
+                if (validData)
+
+                    $.ajax({
+                        method: 'put',
+                        dataType: 'json',
+                        headers: {
+                            "Content-Type": 'application/json',
+                        },
+                        url: profile_api_url,
+                        data: JSON.stringify({
+                            "username": username,
+                            "new_password": password,
+                            "repeat_password": confirm_password,
+                            "avatar": base64Image
+                        }),
+                        success: function (data) {
+                            console.log("success", data.access_token)
+                            window.location.href = '/profile'
+
+                        },
+                        error: function (data) {
+                            console.log("error", data.responseJSON.detail)
+
+
+                        }
+                    })
+
+            }
+        }
+
+
+        $(document).ready(function () {
+
+
+            var menuItem = $('li.menu-item#nav_profile');
+
+            if (menuItem.length > 0) {
+                menuItem.addClass('active');
+            }
+
+
+            $("#chooseImageButton").click(function () {
+                $("#imageInput").val(null);
+                $("#imageInput").click();
+            });
+
+            $("#imageInput").change(function () {
+                var selectedFile = this.files[0];
+
+                if (selectedFile) {
+                    var reader = new FileReader();
+
+                    reader.onload = function (e) {
+                        var image = new Image();
+                        image.classList.add("rounded", "pt-1", "mb-3")
+                        image.height = "100"
+                        image.width = "100"
+                        image.alt = "User avatar"
+                        image.src = e.target.result;
+                        {#$("#iconUser").hide()#}
+                        $("#avatarSection").hide()
+                        $("#imageContainer").empty().append(image).css("display", "block");
+                        base64Image = e.target.result;
+                    };
+
+                    reader.readAsDataURL(selectedFile);
+                }
+            });
+        });
+    </script>
 {% endblock %}

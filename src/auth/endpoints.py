@@ -2,12 +2,7 @@ import datetime
 import json
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response, status, Cookie
-import jwt
 from fastapi.security import HTTPAuthorizationCredentials
-from starlette.requests import Request
-from starlette.responses import HTMLResponse
-
-from config.settings import JWT_SECRET, ALGORITHM, RABBITMQ_URL
 from config_fastapi.fastapi_mgr import fastapi_mgr, templates
 from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth

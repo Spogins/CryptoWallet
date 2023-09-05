@@ -44,12 +44,15 @@ class AuthRepository:
 
     async def add(self, user_model: RegisterUserModel) -> User:
         async with self.session_factory() as session:
-            user = User(email=user_model.email, password=user_model.password, username=user_model.username, avatar='#')
-            session.add(user)
-            await session.commit()
-            await session.refresh(user)
-            send_mail.apply_async(args=(user.email,))
-            return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
+            try:
+                user = User(email=user_model.email, password=user_model.password, username=user_model.username, avatar='#')
+                session.add(user)
+                await session.commit()
+                await session.refresh(user)
+                send_mail.apply_async(args=(user.email,))
+                return UserForm(id=user.id, email=user.email, username=user.username, avatar=user.avatar)
+            except:
+                raise HTTPException(status_code=401, detail=f"User with email already exist")
 
     async def get_access(self, user_id, access: bool = True):
         async with self.session_factory() as session:
@@ -59,6 +62,14 @@ class AuthRepository:
             user.chat_access = access
             await session.commit()
             await session.refresh(user)
+
+
+    async def get_user(self, user_id):
+        async with self.session_factory() as session:
+            user = await session.get(User, user_id)
+            if user:
+                return user
+            return False
 
 
 

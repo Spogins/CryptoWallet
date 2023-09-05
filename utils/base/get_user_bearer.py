@@ -7,3 +7,4 @@ async def get_user_from_bearer(bearer):
     verify = jwt.decode(token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
     user_id = verify.get('id')
     return user_id
+
