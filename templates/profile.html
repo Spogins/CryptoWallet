@@ -163,13 +163,13 @@
 
                                     <div class="modal-header">
                                         <h5 class="modal-title" id="exampleModalLabel5">Import ETH Wallet</h5>
-                                        <button class="btn-close" data-bs-dismiss="modal"
+                                        <button id="closeModal" class="btn-close" data-bs-dismiss="modal"
                                                 aria-label="Close"></button>
                                     </div>
 
                                     <div class="modal-body">
                                         <div class="row" id="privateKeyForm">
-                                            <form action="">
+                                            <form action="" id="priv">
                                                 <div class="col mb-3">
                                                     <input type="text" id="privateKey" class="form-control"
                                                            placeholder="Enter ETH Wallet">
@@ -192,7 +192,8 @@
                         </div>
                         <!-- End Modal -->
                         <div class="w-25">
-                            <button onclick="createWallet()" class="btn btn-primary d-grid w-100">Create ETH Wallet</button>
+                            <button onclick="createWallet()" class="btn btn-primary d-grid w-100">Create ETH Wallet
+                            </button>
                         </div>
 
                     </div>
@@ -208,6 +209,10 @@
 {% endblock %}
 {% block script %}
     <script>
+        document.getElementById("priv").addEventListener("submit", function (event) {
+            event.preventDefault(); // Отменяет отправку формы
+            // Здесь можно добавить ваш код для обработки данных формы или выполнить другие действия
+        });
         let validData = true
         let base64Image = ''
         var usernameInput = document.getElementById("username");
@@ -344,7 +349,16 @@
                 },
                 url: private_key_api_url + privateKey,
                 success: function (data) {
-                    location.reload();
+                    setWallets(data)
+                    var currentValue = parseInt($("#walletCt").text(), 10);
+                    var newValue = currentValue + 1;
+                    $("#walletCt").text(newValue);
+                    $('#privateKey').text('')
+                    errorDivKey.textContent = "";
+                    errorDivKey.style.display = "none";
+                    privateKeyInput.classList.remove("is-invalid");
+                    $("#closeModal").click()
+
                 },
                 error: function (data) {
                     errorDivKey.textContent = data.responseJSON.detail;
@@ -367,7 +381,10 @@
                 },
                 url: create_wallet_api_url,
                 success: function (data) {
-                    location.reload();
+                    setWallets(data)
+                    var currentValue = parseInt($("#walletCt").text(), 10);
+                    var newValue = currentValue + 1;
+                    $("#walletCt").text(newValue);
                 },
                 error: function (data) {
                     console.log(data.responseJSON.detail)
@@ -431,7 +448,7 @@
                 },
                 url: user_wallets_api_url + user_id,
                 success: function (data) {
-                    $('#userWallets').append('<span>' + data.length + '</span>')
+                    $('#userWallets').append('<span id="walletCt">' + data.length + '</span>')
 
                     data.forEach((element) => setWallets(element));
                 },

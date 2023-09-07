@@ -63,7 +63,7 @@ class WalletRepository:
                 session.add(_wallet)
                 await session.commit()
                 await session.refresh(_wallet)
-                return _wallet
+                return UserWallet(id=_wallet.id, address=_wallet.address, balance=_wallet.balance, asset_img=_wallet.asset.image)
             except:
                 raise HTTPException(status_code=401, detail='The wallet was registered on the account earlier make sure you are using a new or empty wallet')
 
