@@ -2,8 +2,8 @@ import enum
 
 
 class StatusOrder(enum.Enum):
-    new = 'NEW'
-    delivery = 'DELIVERY'
-    finish = 'CLOSE'
-    turning = 'REFUND'
-    failed = 'FAILED'
+    NEW = 'NEW'
+    DELIVERY = 'DELIVERY'
+    CLOSE = 'CLOSE'
+    REFUND = 'REFUND'
+    FAILED = 'FAILED'

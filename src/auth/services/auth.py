@@ -19,10 +19,9 @@ class AuthService:
             jwt_string = request.cookies.get('access_token')
             jwt_token = jwt_string.split(" ")[1]
             verify = jwt.decode(jwt_token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
-            user_id = verify.get('id')
-            user = await self._repository.get_user(user_id)
-            return user
-
+            if verify.get('id'):
+                return True
+        return False
 
     async def token(self, user):
         return await self._repository.token(user)

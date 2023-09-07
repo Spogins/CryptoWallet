@@ -22,3 +22,7 @@ class ChatService:
     async def get_chat(self, limit):
         return await self._repository.get_chat_messages(limit)
 
+
+    async def get_user_messages(self, user_id):
+        return await self._repository.user_messages(user_id)
+

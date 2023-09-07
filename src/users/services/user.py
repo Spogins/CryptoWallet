@@ -33,6 +33,6 @@ class UserService:
         psw = profile.new_password
         if not profile.new_password == '':
             psw = self.hashed_psw(psw)
-        if not profile.avatar == '':
+        if not profile.avatar == '' and not profile.avatar == '#':
             profile.avatar = await self.boto3_service.upload_image(profile.avatar)
         return await self._repository.edit_profile(profile, user, psw)

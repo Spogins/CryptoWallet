@@ -7,7 +7,6 @@ celery = Celery(
     backend=CELERY_RESULT_BACKEND,# Update with your Redis URL
     include=[
         "src.celery.auth_tasks",
-        "src.celery.user_tasks",
         "config_celery.celery",
         'src.celery.parse_tasks',
         'src.celery.chat_access_tasks',

@@ -5,13 +5,9 @@ import pytest
 from fastapi import FastAPI
 import pytest_asyncio
 from sqlalchemy.ext.asyncio import create_async_engine, async_sessionmaker
-
 from config.settings import DATABASE_TEST_URL
-from src.core.containers import Container, TestContainer
 from src.core.db import Base
 from src.core.routers import router_app
-
-
 from src.core.register import RegisterContainer
 from src.users.models import User
 

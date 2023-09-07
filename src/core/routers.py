@@ -1,5 +1,4 @@
 from fastapi import APIRouter
-
 from src.auth.views import auth_views
 from src.chat.views import chat_views
 from src.ibay.views import ibay_views

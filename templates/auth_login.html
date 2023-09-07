@@ -109,7 +109,7 @@
                 remember = false
             }
             let fields = $(`#email`);
-            if (fields.parent().find('.is-invalid').length === 0)
+            if (fields.parent().find('.is-invalid').length === 0 || fields.parent().find('.invalid-feedback').text() == 'Wrong email address or password')
                 $.ajax({
                     method: 'post',
                     dataType: 'json',

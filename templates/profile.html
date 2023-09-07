@@ -12,19 +12,7 @@
                             <div class="user-avatar-section">
                                 <div class="d-flex align-items-center flex-column">
                                     <div id="avatarSection">
-                                        {% if user.avatar == '#' %}
-                                            <i id="iconUser" class="menu-icon tf-icons ti ti-user mb-3"
-                                               style="font-size: 100px;"></i>
-                                        {% else %}
-                                            <img
-                                                    class="img-fluid rounded pt-1 mb-3"
-                                                    src="{{ user.avatar }}"
-                                                    height="100"
-                                                    width="100"
-                                                    alt="User avatar"
-                                                    id="userAvatar"
-                                            />
-                                        {% endif %}
+
                                     </div>
                                     <div id="imageContainer">
 
@@ -35,7 +23,7 @@
                             </div>
                             <div>
                                 <div class="user-info text-center">
-                                    <h4 class="mb-2">{{ user.username }}</h4>
+                                    <h4 id="profileUsername" class="mb-2"></h4>
                                 </div>
                                 <div class="d-flex justify-content-center">
 
@@ -68,7 +56,7 @@
                                     <div class="mb-3">
                                         <label for="email" class="form-label">Email</label>
                                         <input type="text" class="form-control" id="email" name="email"
-                                               placeholder="{{ user.email }}" readonly/>
+                                               placeholder="" readonly/>
                                     </div>
                                 </div>
                             </div>
@@ -125,6 +113,96 @@
             <!-- /User Card -->
         </div>
         <!--/ User Sidebar -->
+        <!-- Statistics Sidebar -->
+        <div class="col-xl-0 col-lg-0 col-md-0 order-0 order-md-0">
+            <p class="mt-4 small text-uppercase text-muted">Statistics</p>
+            <!-- Chat Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="info-container">
+                        <ul class="list-unstyled mb-0">
+                            <li id="userMessages" class="mb-2">
+                                <span class="fw-semibold me-1">Messages in chats:</span>
+
+                            </li>
+                            <li id="userWallets" class="pt-1">
+                                <span class="fw-semibold me-1">Wallets:</span>
+
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <!-- /Chat Card -->
+        </div>
+        <!--/ Statistics Sidebar -->
+
+        <!-- Wallets Management Sidebar -->
+        <div class="col-xl-0 col-lg-0 col-md-0 order-0 order-md-0">
+            <p class="mt-4 small text-uppercase text-muted">Wallets Management</p>
+            <!-- Wallets Card -->
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div id="wallets">
+
+                    </div>
+                    <div class="row mt-5">
+                        <!-- Button triger modal -->
+                        <div class="w-25">
+                            <button class="btn btn-primary d-grid w-100" data-bs-toggle="modal"
+                                    data-bs-target="#importWallet">Import ETH Wallet
+                            </button>
+                        </div>
+                        <!-- Modal -->
+
+                        <div class="modal fade animate__animated fadeIn" id="importWallet" tabindex="-1"
+                             style="display: none;" aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+
+                                <div class="modal-content">
+
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="exampleModalLabel5">Import ETH Wallet</h5>
+                                        <button class="btn-close" data-bs-dismiss="modal"
+                                                aria-label="Close"></button>
+                                    </div>
+
+                                    <div class="modal-body">
+                                        <div class="row" id="privateKeyForm">
+                                            <form action="">
+                                                <div class="col mb-3">
+                                                    <input type="text" id="privateKey" class="form-control"
+                                                           placeholder="Enter ETH Wallet">
+                                                </div>
+                                                <div class="invalid-feedback mb-2"></div>
+                                            </form>
+                                        </div>
+
+                                    </div>
+
+                                    <div class="modal-footer">
+
+                                        <button onclick="importWallet()" class="btn btn-primary d-grid w-100">Import ETH
+                                            Wallet
+                                        </button>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- End Modal -->
+                        <div class="w-25">
+                            <button onclick="createWallet()" class="btn btn-primary d-grid w-100">Create ETH Wallet</button>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- /Wallets Card -->
+        </div>
+        <!--/ Wallets Management Sidebar -->
     </div>
 
 {% endblock %}
@@ -135,6 +213,8 @@
         var usernameInput = document.getElementById("username");
         var passwordInput = document.getElementById("password");
         var confirmInput = document.getElementById("confirm-password");
+        var privateKeyInput = document.getElementById('privateKey')
+        var errorDivKey = document.querySelector('#privateKeyForm .invalid-feedback')
         var errorDiv = document.querySelector("#passwordForm .invalid-feedback");
         var errorUserDiv = document.querySelector("#usernameForm .invalid-feedback");
 
@@ -252,6 +332,49 @@
             base64Image = '#'
         }
 
+        function importWallet() {
+            var privateKey = $('#privateKey').val()
+            let private_key_api_url = window.location.origin + '/api/v1/import_eth_wallet?private_key='
+
+            $.ajax({
+                method: 'post',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: private_key_api_url + privateKey,
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (data) {
+                    errorDivKey.textContent = data.responseJSON.detail;
+                    errorDivKey.style.display = "block";
+                    privateKeyInput.classList.add("is-invalid");
+
+                }
+            })
+
+        }
+
+        function createWallet() {
+            let create_wallet_api_url = window.location.origin + '/api/v1/create_eth_wallet'
+
+            $.ajax({
+                method: 'post',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: create_wallet_api_url,
+                success: function (data) {
+                    location.reload();
+                },
+                error: function (data) {
+                    console.log(data.responseJSON.detail)
+
+                }
+            })
+        }
 
         function update_user() {
             let profile_api_url = window.location.origin + "/api/v1/edit_profile"
@@ -259,15 +382,9 @@
             let password = $("#password").val()
             let confirm_password = $('#confirm-password').val()
 
-
-            console.log(username)
-            console.log(password)
-            console.log(confirm_password)
-
             if (username.length || password.length && confirm_password.length || base64Image !== '') {
 
                 if (validData)
-
                     $.ajax({
                         method: 'put',
                         dataType: 'json',
@@ -282,13 +399,10 @@
                             "avatar": base64Image
                         }),
                         success: function (data) {
-                            console.log("success", data.access_token)
                             window.location.href = '/profile'
 
                         },
                         error: function (data) {
-                            console.log("error", data.responseJSON.detail)
-
 
                         }
                     })
@@ -296,8 +410,88 @@
             }
         }
 
+        function setWallets(walledData) {
+            $('#wallets').append(
+                '<div class="d-flex justify-content-start align-items-center mb-3 mt-3">' +
+                '<div class="avatar-wrapper">' +
+                '<div class="avatar me-2"><img src="' + walledData.asset_img + '" alt="Avatar"></div>' +
+                '</div>' +
+                '<div class="form-control d-flex flex-column" style="width: auto"><a href="https://sepolia.etherscan.io/address/' + walledData.address + '" target="_blank"><span style="text-decoration: underline" class=" emp_name text-truncate">' + walledData.address + '</span></a>' +
+                '</div>'
+            )
+        }
+
+        function userWallets(user_id) {
+            let user_wallets_api_url = window.location.origin + "/api/v1/user_wallets?user="
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: user_wallets_api_url + user_id,
+                success: function (data) {
+                    $('#userWallets').append('<span>' + data.length + '</span>')
+
+                    data.forEach((element) => setWallets(element));
+                },
+                error: function (data) {
+                }
+            })
+        }
+
+        function userMessages() {
+            let user_wallets_api_url = window.location.origin + "/api/v1/user_messages"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: user_wallets_api_url,
+                success: function (data) {
+                    $('#userMessages').append('<span>' + data + '</span>')
+                },
+                error: function (data) {
+                }
+            })
+        }
 
         $(document).ready(function () {
+            let user_auth_api_url = window.location.origin + "/api/v1/user_auth"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: user_auth_api_url,
+                success: function (data) {
+                    let avatarHeader = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
+                    if (data.avatar !== '#')
+                        avatarHeader = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
+
+
+                    $("#userAvatarDrop").append(avatarHeader)
+                    $("#userAvatarSmall").append(avatarHeader)
+                    $("#usernameHeader").text(data.username)
+
+
+                    $('#profileUsername').text(data.username)
+                    $('#email').attr("placeholder", data.email);
+                    let avatar = '<i id="iconUser" class="menu-icon tf-icons ti ti-user mb-3" style="font-size: 100px;"></i>'
+                    if (data.avatar !== '#')
+                        avatar = '<img class="img-fluid rounded pt-1 mb-3" src="' + data.avatar + '" height="100" width="100" alt="User avatar" id="userAvatar"/>'
+                    $('#avatarSection').append(avatar)
+
+                    userWallets(data.id)
+                    userMessages()
+                },
+                error: function (data) {
+                    window.location.href = '/auth_login'
+
+                }
+            })
 
 
             var menuItem = $('li.menu-item#nav_profile');

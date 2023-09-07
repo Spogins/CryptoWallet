@@ -1,7 +1,6 @@
 from fastapi.middleware.cors import CORSMiddleware
 from propan import RabbitBroker
 from starlette.staticfiles import StaticFiles
-
 from config_socketio.app import sio, check_block
 from config_socketio.socket_app import socket_app
 from src.core.register import RegisterContainer

@@ -2,6 +2,7 @@ from typing import Callable, Type
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy.orm import joinedload
 
 from src.delivery.models import Order
 from src.users.models import User
@@ -52,18 +53,19 @@ class WalletRepository:
             return transaction
 
     async def user_add_wallet(self, user_id, wallet, balance: float = 0):
-        try:
-            async with self.session_factory() as session:
-                _asset = await session.execute(select(Asset).filter_by(abbreviation='ether'))
-                _asset = _asset.scalars().first()
-                user = await session.get(User, user_id)
-                _wallet = Wallet(private_key=wallet.get('private_key'), address=wallet.get('address'), user=user, asset=_asset, balance=balance)
+
+        async with self.session_factory() as session:
+            _asset = await session.execute(select(Asset).filter_by(abbreviation='ether'))
+            _asset = _asset.scalars().first()
+            user = await session.get(User, user_id)
+            _wallet = Wallet(private_key=wallet.get('private_key'), address=wallet.get('address'), user=user, asset=_asset, balance=balance)
+            try:
                 session.add(_wallet)
                 await session.commit()
                 await session.refresh(_wallet)
                 return _wallet
-        except:
-            raise HTTPException(status_code=401, detail='the wallet was registered on the account earlier make sure you are using a new or empty wallet')
+            except:
+                raise HTTPException(status_code=401, detail='The wallet was registered on the account earlier make sure you are using a new or empty wallet')
 
     async def get_all_trans(self, limit: int = 10):
         async with self.session_factory() as session:
@@ -95,9 +97,9 @@ class WalletRepository:
 
     async def user_wallets(self, user_id):
         async with self.session_factory() as session:
-            result = await session.execute(select(Wallet).where(Wallet.user_id == user_id))
+            result = await session.execute(select(Wallet).options(joinedload(Wallet.asset)).where(Wallet.user_id == user_id))
             wallets = result.scalars().all()
-            return [UserWallet(id=wallet.id, address=wallet.address, balance=wallet.balance) for wallet in wallets]
+            return [UserWallet(id=wallet.id, address=wallet.address, balance=wallet.balance, asset_img=wallet.asset.image) for wallet in wallets]
 
     async def update_wallet_balance(self, address, balance_eth):
         async with self.session_factory() as session:
@@ -131,7 +133,7 @@ class WalletRepository:
         async with self.session_factory() as session:
             _blockchain = await session.execute(select(Blockchain).filter_by(name='Ethereum'))
             _blockchain = _blockchain.scalars().first()
-            asset = Asset(abbreviation='ether', symbol='Ξ', decimal_places=18, blockchain=_blockchain)
+            asset = Asset(abbreviation='ether', symbol='Ξ', decimal_places=18, blockchain=_blockchain, image='https://upload.wikimedia.org/wikipedia/commons/6/6f/Ethereum-icon-purple.svg')
             session.add(asset)
             await session.commit()
             await session.refresh(asset)

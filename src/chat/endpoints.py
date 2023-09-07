@@ -27,6 +27,13 @@ async def get_chat(limit: int = 10, chat_service: ChatService = Depends(Provide[
     return await chat_service.get_chat(limit)
 
 
+@app.get('/user_messages', status_code=status.HTTP_200_OK)
+@inject
+async def user_messages(chat_service: ChatService = Depends(Provide[Container.chat_service]),
+                            bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    user_id = await get_user_from_bearer(bearer)
+    return await chat_service.get_user_messages(user_id)
+
 # @app.put("/block_unblock", status_code=status.HTTP_200_OK)
 # @inject
 # async def block_unblock(user: int, chat_service: ChatService = Depends(Provide[Container.chat_service])):

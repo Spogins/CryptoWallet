@@ -7,6 +7,7 @@
 {% endblock %}
 {% block script %}
 <script>
+
     $(document).ready(function() {
         // Находим элемент <li> по классу и идентификатору
         var menuItem = $('#nav_wallets');
@@ -16,6 +17,31 @@
             // Добавляем класс "active" к элементу <li>
             menuItem.addClass('active');
         }
+
+        let user_auth_api_url = window.location.origin + "/api/v1/user_auth"
+        $.ajax({
+            method: 'get',
+            dataType: 'json',
+            headers: {
+                "Content-Type": 'application/json',
+            },
+            url: user_auth_api_url,
+            success: function (data) {
+
+                let avatarHeader = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
+                if (data.avatar !== '#')
+                    avatarHeader = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
+
+
+                $("#userAvatarDrop").append(avatarHeader)
+                $("#userAvatarSmall").append(avatarHeader)
+                $("#usernameHeader").text(data.username)
+            },
+            error: function (data) {
+                console.log("error", data.responseJSON.detail)
+                window.location.href = '/auth_login'
+            }
+        })
     });
 </script>
 {% endblock %}

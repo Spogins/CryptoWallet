@@ -64,13 +64,6 @@ class AuthRepository:
             await session.refresh(user)
 
 
-    async def get_user(self, user_id):
-        async with self.session_factory() as session:
-            user = await session.get(User, user_id)
-            if user:
-                return user
-            return False
-
 
 
 

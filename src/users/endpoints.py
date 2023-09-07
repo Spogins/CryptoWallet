@@ -64,7 +64,18 @@ async def edit_profile(profile: UserProfile,
                        user_service: UserService = Depends(Provide[Container.user_service]),
                        bearer: HTTPAuthorizationCredentials = Depends(user_auth)
                        ):
-
     user = await get_user_from_bearer(bearer)
     return await user_service.edit_profile(profile, user)
 
+
+@app.get("/user_auth", status_code=status.HTTP_200_OK)
+@inject
+async def user_auth(
+        user_service: UserService = Depends(Provide[Container.user_service]),
+        bearer: HTTPAuthorizationCredentials = Depends(user_auth)
+):
+    user_id = await get_user_from_bearer(bearer)
+    try:
+        return await user_service.get_user_by_id(user_id)
+    except NotFoundError:
+        return Response(status_code=status.HTTP_404_NOT_FOUND)

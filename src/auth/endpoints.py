@@ -41,22 +41,6 @@ async def log_out(bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
     response.set_cookie("access_token", value="", max_age=0)
     return response
 
-#
-# @app.get("/token_user", status_code=status.HTTP_200_OK)
-# @inject
-# async def token_user(access_token: str = Cookie(None)):
-#     return access_token
-#
-#
-# @app.get("/verify_token", status_code=status.HTTP_200_OK)
-# @inject
-# async def verify_token(access_token: str = Cookie(None)):
-#     try:
-#         verify = jwt.decode(access_token, JWT_SECRET, leeway=10, algorithms=[ALGORITHM])
-#         return {'access_token': verify}
-#     except:
-#         return {'access_token': 'expire token'}
-
 
 @app.post("/registration", status_code=status.HTTP_201_CREATED)
 @inject

@@ -1,7 +1,7 @@
 from collections.abc import Iterator
 from typing import Callable, List
 from fastapi import HTTPException
-from sqlalchemy import select
+from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.chat.models import ChatMessage
 from src.chat.schemas import MessageForm, ChatForm
@@ -12,6 +12,12 @@ from src.users.models import User
 class ChatRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
+
+
+    async def user_messages(self, user_id):
+        async with self.session_factory() as session:
+            res = await session.scalar(select(func.count(ChatMessage.user_id == user_id)))
+            return res
 
     async def add(self, message: MessageForm, user_id: int):
         async with self.session_factory() as session:
