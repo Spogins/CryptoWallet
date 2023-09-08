@@ -8,8 +8,9 @@ class MessageForm(BaseModel):
 
 
 class ChatForm(BaseModel):
-    id: int
     user_id: int
     text: str
-    image: str
+    image: Optional[str] = ""
     date: str
+    username: str
+    user_avatar: str

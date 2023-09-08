@@ -1,45 +1,354 @@
 {% extends "base.html" %}
+{% block chat_css %}
+    <!-- Page CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/css/pages/app-chat.css') }}"/>
+{% endblock %}
 {% block chat %}
-<div class="row">
-    Chat!
-</div>
+    <div class="app-chat card overflow-hidden">
+        <div class="row g-0">
+
+            <!-- Chat & Contacts -->
+            <div
+                    class="col app-chat-contacts app-sidebar flex-grow-0 overflow-hidden border-end"
+                    id="app-chat-contacts"
+            >
+
+                <div class="sidebar-body">
+                    <!-- Contacts -->
+
+                    <div class="row mb-3 mt-3" style="display:flex; text-align: center">
+                        <h5 class="text-primary mb-0">Contacts</h5>
+                    </div>
+                    <ul class="list-unstyled chat-contact-list mb-0" id="contact-list">
+
+                    </ul>
+                </div>
+            </div>
+            <!-- /Chat contacts -->
+
+            <!-- Chat History -->
+            <div class="col app-chat-history bg-body">
+                <div class="chat-history-wrapper">
+                    <div class="chat-history-header border-bottom">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div class="d-flex overflow-hidden align-items-center">
+
+                                <div id="userChatAvatar" class="flex-shrink-0 avatar">
+
+                                </div>
+                                <div class="chat-contact-info flex-grow-1 ms-2">
+                                    <h6 id="userChatName" class="m-0"></h6>
+
+                                </div>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div id="chatBody" class="chat-history-body bg-body">
+
+                        <ul id="chatHistory" class="list-unstyled chat-history">
+
+                        </ul>
+
+                    </div>
+
+                    <!-- Chat message form -->
+                    <div class="chat-history-footer shadow-sm">
+
+                        <div class=" d-flex justify-content-between align-items-center">
+                            <input
+                                    class="form-control message-input border-0 me-3 shadow-none"
+                                    placeholder="Type your message here"
+                                    id="messageText"
+
+                            />
+
+
+                            <div class="message-actions d-flex align-items-center">
+                                <span id="imageContainer"></span>
+                                <label id="chooseImageButton" class="form-label mb-0">
+                                    <i class="ti ti-photo ti-sm cursor-pointer mx-3"></i>
+                                    <input type="file" id="imageInput" accept="image/*" hidden/>
+                                </label>
+                                <button onclick="sendMessage()" class="btn btn-primary d-flex">
+                                    <i class="ti ti-send me-md-1 me-0"></i>
+                                    <span class="align-middle d-md-inline-block d-none">Send</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /Chat History -->
+            <div class="app-overlay"></div>
+        </div>
+    </div>
 {% endblock %}
 {% block script %}
-<script>
-    $(document).ready(function() {
-        // Находим элемент <li> по классу и идентификатору
-        var menuItem = $('li.menu-item#nav_chat');
+    <!-- Page JS -->
+    <script src="{{ url_for('static', path='assets/js/app-chat.js') }}"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+    <script>
+        let base64Image = ''
+        $("#chooseImageButton").click(function () {
+            $("#imageInput").val(null);
 
-        // Проверяем, что элемент найден
-        if (menuItem.length > 0) {
-            // Добавляем класс "active" к элементу <li>
-            menuItem.addClass('active');
+        });
+
+        $("#imageInput").change(function () {
+            var selectedFile = this.files[0];
+
+            if (selectedFile) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var image = new Image();
+                    image.classList.add("rounded", "pt-1", "mb-3")
+                    image.height = "100"
+                    image.width = "100"
+                    image.alt = "User avatar"
+                    image.src = e.target.result;
+                    base64Image = e.target.result;
+
+                    $("#imageContainer").empty().text($("#imageInput").val())
+
+                };
+
+                reader.readAsDataURL(selectedFile);
+
+            }
+        });
+
+
+        const socketio_url = 'http://' + window.location.hostname + ':8001'
+        const socket = io(socketio_url);
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('new_message', message => {
+            setMessages(userData.id, message)
+            $('#chatBody').scrollTop($('#chatBody')[0].scrollHeight)
+        });
+
+        socket.on('joined_user', (data) => {
+            const usersList = document.getElementById('contact-list');
+            usersList.innerHTML = '';
+            if (data.users.length > 0) {
+                data.users.forEach((user) => {
+                    setUserChat(user)
+                });
+            }
+        });
+
+        socket.on('disconnect_user', (data) => {
+            let user_id = 'user_' + data.user
+            $("#" + user_id + "").remove()
+        });
+
+        function joinChat(username) {
+
+            socket.emit('join', {username, room: 'chat'});
+
+
         }
 
-        let user_auth_api_url = window.location.origin + "/api/v1/user_auth"
-        $.ajax({
-            method: 'get',
-            dataType: 'json',
-            headers: {
-                "Content-Type": 'application/json',
-            },
-            url: user_auth_api_url,
-            success: function (data) {
-
-                let avatarHeader = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
-                if (data.avatar !== '#')
-                    avatarHeader = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
-
-
-                $("#userAvatarDrop").append(avatarHeader)
-                $("#userAvatarSmall").append(avatarHeader)
-                $("#usernameHeader").text(data.username)
-            },
-            error: function (data) {
-                console.log("error", data.responseJSON.detail)
-                window.location.href = '/auth_login'
+        function sendMessage() {
+            let text = $('#messageText').val()
+            if (text.length || base64Image !== '') {
+                let send_message_api_url = window.location.origin + "/api/v1/send_message"
+                $.ajax({
+                    method: 'post',
+                    dataType: 'json',
+                    headers: {
+                        "Content-Type": 'application/json',
+                    },
+                    url: send_message_api_url,
+                    data: JSON.stringify({
+                        "text": text,
+                        "image": base64Image
+                    }),
+                    success: function (data) {
+                        socket.emit('send_message', data);
+                        $('#messageText').val('');
+                        base64Image = ''
+                        $("#imageContainer").empty()
+                    }
+                })
             }
-        })
-    });
-</script>
+        }
+
+        function setMessages(user_id, elem) {
+            let chatHistory = $('#chatHistory')
+            let chatAvatar = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
+            if (elem.user_avatar !== null)
+                chatAvatar = '<img src="' + elem.user_avatar + '"alt="Avatar" class="rounded-circle">'
+
+            let chatImage = ''
+            if (elem.image !== '')
+                chatImage = '<div><img class="img-fluid rounded mt-2" height="250px" width="250px" src="' + elem.image + '"></div>'
+            if (user_id === elem.user_id) {
+                chatHistory.append(
+                    '<li class="chat-message chat-message-right">' +
+                    '<div class="d-flex overflow-hidden">' +
+                    '<div class="chat-message-wrapper flex-grow-1 w-50">' +
+                    '<div class="chat-message-text">' +
+                    '<p class="mb-0">' +
+                    elem.text
+                    + '</p>' +
+                    chatImage +
+                    '</div>' +
+
+                    '<div class="text-end text-muted mt-1">' +
+                    '<i class="ti ti-checks ti-xs me-1"></i>' +
+                    '<small>' + elem.date + '</small>' +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="user-avatar flex-shrink-0 ms-3">' +
+                    '<div class="avatar avatar-sm">' +
+                    chatAvatar
+                    + '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    ' </li>'
+                )
+            } else {
+                chatHistory.append(
+                    '<li><div class="row">' +
+                    '<h6 class="m-0">' + elem.username + '</h6>' +
+                    '</div></li>' +
+                    '<li class="chat-message">' +
+                    '<div class="d-flex overflow-hidden">' +
+                    '<div class="user-avatar flex-shrink-0 me-3">' +
+                    '<div class="avatar avatar-sm">' +
+                    chatAvatar +
+                    '</div>' +
+                    '</div>' +
+                    '<div class="chat-message-wrapper flex-grow-1">' +
+                    '<div class="chat-message-text">' +
+                    '<p class="mb-0">' + elem.text + '</p>' + chatImage +
+                    '</div>' +
+                    '<div class="text-muted mt-1">' +
+                    '<small>' + elem.date + '</small>' +
+                    '</div>' +
+                    '</div>' +
+                    '</div>' +
+                    '</li>'
+                )
+            }
+
+        }
+
+        function getChatMessages(user_id) {
+
+            let chat_history_api_url = window.location.origin + "/api/v1/get_chat?limit=10"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: chat_history_api_url,
+                success: function (data) {
+
+                    var reversedArray = data.reverse();
+                    reversedArray.forEach((element) => setMessages(user_id, element));
+                    $('#chatBody').scrollTop($('#chatBody')[0].scrollHeight)
+
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+                    window.location.href = '/auth_login'
+                }
+            })
+        }
+
+        function setUserChat(user_id) {
+            let get_user_api_url = window.location.origin + "/api/v1/user/"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: get_user_api_url + user_id,
+                success: function (data) {
+
+                    let avatar = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
+                    if (data.avatar !== '#')
+                        avatar = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
+
+                    let usersList = $('#contact-list');
+                    usersList.append(
+                        '<li id="user_' + data.id + '" class="chat-contact-list-item">' +
+                        '<a class="d-flex align-items-center">' +
+                        '<div class="flex-shrink-0 avatar avatar-online">' +
+                        avatar +
+                        '</div>' +
+                        '<div class="chat-contact-info flex-grow-1 ms-2">' +
+                        '<h6 class="chat-contact-name text-truncate m-0">' + data.username + '</h6>' +
+                        '</div>' +
+                        '</a>' +
+                        '</li>'
+                    )
+
+
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+
+                }
+            })
+        }
+
+        let userData
+        $(document).ready(function () {
+            // Находим элемент <li> по классу и идентификатору
+            var menuItem = $('li.menu-item#nav_chat');
+
+            // Проверяем, что элемент найден
+            if (menuItem.length > 0) {
+                // Добавляем класс "active" к элементу <li>
+                menuItem.addClass('active');
+            }
+
+            $('#messageText').keyup(function (e) {
+                if (e.keyCode === 13) {  // enter, return
+                    sendMessage()
+                }
+            })
+
+            let user_auth_api_url = window.location.origin + "/api/v1/user_auth"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: user_auth_api_url,
+                success: function (data) {
+                    userData = data
+                    let avatarHeader = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
+                    if (data.avatar !== '#')
+                        avatarHeader = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
+
+
+                    $("#userAvatarDrop").append(avatarHeader)
+                    $("#userAvatarSmall").append(avatarHeader)
+                    $("#usernameHeader").text(data.username)
+                    $("#userChatAvatar").append(avatarHeader)
+                    $("#userChatName").text(data.username)
+
+                    getChatMessages(data.id)
+                    joinChat(data.id)
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+                    window.location.href = '/auth_login'
+                }
+            })
+        });
+    </script>
 {% endblock %}

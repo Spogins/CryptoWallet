@@ -1,3 +1,5 @@
+from time import sleep
+
 from fastapi import HTTPException
 from src.boto3.boto3_service import BotoService
 from src.chat.repository import ChatRepository
@@ -14,13 +16,15 @@ class ChatService:
         if message.text == '' and message.image == '':
             raise HTTPException(status_code=401,
                                 detail='Message empty data.')
-        elif not message.image == '':
+        if not message.image == '':
+            # sleep(3)
             message.image = await self.boto3_service.upload_image(message.image)
 
         return await self._repository.add(message, user_id)
 
     async def get_chat(self, limit):
-        return await self._repository.get_chat_messages(limit)
+        chat_list = await self._repository.get_chat_messages(limit)
+        return chat_list
 
 
     async def get_user_messages(self, user_id):
