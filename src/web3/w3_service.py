@@ -1,4 +1,5 @@
 import asyncio
+from _decimal import Decimal
 from datetime import datetime
 import httpx
 from eth_account import Account
@@ -106,7 +107,7 @@ class WebService:
     async def get_balance(self, address):
         balance_wei = await self.w3.eth.get_balance(address)
         balance_eth = self.w3.from_wei(balance_wei, 'ether')
-        return {"address": address, "balance_eth": balance_eth}
+        return {"address": address, "balance_eth": Decimal(balance_eth)}
 
     async def transaction(self, private_key_sender, receiver_address, value):
         try:

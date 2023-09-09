@@ -9,7 +9,7 @@ class Wallet(Base):
     id = Column(Integer, primary_key=True, index=True)
     private_key = Column(String, unique=True)
     address = Column(String, unique=True)
-    balance = Column(DECIMAL, default=0.0)
+    balance = Column(DECIMAL, default=0.000000000000000000)
 
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship('User', foreign_keys=[user_id])

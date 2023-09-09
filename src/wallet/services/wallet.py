@@ -135,9 +135,15 @@ class WalletService:
         trans_data = await self.w3_service.transaction(private_key_sender, receiver_address, value)
         return trans_data
 
-    async def transaction(self, private_key_sender, receiver_address, value):
-        trans_data = await self.w3_service.transaction(private_key_sender, receiver_address, value)
-        return await self._repository.create_or_update(trans_data)
+    async def transaction(self, from_address, to_address, value):
+        try:
+            wallet = await self._repository.get_wallet_by_address(from_address)
+            private_key_sender = wallet.private_key
+            trans_data = await self.w3_service.transaction(private_key_sender, to_address, value)
+            return await self._repository.create_or_update(trans_data)
+        except:
+            raise HTTPException(status_code=401,
+                                detail='Wrong wallet data or value.')
 
     async def transaction_info(self, tx_hash):
         return await self.w3_service.transaction_info(tx_hash)

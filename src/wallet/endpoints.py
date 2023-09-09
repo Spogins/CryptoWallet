@@ -95,11 +95,11 @@ async def wallet_balance(wallet_address: str, wallet_service: WalletService = De
 #     return await wallet_service.update_balance(wallet_address)
 #
 #
-# @app.put("/update_all_wallets_balance", status_code=status.HTTP_200_OK)
-# @inject
-# async def update_all_wallets_balance(wallet_service: WalletService = Depends(Provide[Container.wallet_service]), bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
-#     user_id = await get_user_from_bearer(bearer)
-#     return await wallet_service.update_all(user_id)
+@app.put("/update_all_wallets_balance", status_code=status.HTTP_200_OK)
+@inject
+async def update_all_wallets_balance(wallet_service: WalletService = Depends(Provide[Container.wallet_service]), bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    user_id = await get_user_from_bearer(bearer)
+    return await wallet_service.update_all(user_id)
 
 
 @app.post("/test_trans", status_code=status.HTTP_201_CREATED)
@@ -114,8 +114,8 @@ async def send_eth(trans: Transaction,
 @inject
 async def send_eth(trans: Transaction,
                    wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.transaction(private_key_sender=trans.private_key_sender,
-                                            receiver_address=trans.receiver_address, value=trans.value)
+    return await wallet_service.transaction(from_address=trans.from_address,
+                                            to_address=trans.to_address, value=trans.value)
 
 
 @app.get('/wallet_db_transactions', status_code=status.HTTP_200_OK)

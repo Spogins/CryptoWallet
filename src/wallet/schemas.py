@@ -2,8 +2,8 @@ from pydantic import BaseModel
 
 
 class Transaction(BaseModel):
-    private_key_sender: str
-    receiver_address: str
+    from_address: str
+    to_address: str
     value: float
 
 
