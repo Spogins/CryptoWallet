@@ -8,6 +8,23 @@ from src.web3.w3_service import WebService
 from src.delivery.containers import Container as DeliveryContainer
 from src.delivery.services.delivery import DeliveryService
 
+import redis.asyncio as redis
+
+# Initialize Redis connection
+redis_client = redis.StrictRedis(host='localhost', port=6379, db=0, decode_responses=True)
+
+# Function to add a user to a room in Redis
+async def add_user_to_room(room, username):
+    await redis_client.sadd(f'room:{room}:users', username)
+
+# Function to remove a user from a room in Redis
+async def remove_user_from_room(room, username):
+    await redis_client.srem(f'room:{room}:users', username)
+
+# Function to get the list of users in a room from Redis
+async def get_users_in_room(room):
+    return await redis_client.smembers(f'room:{room}:users')
+
 
 mgr: AsyncAioPikaManager = socketio.AsyncAioPikaManager(RABBITMQ_URL)
 sio: AsyncServer = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins=ALLOWED_HOSTS, client_manager=mgr)
@@ -17,8 +34,8 @@ room_clients = set()
 
 # Создаем список активных пользователей и комнат чата
 active_users = {}
-chat_rooms = {}
-room_users = {}
+# chat_rooms = {}
+# room_users = {}
 
 
 # Функция для отправки сообщения всем участникам комнаты
@@ -44,10 +61,11 @@ async def disconnect(sid):
         username = user['username']
         del active_users[sid]
 
-        # Удалите пользователя из списка пользователей комнаты
-        if room in room_users and username in room_users[room]:
-            room_users[room].remove(username)
-
+        # # Удалите пользователя из списка пользователей комнаты
+        # if room in room_users and username in room_users[room]:
+        #     room_users[room].remove(username)
+        await remove_user_from_room(room, username)
+        print(username)
 
 
         await sio.emit('disconnect_user', {'room': room, 'user': username}, room=room)
@@ -63,13 +81,24 @@ async def join_room(sid, data):
     active_users[sid] = {'username': username, 'room': room}
     sio.enter_room(sid, room)
 
-    # Добавьте пользователя в список пользователей комнаты
-    if room not in room_users:
-        room_users[room] = []
-    room_users[room].append(username)
+    # Add the user to the room in Redis
+    await add_user_to_room(room, username)
 
-    # Отправьте обновленный список пользователей комнаты всем участникам
-    await sio.emit('joined_user', {'room': room, 'users': room_users[room]}, room=room)
+    # Get the list of users in the room from Redis
+    room_user_list = await get_users_in_room(room)
+
+
+    # Emit the updated list of users to all participants
+    await sio.emit('joined_user', {'room': room, 'users': list(room_user_list)}, room=room)
+
+
+    # # Добавьте пользователя в список пользователей комнаты
+    # if room not in room_users:
+    #     room_users[room] = []
+    # room_users[room].append(username)
+    #
+    # # Отправьте обновленный список пользователей комнаты всем участникам
+    # await sio.emit('joined_user', {'room': room, 'users': room_users[room]}, room=room)
 
     # await send_message(room, f'{username} присоединился к чату.')
 

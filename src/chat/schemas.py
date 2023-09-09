@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import BaseModel
 
 
@@ -14,3 +14,6 @@ class ChatForm(BaseModel):
     date: str
     username: str
     user_avatar: str
+
+class UserList(BaseModel):
+    users: List[int]

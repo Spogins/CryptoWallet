@@ -136,11 +136,14 @@
         socket.on('joined_user', (data) => {
             const usersList = document.getElementById('contact-list');
             usersList.innerHTML = '';
+            {#if (data.users.length > 0) {#}
+            {#    data.users.forEach((user) => {#}
+            {#        setUserChat(user)#}
+            {#    });}#}
             if (data.users.length > 0) {
-                data.users.forEach((user) => {
-                    setUserChat(user)
-                });
+                setUserChat(data.users)
             }
+
         });
 
         socket.on('disconnect_user', (data) => {
@@ -216,7 +219,7 @@
                 )
             } else {
                 chatHistory.append(
-                    '<li><div class="row">' +
+                    '<li><div class="row mb-2">' +
                     '<h6 class="m-0">' + elem.username + '</h6>' +
                     '</div></li>' +
                     '<li class="chat-message">' +
@@ -265,34 +268,58 @@
             })
         }
 
-        function setUserChat(user_id) {
-            let get_user_api_url = window.location.origin + "/api/v1/user/"
+        function setUserChat(users) {
+            var userList = $.map(users, function (elem) {
+                return parseInt(elem, 10);
+            });
+
+            let get_user_api_url = window.location.origin + "/api/v1/users_from_chat"
             $.ajax({
-                method: 'get',
+                method: 'post',
                 dataType: 'json',
                 headers: {
                     "Content-Type": 'application/json',
                 },
-                url: get_user_api_url + user_id,
+                url: get_user_api_url,
+                data: JSON.stringify({
+                    "users": userList
+                }),
                 success: function (data) {
+                    data.forEach((user) => {
+                        let avatar = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
+                        if (user.avatar !== '#')
+                            avatar = "<img src='" + user.avatar + "' alt class='h-auto rounded-circle'/>"
 
-                    let avatar = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
-                    if (data.avatar !== '#')
-                        avatar = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
+                        let usersList = $('#contact-list');
+                        usersList.append(
+                            '<li id="user_' + user.id + '" class="chat-contact-list-item">' +
+                            '<a class="d-flex align-items-center">' +
+                            '<div class="flex-shrink-0 avatar avatar-online">' +
+                            avatar +
+                            '</div>' +
+                            '<div class="chat-contact-info flex-grow-1 ms-2">' +
+                            '<h6 class="chat-contact-name text-truncate m-0">' + user.username + '</h6>' +
+                            '</div>' +
+                            '</a>' +
+                            '</li>')
+                    })
 
-                    let usersList = $('#contact-list');
-                    usersList.append(
-                        '<li id="user_' + data.id + '" class="chat-contact-list-item">' +
-                        '<a class="d-flex align-items-center">' +
-                        '<div class="flex-shrink-0 avatar avatar-online">' +
-                        avatar +
-                        '</div>' +
-                        '<div class="chat-contact-info flex-grow-1 ms-2">' +
-                        '<h6 class="chat-contact-name text-truncate m-0">' + data.username + '</h6>' +
-                        '</div>' +
-                        '</a>' +
-                        '</li>'
-                    )
+                    {#let avatar = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'#}
+                    {#if (data.avatar !== '#')#}
+                    {#    avatar = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"#}
+                    {##}
+                    {#let usersList = $('#contact-list');#}
+                    {#usersList.append(#}
+                    {#    '<li id="user_' + data.id + '" class="chat-contact-list-item">' +#}
+                    {#    '<a class="d-flex align-items-center">' +#}
+                    {#    '<div class="flex-shrink-0 avatar avatar-online">' +#}
+                    {#    avatar +#}
+                    {#    '</div>' +#}
+                    {#    '<div class="chat-contact-info flex-grow-1 ms-2">' +#}
+                    {#    '<h6 class="chat-contact-name text-truncate m-0">' + data.username + '</h6>' +#}
+                    {#    '</div>' +#}
+                    {#    '</a>' +#}
+                    {#    '</li>')#}
 
 
                 },

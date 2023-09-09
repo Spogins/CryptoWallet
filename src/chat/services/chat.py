@@ -12,6 +12,10 @@ class ChatService:
         self._repository: ChatRepository = chat_repository
         self.boto3_service: BotoService = boto3_service
 
+    async def get_users(self, users):
+        return await self._repository.get_chat_users(users)
+
+
     async def send_message(self, message: MessageForm, user_id):
         if message.text == '' and message.image == '':
             raise HTTPException(status_code=401,

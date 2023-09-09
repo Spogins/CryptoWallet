@@ -1,10 +1,12 @@
+from typing import List
+
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.chat.containers import Container
-from src.chat.schemas import MessageForm
+from src.chat.schemas import MessageForm, UserList
 from src.chat.services.chat import ChatService
 from utils.base.get_user_bearer import get_user_from_bearer
 
@@ -33,6 +35,14 @@ async def user_messages(chat_service: ChatService = Depends(Provide[Container.ch
                             bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
     user_id = await get_user_from_bearer(bearer)
     return await chat_service.get_user_messages(user_id)
+
+@app.post('/users_from_chat', status_code=status.HTTP_200_OK)
+@inject
+async def user_messages(users_list: UserList, chat_service: ChatService = Depends(Provide[Container.chat_service]),
+                            bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
+    return await chat_service.get_users(users_list.users)
+
+
 
 # @app.put("/block_unblock", status_code=status.HTTP_200_OK)
 # @inject

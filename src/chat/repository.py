@@ -15,6 +15,14 @@ class ChatRepository:
     def __init__(self, session_factory: Callable[..., AsyncSession]) -> None:
         self.session_factory = session_factory
 
+
+    async def get_chat_users(self, users):
+        async with self.session_factory() as session:
+            result = await session.execute(select(User).where(User.id.in_(users)))
+            _users = result.scalars().all()
+            return _users
+
+
     async def user_messages(self, user_id):
         async with self.session_factory() as session:
             res = await session.scalar(select(func.count(ChatMessage.user_id == user_id)))
