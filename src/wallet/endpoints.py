@@ -1,7 +1,11 @@
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
+from propan import RabbitBroker
 from starlette import status
+
+from config.settings import RABBITMQ_URL
+from config_fastapi.fastapi_mgr import fastapi_mgr
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.wallet.containers import Container
 from src.wallet.schemas import Transaction
@@ -20,7 +24,19 @@ user_auth = AutoModernJWTAuth()
 #     await wallet_service.refund(120)
 
 @app.get("/tests_wallets", status_code=status.HTTP_200_OK)
-async def tests_wallets():
+@inject
+async def tests_wallets(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+
+    # await fastapi_mgr.emit(event='transaction_info', data={'wallet': 'wallet',
+    #                                                        'hash': 'hash',
+    #                                                        'received': 'received',
+    #                                                        'withdrawn': 'withdrawn'
+    #                                                        }, room=15)
+
+    async with RabbitBroker(RABBITMQ_URL) as broker:
+        await broker.publish(message='test', queue='socketio/test')
+
+
     a_wallet = {
         "private_key": "0x17f270e0a153579b024b38a35ed11397e4b1a56c36f55b144d477ca1869f432e",
         "address": "0x44fe49b6c180B660933548A8632bE93079010F28"

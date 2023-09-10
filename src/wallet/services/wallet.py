@@ -4,7 +4,6 @@ import secrets
 from fastapi import HTTPException
 from propan import RabbitBroker
 from web3.exceptions import InvalidAddress
-
 from config.settings import RABBITMQ_URL
 from src.wallet.models import Asset, Wallet, Transaction
 from src.wallet.repository import WalletRepository
@@ -178,10 +177,31 @@ class WalletService:
         transaction = await self._repository.create_or_update(trans_data)
 
         if not transaction.status == "PENDING":
+            await self.send_transaction_info(trans_data.get('from_address'), trans_data.get('to_address'), _hash, value)
             await self.send_transaction_status(transaction.id, transaction.status)
 
         await self.update_wallet_balance(trans_data.get('from_address'), trans_data.get('to_address'))
         return transaction
+
+    async def send_transaction_info(self, from_address, to_address, _hash, value):
+        from_address = await self._repository.check_wallet(from_address)
+        to_address = await self._repository.check_wallet(to_address)
+        if from_address:
+            async with RabbitBroker(RABBITMQ_URL) as broker:
+                await broker.publish(message={'wallet': from_address.address,
+                                              'hash': _hash,
+                                              'received': False,
+                                              'withdrawn': value,
+                                              'room': from_address.user.id
+                                              }, queue='socketio/send_notification')
+        if to_address:
+            async with RabbitBroker(RABBITMQ_URL) as broker:
+                await broker.publish(message={'wallet': to_address.address,
+                                              'hash': _hash,
+                                              'received': value,
+                                              'withdrawn': False,
+                                              'room': to_address.user.id
+                                              }, queue='socketio/send_notification')
 
     async def get_wallet_asset(self, from_address, to_address):
         asset = await self._repository.get_asset(from_address, to_address)

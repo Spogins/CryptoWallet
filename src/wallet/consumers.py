@@ -30,5 +30,3 @@ async def buy_product(data):
     service: WalletService = await wallet_service()
     await service.refund(data)
 
-
-

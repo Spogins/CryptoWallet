@@ -248,7 +248,6 @@
                         "value": value.val()
                     }),
                     success: function (data) {
-                        console.log("success", data)
                         modal.modal('hide');
                         $("#transSend").modal('show');
                         let transUrl = 'https://sepolia.etherscan.io/tx/' + data.hash
@@ -382,6 +381,8 @@
                     $("#usernameHeader").text(data.username)
 
                     userWallets(data.id)
+                    let username = data.id
+                    socket.emit('join', {username, room: username});
                 },
                 error: function (data) {
                     console.log("error", data.responseJSON.detail)

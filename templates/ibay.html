@@ -35,6 +35,8 @@
                 $("#userAvatarDrop").append(avatarHeader)
                 $("#userAvatarSmall").append(avatarHeader)
                 $("#usernameHeader").text(data.username)
+                let username = data.id
+                socket.emit('join', {username, room: username});
             },
             error: function (data) {
                 console.log("error", data.responseJSON.detail)

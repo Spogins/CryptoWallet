@@ -163,10 +163,10 @@ class WalletRepository:
 
     async def check_wallet(self, address):
         async with self.session_factory() as session:
-            result = await session.execute(select(Wallet).where(Wallet.address == address))
-            wallets = result.scalars().first()
-            if wallets:
-                return True
+            result = await session.execute(select(Wallet).where(Wallet.address == address).options(joinedload(Wallet.user)))
+            wallet = result.scalar_one_or_none()
+            if wallet is not None:
+                return wallet
             else:
                 return False
 

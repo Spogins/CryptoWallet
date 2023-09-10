@@ -1,7 +1,8 @@
 from fastapi.middleware.cors import CORSMiddleware
 from propan import RabbitBroker
 from starlette.staticfiles import StaticFiles
-from config_socketio.app import sio, check_block
+from config_socketio.app import sio, check_block, delivery
+from config_socketio.consumers import socketio_router
 from config_socketio.socket_app import socket_app
 from src.core.register import RegisterContainer
 from src.core.routers import router_app
@@ -48,7 +49,9 @@ async def publish_smtp():
     app.broker.include_router(parser_router)
     app.broker.include_router(wallet_router)
     app.broker.include_router(delivery_router)
-    # sio.start_background_task(check_block)
+    app.broker.include_router(socketio_router)
+    sio.start_background_task(check_block)
+    sio.start_background_task(delivery)
     print('startup')
     await broker.start()
 

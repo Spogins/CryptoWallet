@@ -5,8 +5,8 @@ import socketio
 sio = socketio.AsyncClient()
 
 
-@sio.on('message')
-async def message(data):
+@sio.on('test')
+async def test(data):
     print(data)
 
 
@@ -17,7 +17,7 @@ async def message(data):
 
 async def main():
     await sio.connect("http://localhost:8001")
-    await sio.emit("parse_block")
+    # await sio.emit("parse_block")
     # await sio.emit("delivery")
     await sio.wait()
 

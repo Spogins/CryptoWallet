@@ -504,6 +504,8 @@
 
                     userWallets(data.id)
                     userMessages()
+                    let username = data.id
+                    socket.emit('join', {username, room: username});
                 },
                 error: function (data) {
                     window.location.href = '/auth_login'
