@@ -9,182 +9,137 @@
                 <div class="card-body">
                     <div class="row mb-5" id="wallets">
                         <!-- Wallets Card -->
-                        <div class="col-md-6 mt-3">
-
-                            <div class="card text-center">
-                                 <span>example</span>
-                                <div class="card-body">
-                                    <div class="tab-content p-0">
-                                        <div class="tab-pane fade show active" role="tabpanel">
-                                            <div class="row">
-                                                <div class="col-2"><img class="d-block w-px-100 h-px-100 rounded"
-                                                                        src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Ethereum-icon-purple.svg"
-                                                                        height="100" width="100" alt="eth"></div>
-                                                <div class="col">
-                                                    <div class="row">
-                                                        <ul class="list-unstyled mb-0">
-                                                            <li id="userMessages" class="mb-2"
-                                                                style="text-align: initial;"><span
-                                                                    class="fw-semibold me-1">Address:</span><a
-                                                                    href="https://sepolia.etherscan.io/address/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
-                                                                    target="_blank"><span
-                                                                    style="text-decoration: underline"
-                                                                    class=" emp_name text-truncate">0x5A79fe36275B1A8d557A8e1b3D36261515d12542</span></a>
-                                                            </li>
-                                                            <li class="pt-1" style="text-align: initial;"><span
-                                                                    class="fw-semibold me-1">Balance:</span><span>0.02957399999</span>
-                                                            </li>
-                                                        </ul>
-                                                        <div style="display:flex;justify-content: space-around;"
-                                                             class="mt-2">
-                                                            <button class="btn btn-primary waves-effect waves-light">
-                                                                Watch Transactions
-                                                            </button>
-                                                            <button type="button"
-                                                                    class="btn btn-success waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#sandTransModal">
-                                                                Send Transactions
-                                                            </button>
-                                                            <button class="btn btn-warning waves-effect waves-light">Get
-                                                                Free ETH
-                                                            </button>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="modal fade" id="sandTransModal" data-bs-backdrop="static" tabindex="-1"
-                                         style="display: none;" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <form class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Send ETH</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="row">
-                                                        <div class="col mb-3">
-                                                            <label for="nameBackdrop" class="form-label">Send to:</label>
-                                                            <input type="text" class="form-control"
-                                                                   placeholder="Enter address...">
-                                                        </div>
-                                                    </div>
-                                                    <div class="row g-2">
-                                                        <div class="col mb-3">
-                                                            <label for="nameBackdrop" class="form-label">Value:</label>
-                                                            <input type="text" class="form-control"
-                                                                   placeholder="Send amount...">
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-label-secondary waves-effect"
-                                                            data-bs-dismiss="modal">
-                                                        Close
-                                                    </button>
-                                                    <button type="button"
-                                                            class="btn btn-primary waves-effect waves-light">Send
-                                                    </button>
-                                                </div>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
 
                         <!-- /Wallets Card -->
                     </div>
 
                     <div class="col-md-6 mt-3" id="walletEmptyForm" style="display:none;">
-                            <div class="card text-center">
-                                <div class="card-body">
-                                    <div class="tab-content p-0">
-                                        <div class="tab-pane fade show active" role="tabpanel">
-                                            <div class="row">
-                                                <div class="col-2"><img id="walletAssetImgForm" class="d-block w-px-100 h-px-100 rounded"
-                                                                        src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Ethereum-icon-purple.svg"
-                                                                        height="100" width="100" alt="eth"></div>
-                                                <div class="col">
-                                                    <div class="row">
-                                                        <ul class="list-unstyled mb-0">
-                                                            <li class="mb-2"
-                                                                style="text-align: initial;"><span
-                                                                    class="fw-semibold me-1">Address:</span><a
-                                                                    href="https://sepolia.etherscan.io/address/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
-                                                                    target="_blank"><span
-                                                                    id="walletAddressForm"
-                                                                    style="text-decoration: underline"
-                                                                    class=" emp_name text-truncate">0x5A79fe36275B1A8d557A8e1b3D36261515d12542</span></a>
-                                                            </li>
-                                                            <li class="pt-1" style="text-align: initial;"><span
-                                                                    class="fw-semibold me-1">Balance:</span><span id="walletBalanceForm" >0.02957399999</span>
-                                                            </li>
-                                                        </ul>
-                                                        <div style="display:flex;justify-content: space-around;"
-                                                             class="mt-2">
-                                                            <button class="btn btn-primary waves-effect waves-light">
-                                                                Watch Transactions
-                                                            </button>
-                                                            <button type="button" id="walletSendTransButtonForm"
-                                                                    class="btn btn-success waves-effect waves-light"
-                                                                    data-bs-toggle="modal"
-                                                                    data-bs-target="#walletTransModalForm">
-                                                                Send Transactions
-                                                            </button>
-                                                            <button class="btn btn-warning waves-effect waves-light">Get
-                                                                Free ETH
-                                                            </button>
-                                                        </div>
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="tab-content p-0">
+                                    <div class="tab-pane fade show active" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-2"><img id="walletAssetImgForm"
+                                                                    class="d-block w-px-100 h-px-100 rounded"
+                                                                    src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Ethereum-icon-purple.svg"
+                                                                    height="100" width="100" alt="eth"></div>
+                                            <div class="col">
+                                                <div class="row">
+                                                    <ul class="list-unstyled mb-0">
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Address:</span><a
+                                                                href="https://sepolia.etherscan.io/address/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
+                                                                target="_blank"><span
+                                                                id="walletAddressForm"
+                                                                style="text-decoration: underline"
+                                                                class=" emp_name text-truncate">0x5A79fe36275B1A8d557A8e1b3D36261515d12542</span></a>
+                                                        </li>
+                                                        <li class="pt-1" style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Balance:</span><span
+                                                                id="walletBalanceForm">0.02957399999</span>
+                                                        </li>
+                                                    </ul>
+                                                    <div style="display:flex;justify-content: space-around;"
+                                                         class="mt-2">
+                                                        <button class="btn btn-primary waves-effect waves-light">
+                                                            Watch Transactions
+                                                        </button>
+                                                        <button type="button" id="walletSendTransButtonForm"
+                                                                class="btn btn-success waves-effect waves-light"
+                                                                {#                                                                data-bs-toggle="modal"#}
+                                                                name="sendTransButton"
+                                                                {#                                                                data-bs-target="#walletTransModalForm"#}
+                                                        >
+                                                            Send Transactions
+                                                        </button>
+                                                        <button class="btn btn-warning waves-effect waves-light">Get
+                                                            Free ETH
+                                                        </button>
                                                     </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="modal fade" id="walletTransModalForm" data-bs-backdrop="static" tabindex="-1"
-                                         style="display: none;" aria-hidden="true">
-                                        <div class="modal-dialog">
-                                            <form class="modal-content">
-                                                <div class="modal-header">
-                                                    <h5 class="modal-title">Send ETH</h5>
-                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                            aria-label="Close"></button>
-                                                </div>
-                                                <div class="modal-body">
-                                                    <div class="row">
-                                                        <div class="col mb-3">
-                                                            <label for="nameBackdrop" class="form-label">Send to:</label>
-                                                            <input type="text" class="form-control"
-                                                                   placeholder="Enter address...">
-                                                        </div>
+                                </div>
+                                <div class="modal fade" id="walletTransModalForm"
+                                     tabindex="-1"
+                                     style="display: none;" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Send ETH</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                                        aria-label="Close"></button>
+                                            </div>
+                                            <div class="modal-body pb-0">
+                                                <div class="row">
+                                                    <div class="col-1">
+                                                        <label for="nameBackdrop" class="form-label">Send to:</label>
                                                     </div>
-                                                    <div class="row g-2">
-                                                        <div class="col mb-3">
-                                                            <label for="nameBackdrop" class="form-label">Value:</label>
-                                                            <input type="text" class="form-control"
-                                                                   placeholder="Send amount...">
-                                                        </div>
+                                                    <div class="col mb-2">
+
+                                                        <input type="text" class="form-control" name="toAddress"
+                                                               placeholder="Enter address...">
                                                     </div>
+                                                    <div class="invalid-feedback mb-2"></div>
                                                 </div>
-                                                <div class="modal-footer">
-                                                    <button type="button" class="btn btn-label-secondary waves-effect"
-                                                            data-bs-dismiss="modal">
-                                                        Close
-                                                    </button>
-                                                    <button type="button"
-                                                            class="btn btn-primary waves-effect waves-light">Send
-                                                    </button>
+                                                <div class="row g-2">
+                                                    <div class="col-1">
+                                                        <label for="nameBackdrop" class="form-label">Value:</label>
+                                                    </div>
+                                                    <div class="col mb-2">
+
+                                                        <input type="text" class="form-control" name="value"
+                                                               placeholder="Send amount...">
+                                                    </div>
+                                                    <div class="invalid-feedback mb-2"></div>
                                                 </div>
-                                            </form>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-label-secondary waves-effect"
+                                                        data-bs-dismiss="modal">
+                                                    Close
+                                                </button>
+                                                <button
+                                                        id="sendButtonForm"
+                                                        type="button"
+                                                        class="btn btn-primary waves-effect waves-light">Send
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
+
+                    <div class="modal fade" id="transSend"
+                         tabindex="-1"
+                         style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Transaction completed</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body pb-0">
+                                    <div class="row">
+                                        <div class="col mb-3">
+                                            <label for="transBackdrop" class="form-label">
+                                                Transaction completed</label>
+                                            <a id="transComplete"
+                                               target="_blank"><span style="text-decoration: underline"
+                                                                     class=" emp_name text-truncate">Transaction link</span></a>
+
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -196,6 +151,147 @@
 {% endblock %}
 {% block script %}
     <script>
+
+
+        function addressInputValidator(toAddress) {
+            var toAddressErrorDiv = toAddress.parent().parent().find('.invalid-feedback')[0]
+
+            if (!toAddress.val().length) {
+                toAddressErrorDiv.textContent = 'Please enter recipient address'
+                toAddressErrorDiv.style.display = "block";
+                toAddress[0].classList.add("is-invalid");
+                return false
+            }
+
+            if (!/^0x/.test(toAddress.val())) {
+                toAddressErrorDiv.textContent = 'The address must start with "0x"'
+                toAddressErrorDiv.style.display = "block";
+                toAddress[0].classList.add("is-invalid");
+                return false
+            }
+
+            if (toAddress.val().length !== 42) {
+                toAddressErrorDiv.textContent = 'Address length must be 42 characters"'
+                toAddressErrorDiv.style.display = "block";
+                toAddress[0].classList.add("is-invalid");
+                return false
+            }
+
+            if (!/^[a-zA-Z0-9]+$/.test(toAddress.val())) {
+                toAddressErrorDiv.textContent = 'Address must consist of only English letters and numbers.'
+                toAddressErrorDiv.style.display = "block";
+                toAddress[0].classList.add("is-invalid");
+                return false
+            }
+
+            return true
+        }
+
+        function valueInputValidator(value) {
+            var valueErrorDiv = value.parent().parent().find('.invalid-feedback')[0]
+
+            if (!value.val().length) {
+                valueErrorDiv.textContent = 'Please enter amount value'
+                valueErrorDiv.style.display = "block";
+                value[0].classList.add("is-invalid");
+
+                return false
+            }
+            if (!/^(\d+(\.\d*)?|\.\d+)$/.test(value.val())) {
+                valueErrorDiv.textContent = 'Wrong amount format'
+                valueErrorDiv.style.display = "block";
+                value[0].classList.add("is-invalid");
+
+                return false
+            }
+
+            return true
+        }
+
+        function sendTrans(fromAddress, modalId) {
+            let modal = $('#' + modalId)
+            let toAddress = modal.find('input[name="toAddress"]');
+            let value = modal.find('input[name="value"]');
+            var toAddressErrorDiv = toAddress.parent().parent().find('.invalid-feedback')[0]
+            var valueErrorDiv = value.parent().parent().find('.invalid-feedback')[0]
+
+            let addressInput = addressInputValidator(toAddress)
+            let valueInput = valueInputValidator(value)
+
+            if (addressInput) {
+                toAddressErrorDiv.textContent = "";
+                toAddressErrorDiv.style.display = "none";
+                if (toAddress.hasClass("is-invalid"))
+                    toAddress.removeClass("is-invalid");
+            }
+
+            if (valueInput) {
+                valueErrorDiv.textContent = "";
+                valueErrorDiv.style.display = "none";
+                if (value.hasClass("is-invalid"))
+                    value.removeClass("is-invalid");
+            }
+
+
+            if (addressInput && valueInput) {
+                let send_eth_api_url = window.location.origin + "/api/v1/send_eth"
+                $.ajax({
+                    method: 'post',
+                    dataType: 'json',
+                    headers: {
+                        "Content-Type": 'application/json',
+                    },
+                    url: send_eth_api_url,
+                    data: JSON.stringify({
+                        "from_address": fromAddress,
+                        "to_address": toAddress.val(),
+                        "value": value.val()
+                    }),
+                    success: function (data) {
+                        console.log("success", data)
+                        modal.modal('hide');
+                        $("#transSend").modal('show');
+                        let transUrl = 'https://sepolia.etherscan.io/tx/' + data.hash
+                        $("#transComplete").attr('href', transUrl)
+
+                    },
+                    error: function (data) {
+                        console.log("error", data.responseJSON.detail)
+
+                        toAddressErrorDiv.textContent = data.responseJSON.detail
+                        toAddressErrorDiv.style.display = "block";
+                        toAddress[0].classList.add("is-invalid");
+
+                    }
+                })
+            }
+
+
+        }
+
+        function showModal(modalId) {
+            let modal = $('#' + modalId)
+            modal.modal('show');
+            let toAddress = modal.find('input[name="toAddress"]');
+            let value = modal.find('input[name="value"]');
+            toAddress.val('')
+            value.val('')
+            var toAddressErrorDiv = toAddress.parent().parent().find('.invalid-feedback')[0]
+            var valueErrorDiv = value.parent().parent().find('.invalid-feedback')[0]
+
+            toAddressErrorDiv.textContent = "";
+            toAddressErrorDiv.style.display = "none";
+
+            if (toAddress.hasClass("is-invalid"))
+                toAddress.removeClass("is-invalid");
+
+
+            valueErrorDiv.textContent = "";
+            valueErrorDiv.style.display = "none";
+            if (value.hasClass("is-invalid"))
+                value.removeClass("is-invalid");
+        }
+
         function setWallets(data) {
             let emptyForm = $('#walletEmptyForm').clone()
 
@@ -204,30 +300,35 @@
             let walletBalance = $(emptyForm).find('#walletBalanceForm')
             let walletSendTransButton = $(emptyForm).find('#walletSendTransButtonForm')
             let walletTransModalForm = $(emptyForm).find('#walletTransModalForm')
-
-
+            let sendButtonForm = $(emptyForm).find('#sendButtonForm')
             let walletAssetImgId = 'walletAssetImg-' + data.id
             let walletAddressId = 'walletAddress-' + data.id
             let walletBalanceId = 'walletBalance-' + data.id
             let walletSendTransButtonId = 'walletSendTransButton-' + data.id
-            let walletTransModalFormId =  'walletTransModal-' + data.id
-
+            let walletTransModalFormId = 'walletTransModal-' + data.id
+            let sendButtonId = 'sendButton-' + data.id
 
             walletAssetImg.attr('src', data.asset_img);
             walletAddress.text(data.address)
             walletBalance.text(data.balance)
-
-            walletSendTransButton.attr('data-bs-target', "#"+walletTransModalFormId+"")
+            var attributeValue = 'sendTrans("' + data.address + '", "' + walletTransModalFormId + '")';
+            sendButtonForm.attr('onclick', attributeValue)
+            attributeValue = 'showModal("' + walletTransModalFormId + '")'
+            walletSendTransButton.attr('onclick', attributeValue)
+            {#walletSendTransButton.attr('data-bs-target', "#" + walletTransModalFormId + "")#}
 
             walletAssetImg.attr('id', walletAssetImgId)
             walletAddress.attr('id', walletAddressId)
             walletBalance.attr('id', walletBalanceId)
             walletSendTransButton.attr('id', walletSendTransButtonId)
             walletTransModalForm.attr('id', walletTransModalFormId)
+            sendButtonForm.attr('id', sendButtonId)
 
             emptyForm.css('display', 'block')
+
             let walletCard = 'wallet-' + data.id
             emptyForm.attr('id', walletCard)
+
             $('#wallets').append(emptyForm)
 
         }
@@ -249,6 +350,7 @@
             })
         }
 
+
         $(document).ready(function () {
             // Находим элемент <li> по классу и идентификатору
             var menuItem = $('#nav_wallets');
@@ -258,6 +360,7 @@
                 // Добавляем класс "active" к элементу <li>
                 menuItem.addClass('active');
             }
+
 
             let user_auth_api_url = window.location.origin + "/api/v1/user_auth"
             $.ajax({
