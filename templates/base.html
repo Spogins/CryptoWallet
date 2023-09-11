@@ -19,7 +19,7 @@
     <title>Dashboard - Analytics | Vuexy - Bootstrap Admin Template</title>
 
     <meta name="description" content=""/>
-
+    <!-- jquery -->
     <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', path='/assets/img/favicon/favicon.ico') }}"/>
 
@@ -48,7 +48,6 @@
           href="{{ url_for('static', path='/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/libs/node-waves/node-waves.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/libs/typeahead-js/typeahead.css') }}"/>
-    <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/libs/apex-charts/apex-charts.css') }}"/>
     <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/libs/swiper/swiper.css') }}"/>
     <link rel="stylesheet"
           href="{{ url_for('static', path='/assets/vendor/libs/datatables-bs5/datatables.bootstrap5.css') }}"/>
@@ -56,9 +55,13 @@
           href="{{ url_for('static', path='/assets/vendor/libs/datatables-responsive-bs5/responsive.bootstrap5.css') }}"/>
     <link rel="stylesheet"
           href="{{ url_for('static', path='/assets/vendor/libs/datatables-checkboxes-jquery/datatables.checkboxes.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/libs/animate-css/animate.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/libs/toastr/toastr.css') }}"/>
+    <link rel="stylesheet" href="{{ url_for('static', path='/assets/vendor/libs/animate-css/animate.css') }}"/>
 
     {% block chat_css %}
     {% endblock %}
+
     <!-- Helpers -->
     <script src="{{ url_for('static', path='/assets/vendor/js/helpers.js') }}"></script>
 
@@ -67,7 +70,6 @@
     <script src="{{ url_for('static', path='/assets/vendor/js/template-customizer.js') }}"></script>
     <!--? Config:  Mandatory theme config file contain global vars & default theme options, Set your preferred theme option in this file.  -->
     <script src="{{ url_for('static', path='/assets/js/config.js') }}"></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
 </head>
 
 <body>
@@ -247,7 +249,6 @@
                     {% endblock %}
                     {% block chat %}
                     {% endblock %}
-
                 </div>
                 <!-- / Content -->
 
@@ -255,7 +256,23 @@
                 <footer class="content-footer footer bg-footer-theme">
                 </footer>
                 <!-- / Footer -->
-
+                <div id="transactionNotification" data-bs-delay="15000"
+                     class=" bs-toast toast toast-placement-ex m-2 fade bottom-0 end-0 hide w-25" role="alert"
+                     aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="ti ti-bell ti-xs me-2 text-success"></i>
+                        <div class="me-auto fw-semibold" style="text-align: center"><h5 class="mb-0">New
+                            Transaction</h5></div>
+                        <small class="text-muted" name="time">time</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body" style="text-align: initial;"><span class="mb-0" name="value">curency</span>
+                    </div>
+                    <div class="toast-body" style="text-align: initial;"><span class="mb-0" name="address">address</span>
+                    </div>
+                    <div class="toast-body" style="text-align: initial;" name="trans">
+                    </div>
+                </div>
                 <div class="content-backdrop fade"></div>
             </div>
             <!-- Content wrapper -->
@@ -271,10 +288,59 @@
 </div>
 
 <!-- / Layout wrapper -->
-
-<!-- Core JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.1.3/socket.io.js"></script>
+
+
+<!-- build:js assets/vendor/js/core.js -->
+<script src="{{ url_for('static', path='/assets/vendor/libs/jquery/jquery.js') }}"></script>
+<!-- Core JS -->
+<!-- build:js assets/vendor/js/core.js -->
+<script src="{{ url_for('static', path='/assets/vendor/libs/jquery/jquery.') }}js"></script>
+<script src="{{ url_for('static', path='/assets/vendor/libs/popper/popper.js') }}"></script>
+<script src="{{ url_for('static', path='/assets/vendor/js/bootstrap.') }}js"></script>
+<script src="{{ url_for('static', path='/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
+<script src="{{ url_for('static', path='/assets/vendor/libs/node-waves/node-waves.') }}js"></script>
+<script src="{{ url_for('static', path='/assets/vendor/libs/hammer/hammer.js') }}"></script>
+<script src="{{ url_for('static', path='/assets/vendor/libs/i18n/i18n.') }}js"></script>
+<script src="{{ url_for('static', path='/assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
+<script src="{{ url_for('static', path='/assets/vendor/js/menu.') }}js"></script>
+<!-- endbuild -->
+<!-- Vendors JS -->
+<script src="{{ url_for('static', path='/assets/vendor/libs/toastr/toastr.js') }}"></script>
+<!-- Main JS -->
+<script src="{{ url_for('static', path='/assets/js/main.js') }}"></script>
+
 <script>
+
+
+    $('#showToast').click(function () {
+
+        let toast = $('#transactionNotification')
+          let toastAnimation = new bootstrap.Toast(toast);
+        toastAnimation.show();
+    })
+    $(window).on('load', function () {
+        toastr.options = {
+
+            "closeButton": true,
+            "debug": false,
+            "newestOnTop": false,
+            "progressBar": false,
+            "positionClass": "toast-bottom-right",
+            "preventDuplicates": false,
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+
+        }
+    })
+
     const socketio_url = 'http://' + window.location.hostname + ':8001'
     const socket = io(socketio_url);
 
@@ -284,7 +350,41 @@
     });
 
     socket.on('transaction_info', (data) => {
-        console.log(data)
+        var currentTime = new Date();
+        var hours = currentTime.getHours();
+        var minutes = currentTime.getMinutes();
+        if (hours < 10) {
+            hours = "0" + hours;
+        }
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        var formattedTime = hours + ":" + minutes;
+
+        let toast = $('#transactionNotification')
+        let time = toast.find('small[name="time"]');
+        let value = toast.find('span[name="value"]');
+        let address = toast.find('span[name="address"]');
+        let trans = toast.find('div[name="trans"]');
+
+        time.text(formattedTime)
+        trans.append(
+            '<a href="https://sepolia.etherscan.io/tx/'+
+                data.hash +
+            '" target="_blank"><span style="text-decoration: underline" class="mb-0 emp_name text-truncate">Transaction URL</span></a>'
+        )
+
+        if (data.received) {
+            value.text('Received '+ data.received + ' ETH on wallet.')
+        } else {
+            value.text('Withdrawn '+ data.withdrawn + ' ETH from wallet.')
+        }
+
+        address.text(data.wallet)
+
+
+        let toastAnimation = new bootstrap.Toast(toast);
+        toastAnimation.show();
     });
 
     function logout() {
@@ -311,28 +411,5 @@
 </script>
 {% block script %}
 {% endblock %}
-<!-- build:js assets/vendor/js/core.js -->
-<script src="{{ url_for('static', path='/assets/vendor/libs/jquery/jquery.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/libs/popper/popper.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/js/bootstrap.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/libs/node-waves/node-waves.js') }}"></script>
-
-<script src="{{ url_for('static', path='/assets/vendor/libs/hammer/hammer.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/libs/i18n/i18n.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/libs/typeahead-js/typeahead.js') }}"></script>
-
-<script src="{{ url_for('static', path='/assets/vendor/js/menu.js') }}"></script>
-<!-- endbuild -->
-
-<!-- Vendors JS -->
-<script src="{{ url_for('static', path='/assets/vendor/libs/apex-charts/apexcharts.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/libs/swiper/swiper.js') }}"></script>
-<script src="{{ url_for('static', path='/assets/vendor/libs/datatables-bs5/datatables-bootstrap5.js') }}"></script>
-
-<!-- Main JS -->
-<script src="{{ url_for('static', path='/assets/js/main.js') }}"></script>
-
-
 </body>
 </html>

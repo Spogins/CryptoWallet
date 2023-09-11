@@ -60,12 +60,14 @@ async def disconnect(sid):
         room = user['room']
         username = user['username']
         del active_users[sid]
+
         await remove_user_from_room(username, username)
         await remove_user_from_room('chat', username)
 
-        await sio.emit('disconnect_user', {'room': room, 'user': username}, room=room)
+        await sio.emit('disconnect_user', {'room': 'chat', 'user': username}, room='chat')
+        sio.leave_room(sid, 'chat')
+        sio.leave_room(sid, username)
 
-        sio.leave_room(sid, room)
 
 
 @sio.on('join')
