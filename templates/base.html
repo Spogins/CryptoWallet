@@ -312,13 +312,12 @@
 
 <script>
 
-
     $('#showToast').click(function () {
-
         let toast = $('#transactionNotification')
-          let toastAnimation = new bootstrap.Toast(toast);
+        let toastAnimation = new bootstrap.Toast(toast);
         toastAnimation.show();
     })
+
     $(window).on('load', function () {
         toastr.options = {
 

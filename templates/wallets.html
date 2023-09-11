@@ -62,7 +62,11 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="modal fade" id="walletTransModalForm"
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal fade" id="walletSendTransModal"
                                      tabindex="-1"
                                      style="display: none;" aria-hidden="true">
                                     <div class="modal-dialog">
@@ -82,7 +86,7 @@
                                                         <input type="text" class="form-control" name="toAddress"
                                                                placeholder="Enter address...">
                                                     </div>
-                                                    <div class="invalid-feedback mb-2"></div>
+                                                    <div class="invalid-feedback mb-2" style="text-align: center;"></div>
                                                 </div>
                                                 <div class="row g-2">
                                                     <div class="col-1">
@@ -93,7 +97,7 @@
                                                         <input type="text" class="form-control" name="value"
                                                                placeholder="Send amount...">
                                                     </div>
-                                                    <div class="invalid-feedback mb-2"></div>
+                                                    <div class="invalid-feedback mb-2" style="text-align: center;"></div>
                                                 </div>
                                             </div>
                                             <div class="modal-footer">
@@ -102,7 +106,7 @@
                                                     Close
                                                 </button>
                                                 <button
-                                                        id="sendButtonForm"
+                                                        name="sendTrans"
                                                         type="button"
                                                         class="btn btn-primary waves-effect waves-light">Send
                                                 </button>
@@ -110,10 +114,6 @@
                                         </div>
                                     </div>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-
 
                     <div class="modal fade" id="transSend"
                          tabindex="-1"
@@ -208,8 +208,8 @@
             return true
         }
 
-        function sendTrans(fromAddress, modalId) {
-            let modal = $('#' + modalId)
+        function sendTrans(fromAddress) {
+            let modal = $('#walletSendTransModal')
             let toAddress = modal.find('input[name="toAddress"]');
             let value = modal.find('input[name="value"]');
             var toAddressErrorDiv = toAddress.parent().parent().find('.invalid-feedback')[0]
@@ -268,9 +268,14 @@
 
         }
 
-        function showModal(modalId) {
-            let modal = $('#' + modalId)
+        function showModal(address) {
+            let modal = $('#walletSendTransModal')
             modal.modal('show');
+            let sendButton = modal.find('button[name="sendTrans"]')
+            let attributeValue = 'sendTrans("' + address + '")';
+            sendButton.attr('onclick', attributeValue)
+
+
             let toAddress = modal.find('input[name="toAddress"]');
             let value = modal.find('input[name="value"]');
             toAddress.val('')
@@ -298,30 +303,22 @@
             let walletAddress = $(emptyForm).find('#walletAddressForm')
             let walletBalance = $(emptyForm).find('#walletBalanceForm')
             let walletSendTransButton = $(emptyForm).find('#walletSendTransButtonForm')
-            let walletTransModalForm = $(emptyForm).find('#walletTransModalForm')
-            let sendButtonForm = $(emptyForm).find('#sendButtonForm')
             let walletAssetImgId = 'walletAssetImg-' + data.id
             let walletAddressId = 'walletAddress-' + data.id
             let walletBalanceId = 'walletBalance-' + data.id
             let walletSendTransButtonId = 'walletSendTransButton-' + data.id
-            let walletTransModalFormId = 'walletTransModal-' + data.id
-            let sendButtonId = 'sendButton-' + data.id
 
             walletAssetImg.attr('src', data.asset_img);
             walletAddress.text(data.address)
             walletBalance.text(data.balance)
-            var attributeValue = 'sendTrans("' + data.address + '", "' + walletTransModalFormId + '")';
-            sendButtonForm.attr('onclick', attributeValue)
-            attributeValue = 'showModal("' + walletTransModalFormId + '")'
+            let attributeValue = 'showModal("' + data.address + '")';
             walletSendTransButton.attr('onclick', attributeValue)
-            {#walletSendTransButton.attr('data-bs-target', "#" + walletTransModalFormId + "")#}
+            walletSendTransButton.attr('data-bs-target', "#walletSendTransModal")
 
             walletAssetImg.attr('id', walletAssetImgId)
             walletAddress.attr('id', walletAddressId)
             walletBalance.attr('id', walletBalanceId)
             walletSendTransButton.attr('id', walletSendTransButtonId)
-            walletTransModalForm.attr('id', walletTransModalFormId)
-            sendButtonForm.attr('id', sendButtonId)
 
             emptyForm.css('display', 'block')
 

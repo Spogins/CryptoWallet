@@ -152,6 +152,8 @@
 
         function sendMessage() {
             let text = $('#messageText').val()
+            if ($.trim(text) === '')
+                text.val('')
             if (text.length || base64Image !== '') {
                 let send_message_api_url = window.location.origin + "/api/v1/send_message"
                 $.ajax({
