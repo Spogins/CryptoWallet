@@ -1,3 +1,4 @@
+from _decimal import Decimal
 from typing import Callable, Type
 from fastapi import HTTPException
 from sqlalchemy import select
@@ -103,13 +104,13 @@ class WalletRepository:
 
     async def update_wallet_balance(self, address, balance_eth):
         async with self.session_factory() as session:
-            result = await session.execute(select(Wallet).where(Wallet.address == address))
+            result = await session.execute(select(Wallet).where(Wallet.address == address).options(joinedload(Wallet.user)))
             wallet = result.scalar_one()
             if wallet:
                 wallet.balance = balance_eth
                 await session.commit()
                 await session.refresh(wallet)
-                return {'id': int(wallet.id), 'wallet': wallet.address, 'balance': float(wallet.balance)}
+                return {'id': int(wallet.id), 'wallet': wallet.address, 'balance': Decimal(wallet.balance), 'user': wallet.user.id}
             else:
                 raise HTTPException(status_code=401,
                                     detail='not a valid wallet make sure you check your wallet.')

@@ -67,53 +67,53 @@
                         </div>
                     </div>
                     <div class="modal fade" id="walletSendTransModal"
-                                     tabindex="-1"
-                                     style="display: none;" aria-hidden="true">
-                                    <div class="modal-dialog">
-                                        <div class="modal-content">
-                                            <div class="modal-header">
-                                                <h5 class="modal-title">Send ETH</h5>
-                                                <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                                        aria-label="Close"></button>
-                                            </div>
-                                            <div class="modal-body pb-0">
-                                                <div class="row">
-                                                    <div class="col-1">
-                                                        <label for="nameBackdrop" class="form-label">Send to:</label>
-                                                    </div>
-                                                    <div class="col mb-2">
-
-                                                        <input type="text" class="form-control" name="toAddress"
-                                                               placeholder="Enter address...">
-                                                    </div>
-                                                    <div class="invalid-feedback mb-2" style="text-align: center;"></div>
-                                                </div>
-                                                <div class="row g-2">
-                                                    <div class="col-1">
-                                                        <label for="nameBackdrop" class="form-label">Value:</label>
-                                                    </div>
-                                                    <div class="col mb-2">
-
-                                                        <input type="text" class="form-control" name="value"
-                                                               placeholder="Send amount...">
-                                                    </div>
-                                                    <div class="invalid-feedback mb-2" style="text-align: center;"></div>
-                                                </div>
-                                            </div>
-                                            <div class="modal-footer">
-                                                <button type="button" class="btn btn-label-secondary waves-effect"
-                                                        data-bs-dismiss="modal">
-                                                    Close
-                                                </button>
-                                                <button
-                                                        name="sendTrans"
-                                                        type="button"
-                                                        class="btn btn-primary waves-effect waves-light">Send
-                                                </button>
-                                            </div>
+                         tabindex="-1"
+                         style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Send ETH</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body pb-0">
+                                    <div class="row">
+                                        <div class="col-1">
+                                            <label for="nameBackdrop" class="form-label">Send to:</label>
                                         </div>
+                                        <div class="col mb-2">
+
+                                            <input type="text" class="form-control" name="toAddress"
+                                                   placeholder="Enter address...">
+                                        </div>
+                                        <div class="invalid-feedback mb-2" style="text-align: center;"></div>
+                                    </div>
+                                    <div class="row g-2">
+                                        <div class="col-1">
+                                            <label for="nameBackdrop" class="form-label">Value:</label>
+                                        </div>
+                                        <div class="col mb-2">
+
+                                            <input type="text" class="form-control" name="value"
+                                                   placeholder="Send amount...">
+                                        </div>
+                                        <div class="invalid-feedback mb-2" style="text-align: center;"></div>
                                     </div>
                                 </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-label-secondary waves-effect"
+                                            data-bs-dismiss="modal">
+                                        Close
+                                    </button>
+                                    <button
+                                            name="sendTrans"
+                                            type="button"
+                                            class="btn btn-primary waves-effect waves-light">Send
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
                     <div class="modal fade" id="transSend"
                          tabindex="-1"
@@ -296,9 +296,26 @@
                 value.removeClass("is-invalid");
         }
 
+        function updateBalance(address) {
+            let update_wallet_balance_api_url = window.location.origin + "/api/v1/update_wallet_balance?wallet_address="
+            $.ajax({
+                method: 'put',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: update_wallet_balance_api_url + address,
+                success: function (data) {
+                    $('#walletBalance-' + data.id).text(data.balance)
+                },
+            })
+        }
+
+        socket.on('update_balance', (data) => {
+            updateBalance(data.address)});
+
         function setWallets(data) {
             let emptyForm = $('#walletEmptyForm').clone()
-
             let walletAssetImg = $(emptyForm).find('#walletAssetImgForm')
             let walletAddress = $(emptyForm).find('#walletAddressForm')
             let walletBalance = $(emptyForm).find('#walletBalanceForm')
@@ -327,6 +344,8 @@
 
             $('#wallets').append(emptyForm)
 
+            setInterval(function () {
+                updateBalance(data.address)}, 60000);
         }
 
         function userWallets(user_id) {

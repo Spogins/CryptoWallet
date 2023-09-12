@@ -18,8 +18,10 @@ class WalletService:
 
     async def buy_product(self, data):
         from_wallet: Wallet = await self.get_wallet_by_address(data.get('from_wallet'))
-        transaction: Transaction = await self.transaction(from_wallet.private_key, data.get('to_wallet'), Decimal(data.get('value')))
-        data: dict = {'transaction_id': transaction.id, 'product_id': data.get('product_id'), 'user_id': data.get('user_id')}
+        transaction: Transaction = await self.transaction(from_wallet.private_key, data.get('to_wallet'),
+                                                          Decimal(data.get('value')))
+        data: dict = {'transaction_id': transaction.id, 'product_id': data.get('product_id'),
+                      'user_id': data.get('user_id')}
         async with RabbitBroker(RABBITMQ_URL) as broker:
             await broker.publish(message=data, queue='delivery/create_order')
 
@@ -71,7 +73,7 @@ class WalletService:
         asset = await self.get_wallet_asset(trans.get('from'), trans.get('to'))
         gas_price_gwei = int(trans.get('gasPrice'))  # Пример: 100 Gwei
         gas_limit = int(trans.get('gas'))  # Пример: стандартный лимит для отправки эфира
-        txn_fee_wei = gas_price_gwei * gas_limit * 10 ** (asset.decimal_places/2)  # 1 Gwei = 10^9 Wei
+        txn_fee_wei = gas_price_gwei * gas_limit * 10 ** (asset.decimal_places / 2)  # 1 Gwei = 10^9 Wei
         txn_fee_eth = txn_fee_wei / 10 ** asset.decimal_places
 
         if status == 1:
@@ -81,7 +83,7 @@ class WalletService:
         else:
             status = "PENDING"
         value = Decimal((trans.get('value') / 10 ** asset.decimal_places))
-        txn_fee = Decimal(txn_fee_eth / 10 ** (asset.decimal_places/2))
+        txn_fee = Decimal(txn_fee_eth / 10 ** (asset.decimal_places / 2))
         transaction = {
             "hash": _hash,
             "from_address": trans.get('from'),
@@ -147,7 +149,6 @@ class WalletService:
     async def transaction_info(self, tx_hash):
         return await self.w3_service.transaction_info(tx_hash)
 
-
     async def send_transaction_status(self, trans_id, status):
         data = {
             'transaction_id': trans_id,
@@ -179,8 +180,7 @@ class WalletService:
         if not transaction.status == "PENDING":
             await self.send_transaction_info(trans_data.get('from_address'), trans_data.get('to_address'), _hash, value)
             await self.send_transaction_status(transaction.id, transaction.status)
-
-        await self.update_wallet_balance(trans_data.get('from_address'), trans_data.get('to_address'))
+            await self.update_wallet_balance(trans_data.get('from_address'), trans_data.get('to_address'))
         return transaction
 
     async def send_transaction_info(self, from_address, to_address, _hash, value):
@@ -212,10 +212,15 @@ class WalletService:
                                 detail='Not found asset for wallet.')
 
     async def update_wallet_balance(self, from_address, to_address):
-        if await self._repository.check_wallet(from_address):
-            await self.update_balance(from_address)
-        if await self._repository.check_wallet(to_address):
-            await self.update_balance(to_address)
+        wallets = [from_address, to_address]
+        for address in wallets:
+            if await self._repository.check_wallet(address):
+                wallet = await self.update_balance(address)
+                async with RabbitBroker(RABBITMQ_URL) as broker:
+                    await broker.publish(message={'address': wallet.get('wallet'), 'room': wallet.get('user'),
+                                                  'balance': wallet.get('balance')}, queue='socketio/update_balance')
+
+
     #
     #
     # # USED ONLY FOR MORALIS TEST

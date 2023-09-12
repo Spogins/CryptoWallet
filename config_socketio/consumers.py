@@ -16,4 +16,6 @@ async def send_notification(data):
 
 
 
-
+@socketio_router.handle('update_balance')
+async def update_balance(data):
+    await sio.emit(event='update_balance', data=data, room=data.get('room'))
