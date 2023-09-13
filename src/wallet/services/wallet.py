@@ -45,8 +45,8 @@ class WalletService:
         wallet = await self.generate_wallet()
         return await self._repository.user_add_wallet(user_id, wallet)
 
-    async def get_db_transaction(self, address, limit):
-        return await self._repository.get_db_transaction(address, limit)
+    async def get_db_transaction(self, address):
+        return await self._repository.get_db_transaction(address)
 
     async def user_wallets(self, user_id):
         return await self._repository.user_wallets(user_id)

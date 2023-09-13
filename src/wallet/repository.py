@@ -68,9 +68,9 @@ class WalletRepository:
             except:
                 raise HTTPException(status_code=401, detail='The wallet was registered on the account earlier make sure you are using a new or empty wallet')
 
-    async def get_all_trans(self, limit: int = 10):
+    async def get_all_trans(self):
         async with self.session_factory() as session:
-            result = await session.execute(select(Transaction).limit(limit))
+            result = await session.execute(select(Transaction))
             transactions = result.scalars().all()
             return transactions
 
@@ -115,10 +115,10 @@ class WalletRepository:
                 raise HTTPException(status_code=401,
                                     detail='not a valid wallet make sure you check your wallet.')
 
-    async def get_db_transaction(self, address, limit: int = 10):
+    async def get_db_transaction(self, address):
         async with self.session_factory() as session:
-            result_from = await session.execute(select(Transaction).where(Transaction.from_address == address).limit(limit))
-            result_to = await session.execute(select(Transaction).where(Transaction.to_address == address).limit(limit))
+            result_from = await session.execute(select(Transaction).where(Transaction.from_address == address))
+            result_to = await session.execute(select(Transaction).where(Transaction.to_address == address))
             transactions: list = result_from.scalars().all()
             transactions_to = result_to.scalars().all()
             transactions.extend(transactions_to)

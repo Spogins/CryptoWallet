@@ -8,6 +8,13 @@ class ProductForm(BaseModel):
     price: float
     image: Optional[str] = ''
 
+class AddProductForm(BaseModel):
+    id: int
+    title: str
+    wallet: str
+    price: float
+    image: str
+
 
 class ProductEdit(BaseModel):
     id: int

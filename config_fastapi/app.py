@@ -50,8 +50,8 @@ async def publish_smtp():
     app.broker.include_router(wallet_router)
     app.broker.include_router(delivery_router)
     app.broker.include_router(socketio_router)
-    sio.start_background_task(check_block)
-    sio.start_background_task(delivery)
+    # sio.start_background_task(check_block)
+    # sio.start_background_task(delivery)
     await broker.start()
 
 

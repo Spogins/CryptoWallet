@@ -29,6 +29,7 @@
                                                         <li class="mb-2"
                                                             style="text-align: initial;"><span
                                                                 class="fw-semibold me-1">Address:</span><a
+                                                                id="hrefAddress"
                                                                 href="https://sepolia.etherscan.io/address/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
                                                                 target="_blank"><span
                                                                 id="walletAddressForm"
@@ -42,7 +43,10 @@
                                                     </ul>
                                                     <div style="display:flex;justify-content: space-around;"
                                                          class="mt-2">
-                                                        <button class="btn btn-primary waves-effect waves-light">
+                                                        <button class="btn btn-primary waves-effect waves-light"
+                                                                name="watchTransactions"
+                                                                id="walletWatchTransButtonForm"
+                                                        >
                                                             Watch Transactions
                                                         </button>
                                                         <button type="button" id="walletSendTransButtonForm"
@@ -53,7 +57,8 @@
                                                         >
                                                             Send Transactions
                                                         </button>
-                                                        <button class="btn btn-warning waves-effect waves-light">Get
+                                                        <button onclick="requestEth()"
+                                                                class="btn btn-warning waves-effect waves-light">Get
                                                             Free ETH
                                                         </button>
                                                     </div>
@@ -66,6 +71,8 @@
                             </div>
                         </div>
                     </div>
+
+
                     <div class="modal fade" id="walletSendTransModal"
                          tabindex="-1"
                          style="display: none;" aria-hidden="true">
@@ -140,10 +147,134 @@
                             </div>
                         </div>
                     </div>
+
+
+                    <div class="modal fade" id="transactionData"
+                         tabindex="-1"
+                         style="display: none;" aria-hidden="true">
+                        <div class="modal-dialog modal-xl">
+                            <div class="modal-content">
+                                <h5 class="card-header" id="transModalTitle"></h5>
+                                <div class="card-datatable table-responsive">
+                                    <div id="DataTables_Table_3_wrapper"
+                                         class="dataTables_wrapper dt-bootstrap5 no-footer">
+                                        <table class="dt-multilingual table dataTable no-footer dtr-column"
+                                               id="DataTables_Table_3"
+                                               aria-describedby="DataTables_Table_3_info" style="width: 1396px;">
+                                            <thead>
+                                            <tr>
+                                                <th class="control sorting_disabled dtr-hidden sorting_asc" rowspan="1"
+                                                    colspan="1"
+                                                    style="width: 0px; display: none;" aria-label=""></th>
+
+                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
+                                                    rowspan="1"
+                                                    colspan="1" style="width: 250px;"
+                                                    aria-label="Position: aktivieren, um Spalte aufsteigend zu sortieren">
+                                                    Txn Hash
+                                                </th>
+                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
+                                                    rowspan="1"
+                                                    colspan="1" style="width: 250px;"
+                                                    aria-label="Position: aktivieren, um Spalte aufsteigend zu sortieren">
+                                                    From
+                                                </th>
+                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
+                                                    rowspan="1"
+                                                    colspan="1" style="width: 250px;"
+                                                    aria-label="Position: aktivieren, um Spalte aufsteigend zu sortieren">
+                                                    To
+                                                </th>
+
+
+                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
+                                                    rowspan="1"
+                                                    colspan="1" style="width: 250px;"
+                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
+                                                    Value
+                                                </th>
+
+                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
+                                                    rowspan="1"
+                                                    colspan="1" style="width: 100px;"
+                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
+                                                    Age
+                                                </th>
+                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
+                                                    rowspan="1"
+                                                    colspan="1" style="width: 100px;"
+                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
+                                                    Txn Fee
+                                                </th>
+                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
+                                                    rowspan="1"
+                                                    colspan="1" style="width: 100px;"
+                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
+                                                    Status
+                                                </th>
+
+
+                                            </tr>
+                                            </thead>
+                                            <tbody id="DataTableBody">
+                                            {#                                            <tr class="">#}
+                                            {#                                                <td class="control sorting_1" tabindex="0" style="display: none;"></td>#}
+                                            {##}
+                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
+                                            {#                                                    0xdef0f0f1ea91314f5422dc7ff5e4d50679370645000b78b13f7a11bd124ea732#}
+                                            {#                                                </td>#}
+                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
+                                            {#                                                    0x44fe49b6c180B660933548A8632bE93079010F28#}
+                                            {#                                                </td>#}
+                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
+                                            {#                                                    0x669130e74FB677D6616315D1CaE8c88BA4A883Df#}
+                                            {#                                                </td>#}
+                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
+                                            {#                                                    0.001000000000000000#}
+                                            {#                                                </td>#}
+                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
+                                            {#                                                    15:45:12#}
+                                            {#                                                </td>#}
+                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
+                                            {#                                                    0.000210000000000000#}
+                                            {#                                                </td>#}
+                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
+                                            {#                                                    SUCCESS#}
+                                            {#                                                </td>#}
+                                            {#                                            </tr>#}
+
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
+                <div id="freeEth" data-bs-delay="5000"
+                     class=" bs-toast toast toast-placement-ex m-2 fade bottom-0 end-0 hide" role="alert"
+                     aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <i class="ti ti-bell ti-xs me-2 text-warning"></i>
+                        <div class="me-auto fw-semibold" style="text-align: center"><h5 class="mb-0">Getting free
+                            ETH</h5></div>
+                        <small class="text-muted" name="time">time</small>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body" style="text-align: initial;"><span class="mb-0" name="value">You have successfully sent a request to Fre ETH.</span>
+                    </div>
+                    <div class="toast-body" style="text-align: initial;"><span class="mb-0"
+                                                                               name="address">Please Wait.</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Transacion Table -->
+            <div class="card">
 
             </div>
 
+            <!--/ Transacion Table -->
 
         </div>
         <!--/ Wallets -->
@@ -151,7 +282,13 @@
 {% endblock %}
 {% block script %}
     <script>
+        let dataTable = $('#DataTables_Table_3').DataTable();
 
+        function requestEth() {
+            let toast = $('#freeEth')
+            let toastAnimation = new bootstrap.Toast(toast);
+            toastAnimation.show();
+        }
 
         function addressInputValidator(toAddress) {
             var toAddressErrorDiv = toAddress.parent().parent().find('.invalid-feedback')[0]
@@ -264,8 +401,6 @@
                     }
                 })
             }
-
-
         }
 
         function showModal(address) {
@@ -296,6 +431,89 @@
                 value.removeClass("is-invalid");
         }
 
+        function showTransactions(address) {
+            console.log(address)
+            let modal = $('#transactionData')
+            setTransaction(address, 1)
+            modal.modal('show');
+        }
+
+        function setTransaction(address, page) {
+            dataTable.clear().draw();
+            let wallet_db_transactions = window.location.origin + "/api/v1/wallet_db_transactions?address=" + address + "&page=" + page + "&size=10"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: wallet_db_transactions,
+                success: function (data) {
+                    console.log(data)
+                    $('#transModalTitle').text(
+                        "List of ETH transactions of " + address + " wallet"
+                    )
+                    let transInfo
+                    data.items.forEach((elem) => {
+                        var dateString = "2023-09-12 12:21:48";
+                        var date = new Date(dateString);
+                        var now = new Date();
+                        var timeDifference = now - date;
+                        var secondsAgo = Math.floor(timeDifference / 1000);
+                        var formattedTime;
+                        if (secondsAgo < 60) {
+                            formattedTime = secondsAgo + " sec ago";
+                        } else if (secondsAgo < 3600) {
+                            var minutesAgo = Math.floor(secondsAgo / 60);
+                            formattedTime = minutesAgo + " min ago";
+                        } else if (secondsAgo < 86400) {
+                            var hoursAgo = Math.floor(secondsAgo / 3600);
+                            formattedTime = hoursAgo + " hours ago";
+                        } else {
+                            var daysAgo = Math.floor(secondsAgo / 86400);
+                            formattedTime = daysAgo + " days ago";
+                        }
+                        let data = [elem.hash, elem.from_address, elem.to_address, elem.value, formattedTime, elem.txn_fee, elem.status, '']
+                        dataTable.row.add(data).draw();
+
+                        transInfo += '<tr class="">' +
+                            '<td class="control sorting_1" tabindex="0" style="display: none;"></td>' +
+                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                            elem.hash +
+                            '</td>' +
+                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                            elem.from_address +
+                            '</td>' +
+                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                            elem.to_address +
+                            '</td>' +
+                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                            elem.value +
+                            '</td>' +
+                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                            formattedTime +
+                            '</td>' +
+                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                            elem.txn_fee +
+                            '</td>' +
+                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                            elem.status +
+                            '</td>' +
+                            '</tr>'
+
+                    });
+                    $('#DataTableBody').empty().append(transInfo)
+
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+
+                }
+            })
+
+        }
+
+
         function updateBalance(address) {
             let update_wallet_balance_api_url = window.location.origin + "/api/v1/update_wallet_balance?wallet_address="
             $.ajax({
@@ -312,7 +530,8 @@
         }
 
         socket.on('update_balance', (data) => {
-            updateBalance(data.address)});
+            updateBalance(data.address)
+        });
 
         function setWallets(data) {
             let emptyForm = $('#walletEmptyForm').clone()
@@ -320,11 +539,17 @@
             let walletAddress = $(emptyForm).find('#walletAddressForm')
             let walletBalance = $(emptyForm).find('#walletBalanceForm')
             let walletSendTransButton = $(emptyForm).find('#walletSendTransButtonForm')
+            let walletWatchTransButton = $(emptyForm).find('#walletWatchTransButtonForm')
+            let hrefAddress = $(emptyForm).find('#hrefAddress')
+
+            let hrefAddressId = 'hrefAddress-' + data.id
             let walletAssetImgId = 'walletAssetImg-' + data.id
             let walletAddressId = 'walletAddress-' + data.id
             let walletBalanceId = 'walletBalance-' + data.id
             let walletSendTransButtonId = 'walletSendTransButton-' + data.id
+            let walletWatchTransButtonId = 'walletWatchTransButton-' + data.id
 
+            hrefAddress.attr('href', 'https://sepolia.etherscan.io/address/' + data.address);
             walletAssetImg.attr('src', data.asset_img);
             walletAddress.text(data.address)
             walletBalance.text(data.balance)
@@ -332,11 +557,16 @@
             walletSendTransButton.attr('onclick', attributeValue)
             walletSendTransButton.attr('data-bs-target', "#walletSendTransModal")
 
+            attributeValue = 'showTransactions("' + data.address + '")';
+            walletWatchTransButton.attr('onclick', attributeValue)
+            walletWatchTransButton.attr('data-bs-target', "#transactionData")
+
+            hrefAddress.attr('id', hrefAddressId)
             walletAssetImg.attr('id', walletAssetImgId)
             walletAddress.attr('id', walletAddressId)
             walletBalance.attr('id', walletBalanceId)
             walletSendTransButton.attr('id', walletSendTransButtonId)
-
+            walletWatchTransButton.attr('id', walletWatchTransButtonId)
             emptyForm.css('display', 'block')
 
             let walletCard = 'wallet-' + data.id
@@ -345,7 +575,8 @@
             $('#wallets').append(emptyForm)
 
             setInterval(function () {
-                updateBalance(data.address)}, 60000);
+                updateBalance(data.address)
+            }, 60000);
         }
 
         function userWallets(user_id) {

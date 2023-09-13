@@ -1,48 +1,551 @@
 {% extends "base.html" %}
 {% block ibay %}
-<div class="row">
-    Ibay!
-</div>
+    <div class="row">
+        <!-- Product  -->
+        <div class="col-xl-0 col-lg-0 col-md-0 order-0 order-md-0">
+            <div class="row">
+                <div class="col">
+                    <p class="mt-4 small text-uppercase text-muted">Products</p>
+                </div>
+                <div class="col" style="display: flex; justify-content: flex-end; align-items: center;">
+                    <div>
+                        <button class="btn btn-primary waves-effect waves-light"
+                                name=""
+                                id=""
+                                onclick="openCreateProductModal()"
+                        >
+                            Create Product
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row mb-5" id="products">
+                        <!-- Product Card -->
+                        <!-- /Product Card -->
+                    </div>
+
+                    <div class="col-md-6 mt-3" id="productEmptyForm" style="display:none;">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="tab-content p-0">
+                                    <div class="tab-pane fade show active" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-2">
+                                                <img id="productImg"
+                                                     class="d-block w-px-100 h-px-100 rounded"
+                                                     src=""
+                                                     height="100" width="100" alt="eth"></div>
+
+                                            <div class="col">
+                                                <div class="row">
+                                                    <ul class="list-unstyled mb-0">
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Title:</span><span
+                                                                id="productTitle"
+                                                                style=""
+                                                                class=" emp_name text-truncate">Name</span>
+                                                        </li>
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Address:</span><a
+                                                                href="https://sepolia.etherscan.io/address/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
+                                                                target="_blank" id="hrefAddress"><span
+                                                                id="productWalletAddress"
+                                                                style="text-decoration: underline"
+                                                                class=" emp_name text-truncate">0x5A79fe36275B1A8d557A8e1b3D36261515d12542</span></a>
+                                                        </li>
+                                                        <li class="pt-1" style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Price:</span><span
+                                                                id="productPrice">0.02957399999</span>
+                                                        </li>
+                                                    </ul>
+                                                    <div style="display:flex;justify-content: flex-start;"
+                                                         class="mt-2">
+                                                        <button class="btn btn-primary waves-effect waves-light"
+                                                                name="buyProduct"
+                                                                id="buyProductButton"
+                                                        >
+                                                            Buy Product
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="createModal" tabindex="-1" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel3">Create Product</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row mb-3">
+                                <div class="col-1 mb-0" style="text-align: center;">
+                                    <label for="nameLarge" class="form-label">Title:</label>
+
+                                </div>
+                                <div class="col">
+                                    <div>
+                                        <input type="text" id="productTitleInput" class="form-control"
+                                               placeholder="Enter Title...">
+                                    </div>
+                                    <div class="invalid-feedback mb-2" style="text-align: center;"></div>
+                                </div>
+
+
+                            </div>
+                            <div class="row g-2 mb-3">
+                                <div class="col-1 mb-0" style="text-align: center;">
+                                    <label for="emailLarge" class="form-label">Wallet:</label>
+
+                                </div>
+                                <div class="col">
+                                    <select id="userWallet" class="form-select">
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="row g-3 mb-3">
+                                <div class="col-1 mb-0" style="text-align: center;">
+                                    <label for="emailLarge" class="form-label">Price:</label>
+
+                                </div>
+                                <div class="col">
+                                    <div class="col">
+                                        <input type="text" id="productPriceInput" class="form-control"
+                                               placeholder="Enter price value...">
+                                    </div>
+                                    <div class="invalid-feedback mb-2" style="text-align: center;"></div>
+                                </div>
+                            </div>
+                            <div class="row g-4">
+                                <div class="col-1 mb-0" style="text-align: center;">
+                                    <label for="dobLarge" class="form-label">Image:</label>
+
+
+                                </div>
+                                <div class="col">
+                                    <div>
+                                        <button class="btn btn-primary me-3" id="chooseImageButton">Upload</button>
+
+                                        <input type="file" id="imageInput" accept="image/*" hidden/>
+                                        <span id="imageContainer"></span>
+                                    </div>
+                                    <div id="imageError" class="invalid-feedback mb-2"
+                                         style="text-align: initial;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button" onclick="createProduct()"
+                                    class="btn btn-primary waves-effect waves-light">Create product
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--/ Product -->
+    </div>
+    <div class="row" style="display: none">
+        <!-- Orders  -->
+        <div class="col-xl-0 col-lg-0 col-md-0 order-0 order-md-0">
+            <p class="mt-4 small text-uppercase text-muted">Orders</p>
+
+            <div class="card mb-4">
+                <div class="card-body">
+                    <div class="row mb-5" id="products">
+                        <!-- Orders Card -->
+
+                        <!-- /Orders Card -->
+                    </div>
+
+                    <div class="col-md-6 mt-3" id="walletEmptyForm" style="display:none;">
+                        <div class="card text-center">
+                            <div class="card-body">
+                                <div class="tab-content p-0">
+                                    <div class="tab-pane fade show active" role="tabpanel">
+                                        <div class="row">
+                                            <div class="col-2"><img id="walletAssetImgForm"
+                                                                    class="d-block w-px-100 h-px-100 rounded"
+                                                                    src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Ethereum-icon-purple.svg"
+                                                                    height="100" width="100" alt="eth"></div>
+                                            <div class="col">
+                                                <div class="row">
+                                                    <ul class="list-unstyled mb-0">
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Address:</span><a
+                                                                href="https://sepolia.etherscan.io/address/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
+                                                                target="_blank"><span
+                                                                id="walletAddressForm"
+                                                                style="text-decoration: underline"
+                                                                class=" emp_name text-truncate">0x5A79fe36275B1A8d557A8e1b3D36261515d12542</span></a>
+                                                        </li>
+                                                        <li class="pt-1" style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Balance:</span><span
+                                                                id="walletBalanceForm">0.02957399999</span>
+                                                        </li>
+                                                    </ul>
+                                                    <div style="display:flex;justify-content: space-around;"
+                                                         class="mt-2">
+                                                        <button class="btn btn-primary waves-effect waves-light"
+                                                                name="watchTransactions"
+                                                                id="walletWatchTransButtonForm"
+                                                        >
+                                                            Watch Transactions
+                                                        </button>
+                                                        <button type="button" id="walletSendTransButtonForm"
+                                                                class="btn btn-success waves-effect waves-light"
+                                                                {#                                                                data-bs-toggle="modal"#}
+                                                                name="sendTransButton"
+                                                                {#                                                                data-bs-target="#walletTransModalForm"#}
+                                                        >
+                                                            Send Transactions
+                                                        </button>
+                                                        <button onclick="requestEth()"
+                                                                class="btn btn-warning waves-effect waves-light">Get
+                                                            Free ETH
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!--/ Orders -->
+    </div>
 
 {% endblock %}
 {% block script %}
-<script>
-    $(document).ready(function() {
-        // Находим элемент <li> по классу и идентификатору
-        var menuItem = $('li.menu-item#nav_ibay');
+    <script>
+        let WalletData
+        let base64Image = ''
+        $("#chooseImageButton").click(function () {
+            $("#imageInput").val(null);
+            $("#imageInput").click()
+        });
 
-        // Проверяем, что элемент найден
-        if (menuItem.length > 0) {
-            // Добавляем класс "active" к элементу <li>
-            menuItem.addClass('active');
+        $("#imageInput").change(function () {
+            var selectedFile = this.files[0];
+
+            if (selectedFile) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var image = new Image();
+                    image.classList.add("rounded", "pt-1", "mb-3")
+                    image.height = "100"
+                    image.width = "100"
+                    image.alt = "User avatar"
+                    image.src = e.target.result;
+                    base64Image = e.target.result;
+                    $("#imageContainer").empty().text($("#imageInput").val())
+                };
+
+                reader.readAsDataURL(selectedFile);
+
+            }
+        });
+
+        function openCreateProductModal() {
+            let modal = $('#createModal')
+            modal.modal('show');
+            $('#productTitleInput').val('')
+            $('#productPriceInput').val('')
+            $("#imageInput").val(null);
+            base64Image = ''
+            $('#imageContainer').text('')
+
+            if (WalletData.length)
+                $('#userWallet').val(WalletData[0].id)
         }
 
-        let user_auth_api_url = window.location.origin + "/api/v1/user_auth"
-        $.ajax({
-            method: 'get',
-            dataType: 'json',
-            headers: {
-                "Content-Type": 'application/json',
-            },
-            url: user_auth_api_url,
-            success: function (data) {
+        function valueInputValidator(value) {
+            var valueErrorDiv = value.parent().parent().find('.invalid-feedback')[0]
 
-                let avatarHeader = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
-                if (data.avatar !== '#')
-                    avatarHeader = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
+            if (!value.val().length) {
+                valueErrorDiv.textContent = 'Please enter amount value.'
+                valueErrorDiv.style.display = "block";
+                value[0].classList.add("is-invalid");
 
-
-                $("#userAvatarDrop").append(avatarHeader)
-                $("#userAvatarSmall").append(avatarHeader)
-                $("#usernameHeader").text(data.username)
-                let username = data.id
-                socket.emit('join', {username, room: username});
-            },
-            error: function (data) {
-                console.log("error", data.responseJSON.detail)
-                window.location.href = '/auth_login'
+                return false
             }
-        })
-    });
-</script>
+            if (!/^(\d+(\.\d*)?|\.\d+)$/.test(value.val())) {
+                valueErrorDiv.textContent = 'Wrong amount format.'
+                valueErrorDiv.style.display = "block";
+                value[0].classList.add("is-invalid");
+
+                return false
+            }
+
+            return true
+        }
+
+
+        function titleInputValidator(title) {
+            var titleErrorDiv = title.parent().parent().find('.invalid-feedback')[0]
+
+            if (!title.val().length) {
+                titleErrorDiv.textContent = 'Please enter product title name.'
+                titleErrorDiv.style.display = "block";
+                title[0].classList.add("is-invalid");
+
+                return false
+            }
+
+            if (title.val().length < 3 || title.val().length > 20) {
+                titleErrorDiv.textContent = 'Title must have at least 3 characters and no more than 20 characters.'
+                titleErrorDiv.style.display = "block";
+                title[0].classList.add("is-invalid");
+
+                return false
+            }
+
+            if (!/^[a-zA-Z0-9]+$/.test(title.val())) {
+                titleErrorDiv.textContent = 'Title must consist of only English letters and numbers.'
+                titleErrorDiv.style.display = "block";
+                title[0].classList.add("is-invalid");
+
+                return false
+            }
+
+
+            return true
+        }
+
+        function imageInputValidator() {
+            let imageErrorDiv = $('#imageError')[0]
+
+            if (base64Image === '') {
+                imageErrorDiv.textContent = 'Please enter product image.'
+                imageErrorDiv.style.display = "block";
+                return false
+            }
+
+            return true
+        }
+
+        function createProduct() {
+            let productTitle = $('#productTitleInput')
+            let productPrice = $('#productPriceInput')
+            let userWallet = $('#userWallet')
+
+            let valueValidator = valueInputValidator(productPrice)
+            let titleValidator = titleInputValidator(productTitle)
+            let imageValidator = imageInputValidator()
+
+            var valueErrorDiv = productPrice.parent().parent().find('.invalid-feedback')[0]
+            var titleErrorDiv = productTitle.parent().parent().find('.invalid-feedback')[0]
+
+            if (titleValidator) {
+                titleErrorDiv.textContent = "";
+                titleErrorDiv.style.display = "none";
+                if (productTitle.hasClass("is-invalid"))
+                    productTitle.removeClass("is-invalid");
+            }
+
+            if (valueValidator) {
+                valueErrorDiv.textContent = "";
+                valueErrorDiv.style.display = "none";
+                if (productPrice.hasClass("is-invalid"))
+                    productPrice.removeClass("is-invalid");
+            }
+
+            if (imageValidator) {
+                let imageErrorDiv = $('#imageError')[0]
+                imageErrorDiv.textContent = "";
+                imageErrorDiv.style.display = "none";
+            }
+
+            if (titleValidator && valueValidator && imageValidator) {
+                let add_product_api_url = window.location.origin + '/api/v1/add_product'
+
+                $.ajax({
+                    method: 'post',
+                    dataType: 'json',
+                    headers: {
+                        "Content-Type": 'application/json',
+                    },
+                    url: add_product_api_url,
+                    data: JSON.stringify({
+                        "title": productTitle.val(),
+                        "wallet": userWallet.val(),
+                        "price": productPrice.val(),
+                        "image": base64Image
+                    }),
+                    success: function (data) {
+                        console.log(data)
+                        setProducts(data)
+                        $('#createModal').modal('hide');
+
+                    },
+                    error: function (data) {
+
+                        console.log(data.responseJSON)
+
+                    }
+                })
+            }
+
+        }
+
+        function buyProduct(address) {
+            console.log(address)
+        }
+
+        function getProducts() {
+            let get_products_api_url = window.location.origin + "/api/v1/get_products"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: get_products_api_url,
+                success: function (data) {
+                    data.forEach((element) => setProducts(element));
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+
+                }
+            })
+        }
+
+        function setProducts(product) {
+            let emptyForm = $('#productEmptyForm').clone()
+
+            let productImg = emptyForm.find('#productImg')
+            let productTitle = emptyForm.find('#productTitle')
+            let hrefAddress = emptyForm.find('#hrefAddress')
+            let productWalletAddress = emptyForm.find('#productWalletAddress')
+            let productPrice = emptyForm.find('#productPrice')
+            let buyProductButton = emptyForm.find('#buyProductButton')
+
+            let productImgId = 'productImg' + product.id
+            let productTitleId = 'productTitle' + product.id
+            let hrefAddressId = 'hrefAddress' + product.id
+            let productWalletAddressId = 'productWalletAddress' + product.id
+            let productPriceId = 'productPrice' + product.id
+            let buyProductButtonId = 'buyProductButton' + product.id
+
+
+            productImg.attr('src', product.image);
+            productTitle.text(product.title)
+            hrefAddress.attr('href', 'https://sepolia.etherscan.io/address/' + product.wallet);
+            productWalletAddress.text(product.wallet)
+            productPrice.text(product.price + ' ETH')
+            let attributeValue = 'buyProduct("' + product.wallet + '")';
+            buyProductButton.attr('onclick', attributeValue)
+
+            productImg.attr('id', productImgId)
+            productTitle.attr('id', productTitleId)
+            hrefAddress.attr('id', hrefAddressId)
+            productWalletAddress.attr('id', productWalletAddressId)
+            productPrice.attr('id', productPriceId)
+            buyProductButton.attr('id', buyProductButtonId)
+
+            emptyForm.css('display', 'block')
+
+            let productCardID = 'product-' + product.id
+            emptyForm.attr('id', productCardID)
+
+            $('#products').append(emptyForm)
+        }
+
+        function userWallets(user_id) {
+            let user_wallets_api_url = window.location.origin + "/api/v1/user_wallets?user="
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: user_wallets_api_url + user_id,
+                success: function (data) {
+                    WalletData = data
+
+                    if (data.length) {
+                        data.forEach(function (element) {
+                            $('#userWallet').append(
+                                '<option value="' + element.id + '">' + element.address + ' (' + element.balance + ' ETH)</option>'
+                            )
+                        });
+                    } else {
+                        $('#userWallet').append('<option value="' + 0 + '">You dont have wallets</option>')
+                    }
+
+
+                },
+                error: function (data) {
+                }
+            })
+        }
+
+
+        $(document).ready(function () {
+            // Находим элемент <li> по классу и идентификатору
+            var menuItem = $('li.menu-item#nav_ibay');
+
+            // Проверяем, что элемент найден
+            if (menuItem.length > 0) {
+                // Добавляем класс "active" к элементу <li>
+                menuItem.addClass('active');
+            }
+
+            let user_auth_api_url = window.location.origin + "/api/v1/user_auth"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: user_auth_api_url,
+                success: function (data) {
+
+                    let avatarHeader = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
+                    if (data.avatar !== '#')
+                        avatarHeader = "<img src='" + data.avatar + "' alt class='h-auto rounded-circle'/>"
+
+
+                    $("#userAvatarDrop").append(avatarHeader)
+                    $("#userAvatarSmall").append(avatarHeader)
+                    $("#usernameHeader").text(data.username)
+                    let username = data.id
+                    getProducts()
+                    userWallets(data.id)
+                    socket.emit('join', {username, room: username});
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+                    window.location.href = '/auth_login'
+                }
+            })
+        });
+    </script>
 {% endblock %}

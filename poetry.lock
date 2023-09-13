@@ -1262,6 +1262,38 @@ httpx = ["httpx[httpx] (>=0.23,<0.24)"]
 redis = ["redis[redis] (>=4.3,<5.0)"]
 
 [[package]]
+name = "fastapi-pagination"
+version = "0.12.9"
+description = "FastAPI pagination"
+optional = false
+python-versions = ">=3.8,<4.0"
+files = [
+    {file = "fastapi_pagination-0.12.9-py3-none-any.whl", hash = "sha256:0658ae3d269bbde53950ced28613307f4866812b6fe55392fca2cc20da6b2881"},
+    {file = "fastapi_pagination-0.12.9.tar.gz", hash = "sha256:b6f1978a341ed5aa534b04994619eef36377220c7ae11e933589cbfea9ae1c1e"},
+]
+
+[package.dependencies]
+fastapi = ">=0.93.0"
+pydantic = ">=1.9.1"
+
+[package.extras]
+all = ["SQLAlchemy (>=1.3.20)", "asyncpg (>=0.24.0)", "beanie (>=1.11.9,<2.0.0)", "bunnet (>=1.1.0,<2.0.0)", "databases (>=0.6.0)", "django (<5.0.0)", "mongoengine (>=0.23.1,<0.28.0)", "motor (>=2.5.1,<4.0.0)", "orm (>=0.3.1)", "ormar (>=0.11.2)", "piccolo (>=0.89,<0.120)", "pony (>=0.7.16,<0.8.0)", "scylla-driver (>=3.25.6,<4.0.0)", "sqlakeyset (>=2.0.1680321678,<3.0.0)", "sqlmodel (>=0.0.8,<0.0.9)", "tortoise-orm (>=0.16.18,<0.20.0)"]
+asyncpg = ["SQLAlchemy (>=1.3.20)", "asyncpg (>=0.24.0)"]
+beanie = ["beanie (>=1.11.9,<2.0.0)"]
+bunnet = ["bunnet (>=1.1.0,<2.0.0)"]
+databases = ["databases (>=0.6.0)"]
+django = ["databases (>=0.6.0)", "django (<5.0.0)"]
+mongoengine = ["mongoengine (>=0.23.1,<0.28.0)"]
+motor = ["motor (>=2.5.1,<4.0.0)"]
+orm = ["databases (>=0.6.0)", "orm (>=0.3.1)"]
+ormar = ["ormar (>=0.11.2)"]
+piccolo = ["piccolo (>=0.89,<0.120)"]
+scylla-driver = ["scylla-driver (>=3.25.6,<4.0.0)"]
+sqlalchemy = ["SQLAlchemy (>=1.3.20)", "sqlakeyset (>=2.0.1680321678,<3.0.0)"]
+sqlmodel = ["sqlakeyset (>=2.0.1680321678,<3.0.0)", "sqlmodel (>=0.0.8,<0.0.9)"]
+tortoise = ["tortoise-orm (>=0.16.18,<0.20.0)"]
+
+[[package]]
 name = "fastapi-socketio"
 version = "0.0.10"
 description = "Easily integrate socket.io with your FastAPI app."
@@ -3188,4 +3220,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "187bac6d5b333e2f7503bd49e5cae6f92525093e03e7d9ff21d60200ae3fbe23"
+content-hash = "1c52f3119ed2c9dd7b04e74ac7f7429911b8f840df9739388569ec38b99ee9d9"

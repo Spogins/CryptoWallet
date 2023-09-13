@@ -1,6 +1,7 @@
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
+from fastapi_pagination import Params, Page, paginate
 from propan import RabbitBroker
 from starlette import status
 
@@ -8,7 +9,8 @@ from config.settings import RABBITMQ_URL
 from config_fastapi.fastapi_mgr import fastapi_mgr
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.wallet.containers import Container
-from src.wallet.schemas import Transaction
+from src.wallet.schemas import Transaction, TransForm
+from src.wallet.models import Transaction as TransactionModel
 from src.wallet.services.wallet import WalletService
 from utils.base.get_user_bearer import get_user_from_bearer
 
@@ -134,16 +136,18 @@ async def send_eth(trans: Transaction,
                                             to_address=trans.to_address, value=trans.value)
 
 
-@app.get('/wallet_db_transactions', status_code=status.HTTP_200_OK)
+@app.get('/wallet_db_transactions', status_code=status.HTTP_200_OK, response_model=Page[TransForm])
 @inject
-async def db_transactions(address: str, limit: int = 10, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.get_db_transaction(address, limit)
+async def db_transactions(address: str, params: Params = Depends(), wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    transactions = await wallet_service.get_db_transaction(address)
+    transactions = transactions[::-1]
+    return paginate(transactions, params)
 
 
 @app.get('/db_transactions', status_code=status.HTTP_200_OK)
 @inject
-async def get_all_transaction(limit: int = 10, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-    return await wallet_service.get_all_transaction(limit)
+async def get_all_transaction(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_all_transaction()
 
 
 # @app.put('/update_db_transaction', status_code=status.HTTP_200_OK)
