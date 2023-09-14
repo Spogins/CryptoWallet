@@ -136,12 +136,12 @@ async def send_eth(trans: Transaction,
                                             to_address=trans.to_address, value=trans.value)
 
 
-@app.get('/wallet_db_transactions', status_code=status.HTTP_200_OK, response_model=Page[TransForm])
+@app.get('/wallet_db_transactions', status_code=status.HTTP_200_OK)
 @inject
-async def db_transactions(address: str, params: Params = Depends(), wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+async def db_transactions(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     transactions = await wallet_service.get_db_transaction(address)
     transactions = transactions[::-1]
-    return paginate(transactions, params)
+    return transactions
 
 
 @app.get('/db_transactions', status_code=status.HTTP_200_OK)

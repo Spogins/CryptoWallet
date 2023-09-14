@@ -18,7 +18,7 @@ class WalletService:
 
     async def buy_product(self, data):
         from_wallet: Wallet = await self.get_wallet_by_address(data.get('from_wallet'))
-        transaction: Transaction = await self.transaction(from_wallet.private_key, data.get('to_wallet'),
+        transaction: Transaction = await self.transaction(from_wallet.address, data.get('to_wallet'),
                                                           Decimal(data.get('value')))
         data: dict = {'transaction_id': transaction.id, 'product_id': data.get('product_id'),
                       'user_id': data.get('user_id')}
@@ -29,7 +29,7 @@ class WalletService:
         trans: Transaction = await self._repository.get_transaction(_data.get('trans_id'))
         wallet: Wallet = await self._repository.get_wallet_by_address(trans.to_address)
         value = trans.value + (Decimal(trans.txn_fee) * Decimal('1.5'))
-        transaction: Transaction = await self.transaction(wallet.private_key, trans.from_address, value)
+        transaction: Transaction = await self.transaction(wallet.address, trans.from_address, value)
         data = {'transaction_id': _data.get('trans_id'), 'ref_transaction_id': transaction.id}
         if _data.get('status') == 'REFUND':
             async with RabbitBroker(RABBITMQ_URL) as broker:
@@ -141,7 +141,10 @@ class WalletService:
             wallet = await self._repository.get_wallet_by_address(from_address)
             private_key_sender = wallet.private_key
             trans_data = await self.w3_service.transaction(private_key_sender, to_address, value)
-            return await self._repository.create_or_update(trans_data)
+
+            transaction = await self._repository.create_or_update(trans_data)
+            await self.update_transactions_table(from_address, to_address)
+            return transaction
         except:
             raise HTTPException(status_code=401,
                                 detail='Wrong wallet data or value.')
@@ -178,10 +181,18 @@ class WalletService:
         transaction = await self._repository.create_or_update(trans_data)
 
         if not transaction.status == "PENDING":
+            await self.update_transactions_table(trans_data.get('from_address'), trans_data.get('to_address'))
             await self.send_transaction_info(trans_data.get('from_address'), trans_data.get('to_address'), _hash, value)
             await self.send_transaction_status(transaction.id, transaction.status)
             await self.update_wallet_balance(trans_data.get('from_address'), trans_data.get('to_address'))
         return transaction
+
+    async def update_transactions_table(self, from_address, to_address):
+        wallets = [from_address, to_address]
+        for address in wallets:
+            wallet = await self._repository.check_wallet(address)
+            async with RabbitBroker(RABBITMQ_URL) as broker:
+                await broker.publish(message={'address': wallet.address, 'room': wallet.user.id}, queue='socketio/update_transactions_table')
 
     async def send_transaction_info(self, from_address, to_address, _hash, value):
         from_address = await self._repository.check_wallet(from_address)

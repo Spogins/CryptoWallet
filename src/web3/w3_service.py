@@ -130,7 +130,7 @@ class WebService:
                 'to': receiver_address,
                 'value': self.w3.to_wei(value, asset.abbreviation),  # Сумма для перевода в Wei (0.1 ETH)
                 'gas': 21000,  # Лимит газа для базовой транзакции
-                'gasPrice': self.w3.to_wei('10', 'gwei'),  # Цена газа в Wei
+                'gasPrice': self.w3.to_wei('100', 'gwei'),  # Цена газа в Wei
                 'nonce': nonce,
                 'chainId': await self.w3.eth.chain_id,  # ID сети (Ropsten)
             }

@@ -1,7 +1,7 @@
 import random
 from propan import RabbitBroker
 from config.settings import RABBITMQ_URL
-from config_socketio.google_requests import fetch
+from config_socketio.google_requests import fetch, run_delivery
 from src.delivery.models import Order
 from src.delivery.repository import DeliveryRepository
 
@@ -15,16 +15,30 @@ class DeliveryService:
         if order:
             _random = random.randint(0, 1)
             if _random:
-                await self._repository.update_order_status("SUCCESS", order.transaction_id)
+                order = await self._repository.update_order_status("SUCCESS", order.transaction_id)
+                await self.send_update_order(order)
                 return "SUCCESS"
             else:
                 await self.refund_transaction({'trans_id': order.transaction_id, 'status': 'REFUND'})
+                await self._repository.update_order_status("REFUND", order.transaction_id)
                 return "REFUND"
 
 
     async def update_order_refund(self, data):
-        await self._repository.update_order_refund(data)
+        order = await self._repository.update_order_refund(data)
+        await self.send_update_order(order)
 
+
+    async def send_update_order(self,order):
+        async with RabbitBroker(RABBITMQ_URL) as broker:
+            data = {
+                'id': order.id,
+                'status': order.status,
+                'transaction': order.transaction.hash,
+                'refund': order.refund.hash if order.refund else False,
+                'room': order.user_id
+            }
+            await broker.publish(message=data, queue='socketio/update_order')
 
     async def update_refund_status(self, data):
         status = data.get('status')
@@ -38,7 +52,7 @@ class DeliveryService:
 
         if status == "SUCCESS":
             status = "DELIVERY"
-            result = await fetch()
+            result = await run_delivery()
             if not result:
                 status = "FAILURE"
                 await self.refund_transaction({'trans_id': trans_id, 'status': status})
@@ -47,7 +61,9 @@ class DeliveryService:
             status = "FAILURE"
             await self.refund_transaction({'trans_id': trans_id, 'status': status})
 
-        await self._repository.update_order_status(status, trans_id)
+        order = await self._repository.update_order_status(status, trans_id)
+        await self.send_update_order(order)
+        return order
 
     @staticmethod
     async def refund_transaction(trans_id):

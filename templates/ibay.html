@@ -160,70 +160,140 @@
                     </div>
                 </div>
             </div>
+
+            <div class="modal fade" id="walletSelection" tabindex="-1" style="display: none;" aria-hidden="true">
+                <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="buyProductTitle">Create Product</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row g-2 mb-3">
+                                <div class="col-1 mb-0" style="text-align: center;">
+                                    <label for="emailLarge" class="form-label">Wallet:</label>
+
+                                </div>
+                                <div class="col">
+                                    <select id="productWallet" class="form-select">
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-label-secondary waves-effect" data-bs-dismiss="modal">
+                                Close
+                            </button>
+                            <button type="button"
+                                    id="buyProduct"
+                                    class="btn btn-primary waves-effect waves-light">Buy product
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal fade" id="transSend"
+                 tabindex="-1"
+                 style="display: none;" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Transaction completed</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                    aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body pb-0">
+                            <div class="row">
+                                <div class="col mb-3">
+                                    <label for="transBackdrop" class="form-label">
+                                        Transaction completed</label>
+                                    <a id="transComplete"
+                                       target="_blank"><span style="text-decoration: underline"
+                                                             class=" emp_name text-truncate">Transaction link</span></a>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
         <!--/ Product -->
     </div>
-    <div class="row" style="display: none">
+
+    <div class="row" id="ordersRow" style="display: block">
         <!-- Orders  -->
         <div class="col-xl-0 col-lg-0 col-md-0 order-0 order-md-0">
             <p class="mt-4 small text-uppercase text-muted">Orders</p>
 
             <div class="card mb-4">
                 <div class="card-body">
-                    <div class="row mb-5" id="products">
+                    <div class="row mb-5" id="orders">
                         <!-- Orders Card -->
 
                         <!-- /Orders Card -->
                     </div>
 
-                    <div class="col-md-6 mt-3" id="walletEmptyForm" style="display:none;">
+                    <div class="col-md-6 mt-3" id="orderEmptyForm" style="display:none;">
                         <div class="card text-center">
                             <div class="card-body">
                                 <div class="tab-content p-0">
                                     <div class="tab-pane fade show active" role="tabpanel">
                                         <div class="row">
-                                            <div class="col-2"><img id="walletAssetImgForm"
-                                                                    class="d-block w-px-100 h-px-100 rounded"
-                                                                    src="https://upload.wikimedia.org/wikipedia/commons/6/6f/Ethereum-icon-purple.svg"
-                                                                    height="100" width="100" alt="eth"></div>
-                                            <div class="col">
+                                            <div class="col-2">
+                                                <img id="orderImg"
+                                                     class="d-block w-px-100 h-px-100 rounded"
+                                                     src=""
+                                                     height="100" width="100" alt="eth"></div>
+
+                                            <div class="col-9">
                                                 <div class="row">
                                                     <ul class="list-unstyled mb-0">
                                                         <li class="mb-2"
                                                             style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Title:</span><span
+                                                                id="orderTitle"
+                                                                style=""
+                                                                class=" emp_name text-truncate">Name</span>
+                                                        </li>
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width:100%;"><span
                                                                 class="fw-semibold me-1">Address:</span><a
-                                                                href="https://sepolia.etherscan.io/address/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
-                                                                target="_blank"><span
-                                                                id="walletAddressForm"
+                                                                href="https://sepolia.etherscan.io/tx/0x5A79fe36275B1A8d557A8e1b3D36261515d12542"
+                                                                target="_blank" id="hrefTransaction"><span
+                                                                id="orderTransaction"
                                                                 style="text-decoration: underline"
                                                                 class=" emp_name text-truncate">0x5A79fe36275B1A8d557A8e1b3D36261515d12542</span></a>
                                                         </li>
-                                                        <li class="pt-1" style="text-align: initial;"><span
-                                                                class="fw-semibold me-1">Balance:</span><span
-                                                                id="walletBalanceForm">0.02957399999</span>
+                                                        <li class="pt-1 mb-2" style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Price:</span><span
+                                                                id="orderPrice">0.02957399999</span>
+                                                        </li>
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Order date:</span><span
+                                                                id="orderDate"
+                                                                style=""
+                                                                class=" emp_name text-truncate">Name</span>
+                                                        </li>
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;"><span
+                                                                class="fw-semibold me-1">Status:</span><span
+                                                                id="orderStatus"
+                                                                style=""
+                                                                class=" emp_name text-truncate">Name</span>
+                                                        </li>
+                                                        <li class="mb-2"
+                                                            style="text-align: initial;overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100%;"><span
+                                                                class="fw-semibold me-1">Refund:</span><a
+                                                                href=""
+                                                                target="_blank" id="hrefRefund"><span
+                                                                id="orderRefund"
+                                                                style="text-decoration: underline"
+                                                                class=" emp_name text-truncate"></span></a>
                                                         </li>
                                                     </ul>
-                                                    <div style="display:flex;justify-content: space-around;"
-                                                         class="mt-2">
-                                                        <button class="btn btn-primary waves-effect waves-light"
-                                                                name="watchTransactions"
-                                                                id="walletWatchTransButtonForm"
-                                                        >
-                                                            Watch Transactions
-                                                        </button>
-                                                        <button type="button" id="walletSendTransButtonForm"
-                                                                class="btn btn-success waves-effect waves-light"
-                                                                {#                                                                data-bs-toggle="modal"#}
-                                                                name="sendTransButton"
-                                                                {#                                                                data-bs-target="#walletTransModalForm"#}
-                                                        >
-                                                            Send Transactions
-                                                        </button>
-                                                        <button onclick="requestEth()"
-                                                                class="btn btn-warning waves-effect waves-light">Get
-                                                            Free ETH
-                                                        </button>
-                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
@@ -243,6 +313,7 @@
 {% endblock %}
 {% block script %}
     <script>
+        let walletOptions
         let WalletData
         let base64Image = ''
         $("#chooseImageButton").click(function () {
@@ -271,6 +342,26 @@
 
             }
         });
+
+
+        socket.on('update_order', (data) => {
+            console.log(data)
+            updateOrder(data)
+        });
+
+        function updateOrder(data) {
+            let status = $('#orderStatus-' + data.id)
+            let hrefRefund = $('#hrefRefund-' + data.id)
+            let orderRefund = $('#orderRefund-' + data.id)
+
+            status.text(data.status)
+            if (data.refund) {
+                hrefRefund.attr('href', 'https://sepolia.etherscan.io/tx/' + data.refund);
+                orderRefund.text(data.refund)
+            }
+
+
+        }
 
         function openCreateProductModal() {
             let modal = $('#createModal')
@@ -305,7 +396,6 @@
 
             return true
         }
-
 
         function titleInputValidator(title) {
             var titleErrorDiv = title.parent().parent().find('.invalid-feedback')[0]
@@ -402,6 +492,9 @@
                         console.log(data)
                         setProducts(data)
                         $('#createModal').modal('hide');
+                        {#let transUrl = 'https://sepolia.etherscan.io/tx/' + data.hash#}
+                        {#$("#transComplete").attr('href', transUrl)#}
+                        {#$("#transSend").modal('show');#}
 
                     },
                     error: function (data) {
@@ -414,8 +507,45 @@
 
         }
 
-        function buyProduct(address) {
-            console.log(address)
+        function buyProductModal(id, title) {
+            let productWallet = $('#productWallet')
+            productWallet.empty().append(walletOptions)
+            $('#buyProductTitle').text('Payment for ' + title)
+            let attrValue = 'buyProduct("' + id + '")';
+            $('#buyProduct').attr('onclick', attrValue)
+
+
+            $('#walletSelection').modal('show')
+        }
+
+        function buyProduct(id) {
+            let buy_product_api_url = window.location.origin + "/api/v1/buy_product"
+            $.ajax({
+                method: 'post',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: buy_product_api_url,
+                data: JSON.stringify({
+                    "id": id,
+                    "wallet": $('#productWallet').val()
+                }),
+                success: function (data) {
+                    console.log('success', data)
+                    $('#walletSelection').modal('hide')
+
+                    setTimeout(function () {
+                        $('#orders').empty();
+                        getOrders()
+                    }, 700)
+
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+
+                }
+            })
         }
 
         function getProducts() {
@@ -435,6 +565,88 @@
 
                 }
             })
+        }
+
+        function getOrders() {
+            let get_orders_api_url = window.location.origin + "/api/v1/get_orders"
+            $.ajax({
+                method: 'get',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: get_orders_api_url,
+                success: function (data) {
+                    data.forEach((element) => setOrders(element));
+                },
+                error: function (data) {
+                    console.log("error", data.responseJSON.detail)
+
+                }
+            })
+        }
+
+        function setOrders(order) {
+            let emptyForm = $('#orderEmptyForm').clone()
+
+            let orderImg = emptyForm.find('#orderImg')
+            let orderTitle = emptyForm.find('#orderTitle')
+            let hrefTransaction = emptyForm.find('#hrefTransaction')
+            let orderTransaction = emptyForm.find('#orderTransaction')
+            let orderPrice = emptyForm.find('#orderPrice')
+            let orderDate = emptyForm.find('#orderDate')
+            let orderStatus = emptyForm.find('#orderStatus')
+            let hrefRefund = emptyForm.find('#hrefRefund')
+            let orderRefund = emptyForm.find('#orderRefund')
+
+
+            let orderImgId = 'orderImg-' + order.id
+            let orderTitleId = 'orderTitle-' + order.id
+            let hrefTransactionId = 'hrefTransaction-' + order.id
+            let orderTransactionId = 'orderTransaction-' + order.id
+            let orderPriceId = 'orderPrice-' + order.id
+            let orderDateId = 'orderDate-' + order.id
+            let orderStatusId = 'orderStatus-' + order.id
+            let hrefRefundId = 'hrefRefund-' + order.id
+            let orderRefundId = 'orderRefund-' + order.id
+
+            orderImg.attr('src', order.product_image);
+            orderTitle.text(order.product)
+
+
+            hrefTransaction.attr('href', 'https://sepolia.etherscan.io/tx/' + order.transaction);
+            orderTransaction.text(order.transaction)
+
+            if (order.refund) {
+                hrefRefund.attr('href', 'https://sepolia.etherscan.io/tx/' + order.refund);
+                orderRefund.text(order.refund)
+            }
+
+
+            orderPrice.text(order.product_price + ' ETH')
+
+            orderDate.text(order.date)
+
+            orderStatus.text(order.status)
+
+
+            orderImg.attr('id', orderImgId)
+            orderTitle.attr('id', orderTitleId)
+            hrefTransaction.attr('id', hrefTransactionId)
+            orderTransaction.attr('id', orderTransactionId)
+            orderPrice.attr('id', orderPriceId)
+            orderDate.attr('id', orderDateId)
+            orderStatus.attr('id', orderStatusId)
+            hrefRefund.attr('id', hrefRefundId)
+            orderRefund.attr('id', orderRefundId)
+
+
+            emptyForm.css('display', 'block')
+
+            let orderCardID = 'order-' + order.id
+            emptyForm.attr('id', orderCardID)
+
+            $('#orders').append(emptyForm)
         }
 
         function setProducts(product) {
@@ -460,7 +672,7 @@
             hrefAddress.attr('href', 'https://sepolia.etherscan.io/address/' + product.wallet);
             productWalletAddress.text(product.wallet)
             productPrice.text(product.price + ' ETH')
-            let attributeValue = 'buyProduct("' + product.wallet + '")';
+            let attributeValue = 'buyProductModal("' + product.id + '", "' + product.title + '")';
             buyProductButton.attr('onclick', attributeValue)
 
             productImg.attr('id', productImgId)
@@ -492,6 +704,7 @@
 
                     if (data.length) {
                         data.forEach(function (element) {
+                            walletOptions += '<option value="' + element.address + '">' + element.address + ' (' + element.balance + ' ETH)</option>'
                             $('#userWallet').append(
                                 '<option value="' + element.id + '">' + element.address + ' (' + element.balance + ' ETH)</option>'
                             )
@@ -538,6 +751,7 @@
                     $("#usernameHeader").text(data.username)
                     let username = data.id
                     getProducts()
+                    getOrders()
                     userWallets(data.id)
                     socket.emit('join', {username, room: username});
                 },

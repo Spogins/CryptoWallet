@@ -8,6 +8,9 @@ class OrderForm(BaseModel):
     refund: str | None
     transaction: str
     product: str
+    product_price: float
+    product_image: str
+
 
 
 

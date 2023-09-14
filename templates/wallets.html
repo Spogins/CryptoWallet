@@ -57,10 +57,12 @@
                                                         >
                                                             Send Transactions
                                                         </button>
-                                                        <button onclick="requestEth()"
-                                                                class="btn btn-warning waves-effect waves-light">Get
-                                                            Free ETH
-                                                        </button>
+
+                                                        <a class="btn btn-warning waves-effect waves-light"
+                                                           href="https://sepoliafaucet.com/"
+                                                           target="_blank"><span
+                                                                class=" emp_name text-truncate">Get
+                                                            Free ETH</span></a>
                                                     </div>
                                                 </div>
                                             </div>
@@ -154,98 +156,25 @@
                          style="display: none;" aria-hidden="true">
                         <div class="modal-dialog modal-xl">
                             <div class="modal-content">
+
                                 <h5 class="card-header" id="transModalTitle"></h5>
-                                <div class="card-datatable table-responsive">
-                                    <div id="DataTables_Table_3_wrapper"
-                                         class="dataTables_wrapper dt-bootstrap5 no-footer">
-                                        <table class="dt-multilingual table dataTable no-footer dtr-column"
-                                               id="DataTables_Table_3"
-                                               aria-describedby="DataTables_Table_3_info" style="width: 1396px;">
-                                            <thead>
-                                            <tr>
-                                                <th class="control sorting_disabled dtr-hidden sorting_asc" rowspan="1"
-                                                    colspan="1"
-                                                    style="width: 0px; display: none;" aria-label=""></th>
+                                <div class="table-responsive text-nowrap">
+                                    <table class="table">
+                                        <thead>
+                                        <tr>
+                                            <th>Txn Hash</th>
+                                            <th>From</th>
+                                            <th>To</th>
+                                            <th>Value</th>
+                                            <th>Age</th>
+                                            <th>Txn Fee</th>
+                                            <th>Status</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody class="table-border-bottom-0" id="DataTableBody">
 
-                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
-                                                    rowspan="1"
-                                                    colspan="1" style="width: 250px;"
-                                                    aria-label="Position: aktivieren, um Spalte aufsteigend zu sortieren">
-                                                    Txn Hash
-                                                </th>
-                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
-                                                    rowspan="1"
-                                                    colspan="1" style="width: 250px;"
-                                                    aria-label="Position: aktivieren, um Spalte aufsteigend zu sortieren">
-                                                    From
-                                                </th>
-                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
-                                                    rowspan="1"
-                                                    colspan="1" style="width: 250px;"
-                                                    aria-label="Position: aktivieren, um Spalte aufsteigend zu sortieren">
-                                                    To
-                                                </th>
-
-
-                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
-                                                    rowspan="1"
-                                                    colspan="1" style="width: 250px;"
-                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
-                                                    Value
-                                                </th>
-
-                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
-                                                    rowspan="1"
-                                                    colspan="1" style="width: 100px;"
-                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
-                                                    Age
-                                                </th>
-                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
-                                                    rowspan="1"
-                                                    colspan="1" style="width: 100px;"
-                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
-                                                    Txn Fee
-                                                </th>
-                                                <th class="sorting" tabindex="0" aria-controls="DataTables_Table_3"
-                                                    rowspan="1"
-                                                    colspan="1" style="width: 100px;"
-                                                    aria-label="Date: aktivieren, um Spalte aufsteigend zu sortieren">
-                                                    Status
-                                                </th>
-
-
-                                            </tr>
-                                            </thead>
-                                            <tbody id="DataTableBody">
-                                            {#                                            <tr class="">#}
-                                            {#                                                <td class="control sorting_1" tabindex="0" style="display: none;"></td>#}
-                                            {##}
-                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
-                                            {#                                                    0xdef0f0f1ea91314f5422dc7ff5e4d50679370645000b78b13f7a11bd124ea732#}
-                                            {#                                                </td>#}
-                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
-                                            {#                                                    0x44fe49b6c180B660933548A8632bE93079010F28#}
-                                            {#                                                </td>#}
-                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
-                                            {#                                                    0x669130e74FB677D6616315D1CaE8c88BA4A883Df#}
-                                            {#                                                </td>#}
-                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
-                                            {#                                                    0.001000000000000000#}
-                                            {#                                                </td>#}
-                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
-                                            {#                                                    15:45:12#}
-                                            {#                                                </td>#}
-                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
-                                            {#                                                    0.000210000000000000#}
-                                            {#                                                </td>#}
-                                            {#                                                <td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">#}
-                                            {#                                                    SUCCESS#}
-                                            {#                                                </td>#}
-                                            {#                                            </tr>#}
-
-                                            </tbody>
-                                        </table>
-                                    </div>
+                                        </tbody>
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -386,9 +315,9 @@
                     }),
                     success: function (data) {
                         modal.modal('hide');
-                        $("#transSend").modal('show');
                         let transUrl = 'https://sepolia.etherscan.io/tx/' + data.hash
                         $("#transComplete").attr('href', transUrl)
+                        $("#transSend").modal('show');
 
                     },
                     error: function (data) {
@@ -432,29 +361,26 @@
         }
 
         function showTransactions(address) {
-            console.log(address)
             let modal = $('#transactionData')
-            setTransaction(address, 1)
+            setTransaction(address)
             modal.modal('show');
         }
 
-        function setTransaction(address, page) {
-            dataTable.clear().draw();
-            let wallet_db_transactions = window.location.origin + "/api/v1/wallet_db_transactions?address=" + address + "&page=" + page + "&size=10"
+        function setTransaction(address) {
+            let wallet_db_transactions = window.location.origin + '/api/v1/wallet_db_transactions?address='
             $.ajax({
                 method: 'get',
                 dataType: 'json',
                 headers: {
                     "Content-Type": 'application/json',
                 },
-                url: wallet_db_transactions,
+                url: wallet_db_transactions + address,
                 success: function (data) {
-                    console.log(data)
                     $('#transModalTitle').text(
                         "List of ETH transactions of " + address + " wallet"
                     )
                     let transInfo
-                    data.items.forEach((elem) => {
+                    data.forEach((elem) => {
                         var dateString = "2023-09-12 12:21:48";
                         var date = new Date(dateString);
                         var now = new Date();
@@ -473,33 +399,46 @@
                             var daysAgo = Math.floor(secondsAgo / 86400);
                             formattedTime = daysAgo + " days ago";
                         }
-                        let data = [elem.hash, elem.from_address, elem.to_address, elem.value, formattedTime, elem.txn_fee, elem.status, '']
-                        dataTable.row.add(data).draw();
-
+                        let status
+                        if (elem.status === 'SUCCESS') {
+                            status = '<span class="badge bg-label-success me-1">Success</span>'
+                        } else if (elem.status === 'PENDING') {
+                            status = '<span class="badge bg-label-warning me-1">Pending</span>'
+                        }
                         transInfo += '<tr class="">' +
                             '<td class="control sorting_1" tabindex="0" style="display: none;"></td>' +
                             '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
-                            elem.hash +
+                            '<a '+
+                               'href="https://sepolia.etherscan.io/tx/'+ elem.hash +'"'+
+                               'target="_blank"><span id="walletAddress-36" style="text-decoration: underline"'+
+                                                     'class=" emp_name text-truncate">'+ elem.hash +'</span></a>'+
                             '</td>' +
                             '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
-                            elem.from_address +
-                            '</td>' +
-                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
-                            elem.to_address +
-                            '</td>' +
-                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
-                            elem.value +
-                            '</td>' +
-                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
-                            formattedTime +
-                            '</td>' +
-                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
-                            elem.txn_fee +
-                            '</td>' +
-                            '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
-                            elem.status +
-                            '</td>' +
-                            '</tr>'
+                            '<a '+
+                               'href="https://sepolia.etherscan.io/address/'+ elem.from_address +'"'+
+                               'target="_blank"><span id="walletAddress-36" style="text-decoration: underline"'+
+                                                     'class=" emp_name text-truncate">'+ elem.from_address +'</span></a>'+
+
+                        '</td>' +
+                        '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                        '<a '+
+                               'href="https://sepolia.etherscan.io/address/'+ elem.to_address +'"'+
+                               'target="_blank"><span id="walletAddress-36" style="text-decoration: underline"'+
+                                                     'class=" emp_name text-truncate">'+ elem.to_address +'</span></a>'+
+                        '</td>' +
+                        '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                        elem.value + ' Ether'+
+                        '</td>' +
+                        '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                        formattedTime +
+                        '</td>' +
+                        '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                        elem.txn_fee +
+                        '</td>' +
+                        '<td style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; max-width: 100px;">' +
+                        status +
+                        '</td>' +
+                        '</tr>'
 
                     });
                     $('#DataTableBody').empty().append(transInfo)
@@ -531,6 +470,11 @@
 
         socket.on('update_balance', (data) => {
             updateBalance(data.address)
+        });
+
+        socket.on('update_transactions_table', (data) => {
+            console.log(data)
+            setTransaction(data.address)
         });
 
         function setWallets(data) {
