@@ -349,6 +349,11 @@
             updateOrder(data)
         });
 
+        socket.on('new_order', (data) => {
+            console.log(data)
+            setOrders(data)
+        });
+
         function updateOrder(data) {
             let status = $('#orderStatus-' + data.id)
             let hrefRefund = $('#hrefRefund-' + data.id)
@@ -518,6 +523,8 @@
             $('#walletSelection').modal('show')
         }
 
+
+
         function buyProduct(id) {
             let buy_product_api_url = window.location.origin + "/api/v1/buy_product"
             $.ajax({
@@ -534,12 +541,6 @@
                 success: function (data) {
                     console.log('success', data)
                     $('#walletSelection').modal('hide')
-
-                    setTimeout(function () {
-                        $('#orders').empty();
-                        getOrders()
-                    }, 700)
-
                 },
                 error: function (data) {
                     console.log("error", data.responseJSON.detail)

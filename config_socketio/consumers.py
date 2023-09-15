@@ -29,3 +29,9 @@ async def update_transactions_table(data):
 @socketio_router.handle('update_order')
 async def update_order(data):
     await sio.emit(event='update_order', data=data, room=data.get('room'))
+
+
+
+@socketio_router.handle('new_order')
+async def new_order(data):
+    await sio.emit(event='new_order', data=data, room=data.get('room'))

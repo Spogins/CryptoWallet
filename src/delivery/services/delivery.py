@@ -71,7 +71,22 @@ class DeliveryService:
             await broker.publish(message=trans_id, queue='wallet/refund_transaction')
 
     async def create_order(self, data):
-        return await self._repository.add(data)
+        new_order = await self._repository.add(data)
+        order = await self._repository.get_order(new_order.id)
+        async with RabbitBroker(RABBITMQ_URL) as broker:
+            data = {
+                'id': order.id,
+                'date': order.date,
+                'status': order.status,
+                'refund': order.refund,
+                'transaction': order.transaction,
+                'product': order.product,
+                'product_price': order.product_price,
+                'product_image': order.product_image,
+                'room': new_order.user_id
+            }
+            await broker.publish(message=data, queue='socketio/new_order')
+
 
     async def get_order(self, order_id):
         return await self._repository.get_order(order_id)

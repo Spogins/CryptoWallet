@@ -75,7 +75,10 @@ class DeliveryRepository:
                 status=order.status,
                 refund=order.refund.hash if order.refund else None,
                 transaction=order.transaction.hash,
-                product=order.product.title)
+                product=order.product.title,
+                product_price=Decimal(order.product.price),
+                product_image=order.product.image
+            )
 
     async def get_orders(self, user_id):
         async with self.session_factory() as session:
