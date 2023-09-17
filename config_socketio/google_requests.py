@@ -30,9 +30,9 @@ async def bound_fetch(semaphore, url, client):
 async def fetch(url, client):
     try:
 
-        response: Response = await client.get(url)
+        response: Response = await client.get(url, timeout=50)
         return True if response.status_code == 200 else False
-    except ConnectTimeout:
+    except:
         return False
 
 

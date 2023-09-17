@@ -20,7 +20,7 @@ class DeliveryService:
                 return "SUCCESS"
             else:
                 await self.refund_transaction({'trans_id': order.transaction_id, 'status': 'REFUND'})
-                await self._repository.update_order_status("REFUND", order.transaction_id)
+                # await self._repository.update_order_status("REFUND", order.transaction_id)
                 return "REFUND"
 
 

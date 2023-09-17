@@ -1,10 +1,12 @@
 import asyncio
+from asyncio.log import logger
 
 import aioredis
 import socketio
 from dependency_injector.wiring import inject, Provide
 from socketio import AsyncAioPikaManager, AsyncServer
 from config.settings import ALLOWED_HOSTS, RABBITMQ_URL
+from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.web3.containers import Container as WebContainer
 from src.web3.w3_service import WebService
 from src.delivery.containers import Container as DeliveryContainer
@@ -70,6 +72,7 @@ async def joined_chat(room, message):
 async def connect(sid, environ):
     print(f'Client connected: {sid}')
 
+
 # Обработчик отключения клиента от сервера
 
 @sio.on('join')
@@ -80,6 +83,7 @@ async def join_room(sid, data):
     sio.enter_room(sid, room)
     await add_user_to_room(room, username)
     room_user_list = await get_users_in_room(room)
+    await sio.save_session(sid, session=f'user_id: {room}')
     if room == 'chat':
         await sio.emit('joined_user', {'room': room, 'users': list(room_user_list)}, room=room)
 
@@ -87,12 +91,14 @@ async def join_room(sid, data):
 @sio.event
 async def disconnect(sid):
     active_users = await get_active_user(sid)
+    print(active_users)
     if active_users is not None:
         room = active_users.get('room')
         username = active_users.get('username')
         await remove_active_user(sid)
         await remove_user_from_room(username, username)
         await remove_user_from_room('chat', username)
+
         await sio.emit('disconnect_user', {'room': 'chat', 'user': username}, room='chat')
         sio.leave_room(sid, 'chat')
         sio.leave_room(sid, username)

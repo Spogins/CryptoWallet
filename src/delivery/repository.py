@@ -29,6 +29,7 @@ class DeliveryRepository:
             result = await session.execute(select(Order).options(joinedload(Order.product)).options(joinedload(Order.transaction)).options(joinedload(Order.refund)).where(Order.transaction_id == data.get('transaction_id')))
             order: Order = result.scalar_one_or_none()
             if order:
+                order.status = 'REFUND'
                 order.refund_id = data.get('ref_transaction_id')
                 await session.commit()
                 await session.refresh(order)

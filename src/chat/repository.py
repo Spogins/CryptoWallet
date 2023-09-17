@@ -25,8 +25,9 @@ class ChatRepository:
 
     async def user_messages(self, user_id):
         async with self.session_factory() as session:
-            res = await session.scalar(select(func.count(ChatMessage.user_id == user_id)))
-            return res
+            result = await session.execute(select(ChatMessage).where(ChatMessage.user_id == user_id))
+            res = result.scalars().all()
+            return len(res)
 
     async def add(self, message: MessageForm, user_id: int):
         async with self.session_factory() as session:

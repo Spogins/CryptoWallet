@@ -107,18 +107,35 @@
 {% endblock %}
 {% block script %}
     <script>
+
+        function login(email, password) {
+            let login_api_url = window.location.origin + "/api/v1/log_in"
+            $.ajax({
+                    method: 'post',
+                    dataType: 'json',
+                    headers: {
+                        "Content-Type": 'application/json',
+                    },
+                    url: login_api_url,
+                    data: JSON.stringify({
+                        "email": email,
+                        "password": password,
+                        "remember": true
+                    }),
+                    success: function (data) {
+                        console.log("success", data.access_token)
+                        window.location.href = '/profile'
+
+                    },
+                })
+        }
+
         function registration() {
             let login_api_url = window.location.origin + "/api/v1/registration"
             let username = $('#username').val()
             let email = $("#email").val()
             let password = $("#password").val()
             let confirm_password = $('#confirm-password').val()
-
-
-            console.log(username)
-            console.log(email)
-            console.log(password)
-            console.log(confirm_password)
 
             let fields = $(`#email`);
             if (fields.parent().find('.is-invalid').length === 0)
@@ -138,7 +155,7 @@
                     }),
                     success: function (data) {
                         console.log("success", data.access_token)
-                        window.location.href = '/auth_login'
+                        login(email, password)
 
                     },
                     error: function (data) {

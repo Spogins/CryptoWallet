@@ -368,7 +368,7 @@
         let trans = toast.find('div[name="trans"]');
 
         time.text(formattedTime)
-        trans.append(
+        trans.empty().append(
             '<a href="https://sepolia.etherscan.io/tx/'+
                 data.hash +
             '" target="_blank"><span style="text-decoration: underline" class="mb-0 emp_name text-truncate">Transaction URL</span></a>'

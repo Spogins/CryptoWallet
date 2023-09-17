@@ -21,6 +21,7 @@ async def profile(request: Request, auth_service: AuthService = Depends(Provide[
     return templates.TemplateResponse(name='index.html', context={'request': request})
 
 
+
 @user_views.get('/profile', include_in_schema=False)
 @inject
 async def profile(request: Request, auth_service: AuthService = Depends(Provide[Container.auth_service])):

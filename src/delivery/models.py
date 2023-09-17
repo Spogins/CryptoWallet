@@ -1,4 +1,6 @@
 import datetime
+
+from sqladmin import ModelView
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
 
@@ -22,6 +24,24 @@ class Order(Base):
 
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship('User', foreign_keys=[user_id])
+
+
+
+
+class OrderAdmin(ModelView, model=Order):
+    column_list = [
+        Order.id,
+        Order.date,
+        Order.status,
+        Order.refund_id,
+        Order.refund,
+        Order.transaction_id,
+        Order.transaction,
+        Order.product_id,
+        Order.product,
+        Order.user_id,
+        Order.user
+    ]
 
 
 

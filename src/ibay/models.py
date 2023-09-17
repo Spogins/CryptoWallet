@@ -1,3 +1,4 @@
+from sqladmin import ModelView
 from sqlalchemy import Column, Integer, String, DateTime, Boolean, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 from src.core.db import Base
@@ -17,3 +18,17 @@ class Product(Base):
 
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship('User', foreign_keys=[user_id])
+
+
+class ProductAdmin(ModelView, model=Product):
+    column_list = [
+        Product.id,
+        Product.title,
+        Product.image,
+        Product.price,
+        Product.in_order,
+        Product.wallet_id,
+        Product.wallet,
+        Product.user_id,
+        Product.user
+    ]

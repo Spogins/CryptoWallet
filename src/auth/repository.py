@@ -42,6 +42,26 @@ class AuthRepository:
             else:
                 raise HTTPException(status_code=401, detail="Wrong email address or password")
 
+    async def admin_token(self, username, password):
+        async with self.session_factory() as session:
+            result = await session.execute(select(User).where(User.username == username and User.is_superuser == True))
+
+            user = result.scalar_one_or_none()
+
+            if user is None:
+                return False
+
+            if pbkdf2_sha256.verify(password, user.password):
+                payload = {"id": user.id,
+                           'created': datetime.datetime.now(tz=datetime.timezone.utc).strftime("%Y-%m-%d %H:%M:%S")}
+
+                token = jwt.encode(
+                    payload,
+                    JWT_SECRET,
+                    algorithm=ALGORITHM
+                )
+                return token
+
     async def add(self, user_model: RegisterUserModel) -> User:
         async with self.session_factory() as session:
             try:

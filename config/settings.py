@@ -72,7 +72,7 @@ WIRING_CONFIG = [
     'config_socketio.app',
     'src.celery',
     'src.delivery',
-
+    'admin'
 ]
 
 DATABASE_TEST_URL = f'postgresql+asyncpg://{DB_USER_TEST}:{DB_PASSWORD_TEST}@{DB_HOST_TEST}:{DB_PORT_TEST}/{DB_NAME_TEST}'

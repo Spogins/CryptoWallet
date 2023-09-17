@@ -89,7 +89,7 @@
     <!-- Page JS -->
     <script src="{{ url_for('static', path='assets/js/app-chat.js') }}"></script>
     <script>
-
+        let userData
         let base64Image = ''
         $("#chooseImageButton").click(function () {
             $("#imageInput").val(null);
@@ -139,8 +139,11 @@
         });
 
         socket.on('disconnect_user', (data) => {
+            {#location.reload();#}
+
             let user_id = 'user_' + data.user
             $("#" + user_id + "").remove()
+
         });
 
         function joinChat(username) {
@@ -152,9 +155,8 @@
 
         function sendMessage() {
             let text = $('#messageText').val()
-            if ($.trim(text) === '')
-                text.val('')
-            if (text.length || base64Image !== '') {
+
+            if (text.length && $.trim(text).length || base64Image !== '') {
                 let send_message_api_url = window.location.origin + "/api/v1/send_message"
                 $.ajax({
                     method: 'post',
@@ -180,7 +182,7 @@
         function setMessages(user_id, elem) {
             let chatHistory = $('#chatHistory')
             let chatAvatar = '<i class="h-auto rounded-circle menu-icon tf-icons ti ti-user" style="font-size: 35px;"></i>'
-            if (elem.user_avatar !== null)
+            if (elem.user_avatar !== '#')
                 chatAvatar = '<img src="' + elem.user_avatar + '"alt="Avatar" class="rounded-circle">'
 
             let chatImage = ''
@@ -305,7 +307,7 @@
             })
         }
 
-        let userData
+
         $(document).ready(function () {
             // Находим элемент <li> по классу и идентификатору
             var menuItem = $('li.menu-item#nav_chat');

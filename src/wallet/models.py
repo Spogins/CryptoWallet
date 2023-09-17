@@ -1,3 +1,4 @@
+from sqladmin import ModelView
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
 from sqlalchemy_utils import URLType
@@ -18,6 +19,19 @@ class Wallet(Base):
     asset = relationship('Asset', foreign_keys=[asset_id])
 
 
+class WalletAdmin(ModelView, model=Wallet):
+    column_list = [
+        Wallet.id,
+        Wallet.private_key,
+        Wallet.address,
+        Wallet.balance,
+        Wallet.user_id,
+        Wallet.user,
+        Wallet.asset_id,
+        Wallet.asset
+    ]
+
+
 class Asset(Base):
     __tablename__ = 'asset'
     id = Column(Integer, primary_key=True, index=True)
@@ -30,6 +44,17 @@ class Asset(Base):
     blockchain = relationship('Blockchain', foreign_keys=[blockchain_id])
 
 
+class AssetAdmin(ModelView, model=Asset):
+    column_list = [
+        Asset.id,
+        Asset.abbreviation,
+        Asset.image,
+        Asset.symbol,
+        Asset.decimal_places,
+        Asset.blockchain_id,
+        Asset.blockchain
+    ]
+
 
 class Blockchain(Base):
     __tablename__ = 'blockchain'
@@ -38,6 +63,14 @@ class Blockchain(Base):
     code = Column(String)
     image = Column(URLType, nullable=True)
 
+
+class BlockchainAdmin(ModelView, model=Blockchain):
+    column_list = [
+        Blockchain.id,
+        Blockchain.name,
+        Blockchain.code,
+        Blockchain.image
+    ]
 
 
 class Transaction(Base):
@@ -50,6 +83,20 @@ class Transaction(Base):
     date = Column(String, default='PENDING')
     txn_fee = Column(DECIMAL, default=0.0)
     status = Column(String, default='PENDING')
+
+
+class TransactionAdmin(ModelView, model=Transaction):
+    column_list = [
+        Transaction.id,
+        Transaction.hash,
+        Transaction.from_address,
+        Transaction.to_address,
+        Transaction.value,
+        Transaction.date,
+        Transaction.txn_fee,
+        Transaction.status
+    ]
+
 
 
 

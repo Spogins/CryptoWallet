@@ -1,3 +1,4 @@
+from sqladmin import ModelView
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 import datetime
 
@@ -16,3 +17,13 @@ class ChatMessage(Base):
     user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship('User', foreign_keys=[user_id])
 
+
+class ChatMessageAdmin(ModelView, model=ChatMessage):
+    column_list = [
+        ChatMessage.id,
+        ChatMessage.text,
+        ChatMessage.image,
+        ChatMessage.date,
+        ChatMessage.user_id,
+        ChatMessage.user
+    ]

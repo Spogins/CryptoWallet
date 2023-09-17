@@ -34,7 +34,10 @@
                             <div class="card-body">
                                 <div class="tab-content p-0">
                                     <div class="tab-pane fade show active" role="tabpanel">
-                                        <div class="row">
+                                        <div class="row" style="
+                                                display: flex;
+                                                justify-content: center;
+                                            ">
                                             <div class="col-2">
                                                 <img id="productImg"
                                                      class="d-block w-px-100 h-px-100 rounded"
@@ -240,7 +243,10 @@
                             <div class="card-body">
                                 <div class="tab-content p-0">
                                     <div class="tab-pane fade show active" role="tabpanel">
-                                        <div class="row">
+                                        <div class="row" style="
+                                            display: flex;
+                                            justify-content: center;
+                                        ">
                                             <div class="col-2">
                                                 <img id="orderImg"
                                                      class="d-block w-px-100 h-px-100 rounded"
@@ -524,7 +530,6 @@
         }
 
 
-
         function buyProduct(id) {
             let buy_product_api_url = window.location.origin + "/api/v1/buy_product"
             $.ajax({
@@ -626,9 +631,18 @@
 
             orderPrice.text(order.product_price + ' ETH')
 
-            orderDate.text(order.date)
 
             orderStatus.text(order.status)
+
+            let date = new Date(order.date);
+            let formattedDate = (date.getDate() < 10 ? '0' : '') + date.getDate() + '.' +
+                ((date.getMonth() + 1) < 10 ? '0' : '') + (date.getMonth() + 1) + '.' +
+                date.getFullYear();
+            let hours = (date.getHours() < 10 ? '0' : '') + date.getHours();
+            let minutes = (date.getMinutes() < 10 ? '0' : '') + date.getMinutes();
+            let formattedTime = hours + ':' + minutes;
+            let formattedDateTime = formattedDate + ' ' + formattedTime;
+            orderDate.text(formattedDateTime)
 
 
             orderImg.attr('id', orderImgId)

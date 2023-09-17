@@ -16,6 +16,7 @@ class Database(Singleton):
         self.engine = create_async_engine(db_url, echo=False, future=True)
         self._session_factory = async_sessionmaker(self.engine, autoflush=False, expire_on_commit=False)
 
+
     async def create_database(self) -> None:
         async with self.engine.begin() as connect:
             await connect.run_sync(Base.metadata.create_all)
