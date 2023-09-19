@@ -28,7 +28,7 @@ origins = [
     "http://localhost",
     "http://localhost:8000",
     "http://127.0.0.1:8000",
-    "http://127.0.0.1:8001",
+    "http://127.0.0.1:8001"
 ]
 
 def create_app() -> FastAPI:
@@ -39,7 +39,7 @@ def create_app() -> FastAPI:
     # app.include_router(router, tags=['Propan'])
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=origins,
+        allow_origins=["*"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
@@ -68,8 +68,8 @@ async def publish_smtp():
     app.broker.include_router(wallet_router)
     app.broker.include_router(delivery_router)
     app.broker.include_router(socketio_router)
-    # sio.start_background_task(check_block)
-    # sio.start_background_task(delivery)
+    sio.start_background_task(check_block)
+    sio.start_background_task(delivery)
     await broker.start()
 
 

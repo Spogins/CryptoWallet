@@ -168,10 +168,10 @@ async def get_all_transaction(wallet_service: WalletService = Depends(Provide[Co
 #     return await wallet_service.transaction_info(_hash)
 
 
-# @app.get('/transactions_moralis', status_code=status.HTTP_200_OK)
-# @inject
-# async def get_transactions(address: str, limit: int = 10, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-#     return await wallet_service.get_transactions(address, limit)
+@app.get('/transactions_moralis', status_code=status.HTTP_200_OK)
+@inject
+async def get_transactions(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.get_transactions(address)
 
 #
 # @app.get('/transaction_w3', status_code=status.HTTP_200_OK)

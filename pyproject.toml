@@ -6,7 +6,7 @@ authors = ["Your Name spogins@gmail.com"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
-celery = "^5.3.3"
+celery = "^5.3.1"
 pytest = "^7.4.0"
 pytest-asyncio = "^0.21.1"
 httpx = "^0.24.1"

@@ -1,0 +1,71 @@
+version: '3.8'
+
+services:
+
+  rabbitmq:
+    image: rabbitmq:3.11
+    ports:
+      - 5672:5672
+      - 15672:15672
+    restart: always
+
+
+  web:
+    build: .
+    command:  uvicorn config_fastapi.app:app --reload --port 8000
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    env_file:
+      - .env
+    depends_on:
+      - rabbitmq
+
+
+
+  db:
+    image: postgres:13.0
+    volumes:
+      - ./docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
+    env_file:
+      - .env
+
+
+  nginx:
+    build: ./docker/nginx
+    volumes:
+      - static_volume:/usr/src/app/static
+      - media_volume:/usr/src/app/media
+    ports:
+      - 80:80
+    depends_on:
+      - web
+
+
+  redis:
+    image: 'redis:alpine'
+    restart: always
+
+
+  celery:
+    restart: always
+    command: celery -A config_celery.celery_app worker --loglevel=info
+    build:
+      context: .
+      dockerfile: ./docker/celery/Dockerfile
+    env_file:
+      - ./.env
+    depends_on:
+      - db
+      - redis
+      - web
+
+networks:
+  default:
+    driver: bridge
+
+
+volumes:
+  postgres_data:
+  static_volume:
+  media_volume:

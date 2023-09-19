@@ -7,6 +7,9 @@ class BaseStatus(enum.Enum):
     CLOSE = 'CLOSE'
     REFUND = 'REFUND'
     FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
+    FAILURE = 'FAILURE'
+    PENDING = 'PENDING'
 
 
 class DeliveryStatus(enum.Enum):
@@ -15,10 +18,12 @@ class DeliveryStatus(enum.Enum):
     CLOSE = 'CLOSE'
     REFUND = 'REFUND'
     FAILED = 'FAILED'
+    SUCCESS = 'SUCCESS'
+    FAILURE = 'FAILURE'
+    PENDING = 'PENDING'
 
 
 class TransactionStatus(enum.Enum):
-    SUCCESS = 'SUCCESS'
     FAILURE = 'FAILURE'
     PENDING = 'PENDING'
     FAILED = 'FAILED'
