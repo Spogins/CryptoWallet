@@ -1,11 +1,9 @@
-from collections.abc import Iterator
 from datetime import datetime
-from typing import Callable, List
+from typing import Callable
 from fastapi import HTTPException
-from sqlalchemy import select, func
+from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
 from src.chat.models import ChatMessage
 from src.chat.schemas import MessageForm, ChatForm
 from src.users.models import User

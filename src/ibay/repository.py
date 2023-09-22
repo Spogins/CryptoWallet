@@ -6,7 +6,7 @@ from sqlalchemy.orm import joinedload
 
 from src.ibay.models import Product
 from src.ibay.schemas import ProductForm, ProductEdit, ProductsForm, AddProductForm
-from src.wallet.models import Transaction, Wallet
+from src.wallet.models import Wallet
 
 
 class IBayRepository:

@@ -1,12 +1,9 @@
 import json
 from typing import Callable
-
 import jwt
-from starlette.responses import RedirectResponse
 from fastapi import Response
 from config.settings import JWT_SECRET, ALGORITHM
 from src.auth.repository import AuthRepository
-from utils.base.get_user_bearer import get_user_from_bearer
 
 
 class AuthService:

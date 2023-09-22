@@ -1,6 +1,5 @@
-import asyncio
 import socketio
-from config_socketio.app import sio, check_block
+from config_socketio.app import sio
 from src.core.register import RegisterContainer
 
 

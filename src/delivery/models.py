@@ -1,9 +1,7 @@
 import datetime
-
 from sqladmin import ModelView
 from sqlalchemy import *
 from sqlalchemy.orm import relationship
-
 from src.core.db import Base
 
 

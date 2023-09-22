@@ -1,5 +1,3 @@
-from typing import List
-
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends, Response
 from fastapi.security import HTTPAuthorizationCredentials
@@ -42,15 +40,3 @@ async def user_messages(users_list: UserList, chat_service: ChatService = Depend
                             bearer: HTTPAuthorizationCredentials = Depends(user_auth)):
     return await chat_service.get_users(users_list.users)
 
-
-
-# @app.put("/block_unblock", status_code=status.HTTP_200_OK)
-# @inject
-# async def block_unblock(user: int, chat_service: ChatService = Depends(Provide[Container.chat_service])):
-#     return await chat_service.get_chat(limit)
-#
-#
-# @app.delete("/delete_message", status_code=status.HTTP_200_OK)
-# @inject
-# async def delete_message(message: int, chat_service: ChatService = Depends(Provide[Container.chat_service])):
-#     return await chat_service.get_chat(limit)

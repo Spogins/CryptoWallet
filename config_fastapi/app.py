@@ -2,13 +2,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from propan import RabbitBroker
 from sqladmin import Admin
 from starlette.staticfiles import StaticFiles
-
 from admin.auth import AuthenticationAdmin
 from config.settings import RABBITMQ_URL
-from config_socketio.app import sio, check_block, delivery
 from config_socketio.consumers import socketio_router
 from config_socketio.socket_app import socket_app
-from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.chat.models import ChatMessageAdmin
 from src.core.register import RegisterContainer
 from src.core.routers import router_app
@@ -16,10 +13,10 @@ from src.delivery.consumers import delivery_router
 from src.delivery.models import OrderAdmin
 from src.ibay.models import ProductAdmin
 from src.parser.consumers import parser_router
+from src.parser.models import BlockAdmin
 from src.users.models import UserAdmin
 from src.wallet.consumers import wallet_router
 from fastapi import FastAPI
-
 from src.wallet.models import WalletAdmin, AssetAdmin, BlockchainAdmin, TransactionAdmin
 
 broker = RabbitBroker(RABBITMQ_URL)
@@ -61,6 +58,7 @@ admin.add_view(WalletAdmin)
 admin.add_view(AssetAdmin)
 admin.add_view(BlockchainAdmin)
 admin.add_view(TransactionAdmin)
+admin.add_view(BlockAdmin)
 
 @app.on_event('startup')
 async def publish_smtp():

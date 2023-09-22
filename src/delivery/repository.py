@@ -1,12 +1,9 @@
 from _decimal import Decimal
 from typing import Callable
-
-from asyncpg import Record
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
 from src.delivery.models import Order
 from src.delivery.schemas import OrderForm
 

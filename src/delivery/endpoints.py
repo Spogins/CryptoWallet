@@ -3,7 +3,6 @@ from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
 from starlette import status
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
-from src.delivery.schemas import OrderEdit
 from src.delivery.services.delivery import DeliveryService
 from src.delivery.containers import Container
 from utils.base.get_user_bearer import get_user_from_bearer
@@ -35,7 +34,3 @@ async def get_order(product: int, delivery_service: DeliveryService = Depends(Pr
     return await delivery_service.get_order(product)
 
 
-# @app.put('/update_order', status_code=status.HTTP_200_OK)
-# @inject
-# async def update_order(order: OrderEdit, delivery_service: DeliveryService = Depends(Provide[Container.delivery_service])):
-#     return await delivery_service.update_order(order)

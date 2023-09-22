@@ -1,8 +1,6 @@
 from typing import Callable
-
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
-
 from src.parser.models import Block
 from src.wallet.models import Wallet, Asset
 

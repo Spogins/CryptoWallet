@@ -1,4 +1,4 @@
-from typing import Callable, Iterator, List
+from typing import Callable
 from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession

@@ -4,7 +4,6 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
-
 from src.delivery.models import Order
 from src.users.models import User
 from src.wallet.models import Wallet, Blockchain, Asset, Transaction

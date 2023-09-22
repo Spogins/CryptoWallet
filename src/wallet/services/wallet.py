@@ -249,16 +249,6 @@ class WalletService:
         gas_limit = float(trans.get('gas'))  # Пример: стандартный лимит для отправки эфира
         txn_fee_wei = gas_price_gwei * gas_limit * 10 ** 9  # 1 Gwei = 10^9 Wei
         txn_fee_eth = txn_fee_wei / 10 ** 18
-        # transaction = {
-        #     "hash": trans.get('hash'),
-        #     "from_address": trans.get('from_address'),
-        #     "to_address": trans.get('to_address'),
-        #     "value": float(trans.get('value')) / 10 ** 18,
-        #     "age": f"Прошло {days} дней, {hours} часов, {minutes} минут, {seconds} секунд.",
-        #     "txn_fee": txn_fee_eth / 10 ** 9,
-        #     'block_number': trans.get('block_number'),
-        #     "status": trans.get('receipt_status'),
-        # }
 
         if trans.get('receipt_status') == '1':
             status = "SUCCESS"
@@ -278,18 +268,6 @@ class WalletService:
         }
         return transaction
 
-    #
-    #
-    #
-    # async def update_all_transaction(self):
-    #     all_trans = await self._repository.get_all_trans()
-    #     updated = []
-    #     for trans in all_trans:
-    #         updated_trans = await self.create_or_update(trans.hash)
-    #         updated.append(updated_trans)
-    #     return updated
-    #
-    #
 
     async def create_eth(self):
         return await self._repository.create_eth()

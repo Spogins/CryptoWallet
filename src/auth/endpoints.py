@@ -1,9 +1,9 @@
 import datetime
 import json
 from dependency_injector.wiring import inject, Provide
-from fastapi import APIRouter, Depends, Response, status, Cookie
+from fastapi import APIRouter, Depends, Response, status
 from fastapi.security import HTTPAuthorizationCredentials
-from config_fastapi.fastapi_mgr import fastapi_mgr, templates
+from config_fastapi.fastapi_mgr import fastapi_mgr
 from src.auth.containers import Container
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.auth.schemas import AuthUsers, RegisterUserModel

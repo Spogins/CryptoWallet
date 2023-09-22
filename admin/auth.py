@@ -1,5 +1,3 @@
-
-import json
 from typing import Optional
 from fastapi import Depends, Request, Response
 from sqladmin.authentication import AuthenticationBackend

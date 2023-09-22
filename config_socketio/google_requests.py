@@ -1,23 +1,8 @@
 import asyncio
-import time
 import httpx
 from httpx import Limits, Response, ConnectTimeout
 
 LIMITS = Limits(max_connections=10000, max_keepalive_connections=10000)
-
-
-# async def fetch():
-#     urls = ['https://www.google.com/search/about/'] * 10000
-#
-#     async with httpx.AsyncClient(limits=LIMITS) as client:
-#         reqs = [client.get(url) for url in urls]
-#         results = await asyncio.gather(*reqs)
-#
-#     for result in results:
-#         if result.status_code != 302:
-#             return False
-#     return True
-
 
 async def run_delivery():
     return await delivery(200, 'https://www.google.com/search/about/')

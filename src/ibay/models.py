@@ -1,5 +1,5 @@
 from sqladmin import ModelView
-from sqlalchemy import Column, Integer, String, DateTime, Boolean, DECIMAL, ForeignKey
+from sqlalchemy import Column, Integer, String, Boolean, DECIMAL, ForeignKey
 from sqlalchemy.orm import relationship
 from src.core.db import Base
 from sqlalchemy_utils import URLType

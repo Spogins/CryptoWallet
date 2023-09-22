@@ -1,29 +1,18 @@
 from dependency_injector.wiring import inject, Provide
 from fastapi import APIRouter, Depends
 from fastapi.security import HTTPAuthorizationCredentials
-from fastapi_pagination import Params, Page, paginate
 from propan import RabbitBroker
 from starlette import status
-
 from config.settings import RABBITMQ_URL
-from config_fastapi.fastapi_mgr import fastapi_mgr
 from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.wallet.containers import Container
-from src.wallet.schemas import Transaction, TransForm
-from src.wallet.models import Transaction as TransactionModel
+from src.wallet.schemas import Transaction
 from src.wallet.services.wallet import WalletService
 from utils.base.get_user_bearer import get_user_from_bearer
 
 app = APIRouter()
 
 user_auth = AutoModernJWTAuth()
-
-
-# bearer: HTTPAuthorizationCredentials = Depends(user_auth)
-# @app.get("/tests_w")
-# @inject
-# async def test(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-#     await wallet_service.refund(120)
 
 @app.get("/tests_wallets", status_code=status.HTTP_200_OK)
 @inject
@@ -56,12 +45,6 @@ async def tests_wallets(wallet_service: WalletService = Depends(Provide[Containe
     return {'a_wallet': a_wallet, 'b_wallet': b_wallet, 'c_wallet': c_wallet}
 
 
-# @app.get("/generate_wallet", status_code=status.HTTP_200_OK)
-# @inject
-# async def generate_wallet(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-#     return await wallet_service.generate_wallet()
-
-
 @app.get('/user_wallets', status_code=status.HTTP_200_OK)
 @inject
 async def user_wallets(user: int, wallet_service: WalletService = Depends(Provide[Container.wallet_service]),
@@ -74,12 +57,6 @@ async def user_wallets(user: int, wallet_service: WalletService = Depends(Provid
 @inject
 async def get_wallet(wallet_id: int, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.get_wallet(wallet_id)
-
-
-# @app.get('/get_wallet_by_address', status_code=status.HTTP_200_OK)
-# @inject
-# async def get_wallet_by_address(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
-#     return await wallet_service.get_wallet_by_address(address)
 
 
 @app.post("/create_eth_wallet", status_code=status.HTTP_201_CREATED)

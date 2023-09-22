@@ -1,12 +1,8 @@
 import asyncio
-from asyncio.log import logger
-
-import aioredis
 import socketio
 from dependency_injector.wiring import inject, Provide
 from socketio import AsyncAioPikaManager, AsyncServer
 from config.settings import ALLOWED_HOSTS, RABBITMQ_URL
-from src.auth.dependencies.jwt_aut import AutoModernJWTAuth
 from src.web3.containers import Container as WebContainer
 from src.web3.w3_service import WebService
 from src.delivery.containers import Container as DeliveryContainer
