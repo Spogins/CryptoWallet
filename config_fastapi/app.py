@@ -4,6 +4,7 @@ from sqladmin import Admin
 from starlette.staticfiles import StaticFiles
 from admin.auth import AuthenticationAdmin
 from config.settings import RABBITMQ_URL
+from config_socketio.app import check_block, sio, delivery
 from config_socketio.consumers import socketio_router
 from config_socketio.socket_app import socket_app
 from src.chat.models import ChatMessageAdmin
