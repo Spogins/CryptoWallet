@@ -43,8 +43,8 @@ RUN ["chmod", "+x", "/usr/src/app/docker-entrypoint.sh"]
 
 
 
-#RUN sed -i 's/\r$//g'  $APP_HOME/docker-entrypoint.sh
-#RUN chmod +x  $APP_HOME/docker-entrypoint.sh
+RUN sed -i 's/\r$//g'  $APP_HOME/docker-entrypoint.sh
+RUN chmod +x  $APP_HOME/docker-entrypoint.sh
 #
 ## run entrypoint.sh
-#ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]
+ENTRYPOINT ["/usr/src/app/docker-entrypoint.sh"]

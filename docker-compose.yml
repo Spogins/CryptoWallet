@@ -1,18 +1,21 @@
-version: '3.8'
+version: '3.10'
 
 services:
 
   rabbitmq:
-    image: rabbitmq:3.11
+    image: rabbitmq:management
+    container_name: rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=guest
+      - RABBITMQ_DEFAULT_PASS=guest
     ports:
-      - 5672:5672
-      - 15672:15672
-    restart: always
+      - "5672:5672"
+      - "15672:15672"
 
 
   web:
     build: .
-    command:  uvicorn config_fastapi.app:app --reload --port 8000
+    command:  uvicorn config_fastapi.app:app --reload --host 0.0.0.0 --port 8000
     volumes:
       - static_volume:/usr/src/app/static
       - media_volume:/usr/src/app/media
@@ -21,7 +24,18 @@ services:
     depends_on:
       - rabbitmq
 
-
+  socketio:
+    build:
+      context: .
+      dockerfile: ./docker/socketio/Dockerfile
+    command: uvicorn config_socketio.socket_app:socket_app --reload --host 0.0.0.0 --port 8001
+    ports:
+      - 8001:8001
+    tty: true
+    depends_on:
+      - redis
+      - celery
+      - rabbitmq
 
   db:
     image: postgres:13.0
@@ -29,6 +43,8 @@ services:
       - ./docker/postgresql/init.sql:/docker-entrypoint-initdb.d/init.sql
     env_file:
       - .env
+    depends_on:
+      - rabbitmq
 
 
   nginx:
@@ -45,6 +61,8 @@ services:
   redis:
     image: 'redis:alpine'
     restart: always
+    depends_on:
+      - rabbitmq
 
 
   celery:
@@ -59,6 +77,7 @@ services:
       - db
       - redis
       - web
+      - rabbitmq
 
 networks:
   default:

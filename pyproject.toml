@@ -34,6 +34,8 @@ aioredis = "^2.0.1"
 fastapi-pagination = "^0.12.9"
 sqladmin = {extras = ["full"], version = "^0.14.1"}
 itsdangerous = "^2.1.2"
+asyncapi-schema-pydantic = "^1.0.1"
+rabbitmq = "^0.2.0"
 
 [tool.pytest.ini_options]
 testpaths = [

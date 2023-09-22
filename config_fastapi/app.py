@@ -4,6 +4,7 @@ from sqladmin import Admin
 from starlette.staticfiles import StaticFiles
 
 from admin.auth import AuthenticationAdmin
+from config.settings import RABBITMQ_URL
 from config_socketio.app import sio, check_block, delivery
 from config_socketio.consumers import socketio_router
 from config_socketio.socket_app import socket_app
@@ -21,7 +22,7 @@ from fastapi import FastAPI
 
 from src.wallet.models import WalletAdmin, AssetAdmin, BlockchainAdmin, TransactionAdmin
 
-broker = RabbitBroker("amqp://guest:guest@localhost:5672")
+broker = RabbitBroker(RABBITMQ_URL)
 
 
 origins = [
@@ -68,8 +69,8 @@ async def publish_smtp():
     app.broker.include_router(wallet_router)
     app.broker.include_router(delivery_router)
     app.broker.include_router(socketio_router)
-    sio.start_background_task(check_block)
-    sio.start_background_task(delivery)
+    # sio.start_background_task(check_block)
+    # sio.start_background_task(delivery)
     await broker.start()
 
 

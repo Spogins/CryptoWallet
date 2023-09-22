@@ -12,5 +12,10 @@ then
 fi
 
 #sudo systemctl start rabbitmq-server
+#sudo systemctl enable rabbitmq-server
+#alembic init -t async migrations
+alembic revision --autogenerate -m "migration"
+alembic upgrade head
+
 
 exec "$@"
