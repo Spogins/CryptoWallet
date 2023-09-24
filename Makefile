@@ -8,16 +8,6 @@ socketio:
 	uvicorn config_socketio.socket_app:socket_app --reload --port 8001
 
 
-socket_connect:
-
-	python3 config_socketio/connect.py
-
-
-connect_to_chat:
-
-	python3 config_socketio/connect_to_chat.py
-
-
 worker:
 
 	celery -A config_celery.celery_app worker --loglevel=info
@@ -41,6 +31,18 @@ alembic:
 celery_clear:
 
 	celery purge
+
+
+init_scripts:
+
+	python init_scripts.py
+
+
+asyncapi_docs:
+	python src/chat/asyncapi/generator.py
+	sudo ag asyncapi_docs.yaml @asyncapi/html-template -o static/async_api --force-write
+	sudo mv static/async_api/index.html templates/asyncapi
+	sudo chmod 746 templates/asyncapi/index.html
 
 
 

@@ -18,4 +18,8 @@ alembic revision --autogenerate -m "migration"
 alembic upgrade head
 
 
+python init_scripts.py
+
+
+
 exec "$@"

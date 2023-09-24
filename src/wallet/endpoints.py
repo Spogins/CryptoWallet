@@ -157,11 +157,19 @@ async def get_transactions(address: str, wallet_service: WalletService = Depends
 #     return await wallet_service.get_transaction(trans_hash)
 
 
+@app.post('/load_wallet_trans', status_code=status.HTTP_200_OK)
+@inject
+async def load_wallet_trans(address: str, wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
+    return await wallet_service.load_wallet_trans(address)
+
+
 #CREATE ASSEY/BLOCKCHAIN MODEL
 @app.post('/create_eth_asset', status_code=status.HTTP_201_CREATED)
 @inject
 async def create_eth_asset(wallet_service: WalletService = Depends(Provide[Container.wallet_service])):
     return await wallet_service.create_eth()
+
+
 
 
 

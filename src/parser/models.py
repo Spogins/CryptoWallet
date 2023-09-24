@@ -6,7 +6,7 @@ from src.core.db import Base
 class Block(Base):
     __tablename__ = 'block'
     id = Column(Integer, primary_key=True, index=True)
-    number = Column(Integer, default=0)
+    number = Column(Integer, nullable=True)
 
 
 class BlockAdmin(ModelView, model=Block):

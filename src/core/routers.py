@@ -1,6 +1,6 @@
 from fastapi import APIRouter
 from src.auth.views import auth_views
-from src.chat.views import chat_views
+from src.chat.views import chat_views, asyncapi_views_router
 from src.ibay.views import ibay_views
 from src.users.endpoints import app as user_app
 from src.auth.endpoints import app as auth_app
@@ -21,6 +21,7 @@ router_app.include_router(wallet_app, prefix=API_PREFIX, tags=["Wallets"])
 router_app.include_router(auth_app, prefix=API_PREFIX, tags=["Auth"])
 router_app.include_router(user_app, prefix=API_PREFIX, tags=["User"])
 router_app.include_router(chat_app, prefix=API_PREFIX, tags=["Chat"])
+router_app.include_router(asyncapi_views_router, tags=["AsyncAPI docs"])
 
 # VIEWS
 router_app.include_router(auth_views)

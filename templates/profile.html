@@ -351,6 +351,7 @@
                 url: private_key_api_url + privateKey,
                 success: function (data) {
                     setWallets(data)
+                    loadWalletTransactions(data.address)
                     var currentValue = parseInt($("#walletCt").text(), 10);
                     var newValue = currentValue + 1;
                     $("#walletCt").text(newValue);
@@ -369,6 +370,23 @@
                 }
             })
 
+        }
+
+        function loadWalletTransactions(address){
+            let load_wallet_trans = window.location.origin + '/api/v1/load_wallet_trans?address='
+
+            $.ajax({
+                method: 'post',
+                dataType: 'json',
+                headers: {
+                    "Content-Type": 'application/json',
+                },
+                url: load_wallet_trans + address,
+                success: function (data) {
+                    console.log('success')
+                },
+
+            })
         }
 
         function createWallet() {

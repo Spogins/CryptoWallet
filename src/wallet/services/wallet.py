@@ -17,6 +17,12 @@ class WalletService:
         self._repository: WalletRepository = wallet_repository
         self.w3_service: WebService = w3_service
 
+    async def load_wallet_trans(self, address):
+        trans_list = await self.get_transactions(address)
+        for trans_data in trans_list:
+            await self._repository.create_or_update(trans_data)
+
+
     async def buy_product(self, data):
         from_wallet: Wallet = await self.get_wallet_by_address(data.get('from_wallet'))
         transaction: Transaction = await self.transaction(from_wallet.address, data.get('to_wallet'),
@@ -47,13 +53,13 @@ class WalletService:
         return await self._repository.user_add_wallet(user_id, wallet)
 
     async def get_db_transaction(self, address):
-        return await self._repository.get_db_transaction(address)
+        return await self._repository.get_db_transaction(address.lower())
 
     async def user_wallets(self, user_id):
         return await self._repository.user_wallets(user_id)
 
-    async def get_all_transaction(self, limit):
-        return await self._repository.get_all_trans(limit)
+    async def get_all_transaction(self):
+        return await self._repository.get_all_trans()
 
     async def import_user_wallet(self, user_id, private_key):
         try:
@@ -257,12 +263,17 @@ class WalletService:
         else:
             status = "PENDING"
 
+
+
+        # Форматирование объекта datetime в требуемый формат "2023-09-19 18:06:48"
+        output_datetime_str = past_time.strftime("%Y-%m-%d %H:%M:%S")
+
         transaction = {
             "hash": trans.get('hash'),
             "from_address": trans.get('from_address'),
             "to_address": trans.get('to_address'),
             "value": float(trans.get('value')) / 10 ** 18,
-            "age": past_time,
+            "age": output_datetime_str,
             "txn_fee": txn_fee_eth / 10 ** 9,
             'status': status
         }
