@@ -1,0 +1,7 @@
+version: '3.10'
+
+services:
+
+  web:
+    environment:
+      - DEBUG=true

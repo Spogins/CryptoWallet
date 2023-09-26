@@ -14,11 +14,17 @@ fi
 #sudo systemctl start rabbitmq-server
 #sudo systemctl enable rabbitmq-server
 #alembic init -t async migrations
-alembic revision --autogenerate -m "migration"
-alembic upgrade head
+#alembic revision --autogenerate -m "migration"
+#alembic upgrade head
+#
+#
+#python init_scripts.py
 
 
-python init_scripts.py
+make migration
+make migrate
+
+make init_scripts
 
 
 

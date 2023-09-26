@@ -30,9 +30,24 @@ origins = [
     "http://127.0.0.1:8001"
 ]
 
+tags_metadata = [
+    {
+        'name': 'AsyncAPI Docs',
+        "externalDocs": {
+            "description": 'AsyncAPI documentations',
+            "url": 'http://0.0.0.0/asyncapi_docs'
+        }
+    }
+]
+
+
 def create_app() -> FastAPI:
     container = RegisterContainer()
-    app = FastAPI()
+    app = FastAPI(title='CryptoWallet',
+                  description='CryptoWallet API',
+                  version='1.0.1',
+                  openapi_tags=tags_metadata
+                  )
     app.container = container
     app.include_router(router_app)
     # app.include_router(router, tags=['Propan'])
@@ -68,8 +83,8 @@ async def publish_smtp():
     app.broker.include_router(wallet_router)
     app.broker.include_router(delivery_router)
     app.broker.include_router(socketio_router)
-    # sio.start_background_task(check_block)
-    # sio.start_background_task(delivery)
+    sio.start_background_task(check_block)
+    sio.start_background_task(delivery)
     await broker.start()
 
 
