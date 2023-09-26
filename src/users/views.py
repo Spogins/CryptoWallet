@@ -18,7 +18,7 @@ async def profile(request: Request, auth_service: AuthService = Depends(Provide[
     access = await auth_service.get_auth(request)
     if not access:
         return RedirectResponse("/auth_login")
-    return templates.TemplateResponse(name='index.html', context={'request': request})
+    return templates.TemplateResponse(name='profile.html', context={'request': request})
 
 
 
