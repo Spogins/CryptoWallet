@@ -24,7 +24,7 @@ fi
 #make migration
 make migrate
 
-#make init_scripts
+make init_scripts
 
 
 
