@@ -21,7 +21,7 @@ fi
 #python init_scripts.py
 
 
-make migration
+#make migration
 make migrate
 
 make init_scripts

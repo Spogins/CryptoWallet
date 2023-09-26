@@ -43,7 +43,7 @@ async def get_users_in_room(room):
 
 
 mgr: AsyncAioPikaManager = socketio.AsyncAioPikaManager(RABBITMQ_URL)
-sio: AsyncServer = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins='http://161.35.217.120', namespaces=['*'], client_manager=mgr)
+sio: AsyncServer = socketio.AsyncServer(async_mode="asgi", cors_allowed_origins='*', namespaces=['*'], client_manager=mgr)
 
 
 room_clients = set()
