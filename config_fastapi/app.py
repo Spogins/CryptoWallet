@@ -7,6 +7,7 @@ from config.settings import RABBITMQ_URL
 from config_socketio.app import check_block, sio, delivery
 from config_socketio.consumers import socketio_router
 from config_socketio.socket_app import socket_app
+from init_scripts import main
 from src.chat.models import ChatMessageAdmin
 from src.core.register import RegisterContainer
 from src.core.routers import router_app
@@ -79,6 +80,7 @@ admin.add_view(BlockAdmin)
 
 @app.on_event('startup')
 async def publish_smtp():
+    await main()
     app.broker = broker
     app.broker.include_router(parser_router)
     app.broker.include_router(wallet_router)
